@@ -16,6 +16,8 @@ const LOOK = {
   tsai:  {coat:"#f4f6f5", shirt:"#8a3b5c", hair:"#6b6b6b", style:"bob", skin:"#e9bb94"},
   kolas: {coat:"#4c7a3a", shirt:"#e9e1c9", hair:"#111", style:"short", skin:"#b9835c"},
   shih:  {coat:"#f4f6f5", shirt:"#5b5ea6", hair:"#2c2320", style:"long", skin:"#f0c9a6"},
+  xiaoc: {coat:"#f4f6f5", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
+  gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
@@ -26,6 +28,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x+8*s, y+19.5*s, 6*s, 1.6*s, 0, 0, 7); c.fill();
   const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0;
   r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40");
+  if(L.shoes){ r(3.5, 18 - step, 4, 1.4, L.shoes); r(8.5, 17 + step, 4, 1.4, L.shoes); }
   r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
   if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); }
   r(1.6, 9+bob + (dir==="left"||dir==="right" ? 0 : step), 1.6, 5, L.coat); r(12.8, 9+bob + (dir==="left"||dir==="right" ? 0 : 1-step), 1.6, 5, L.coat);
@@ -38,10 +41,12 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(dir==="up") r(3.6, 2+bob, 8.8, 5, h);
     if(L.style==="spiky"){ r(4, -0.8+bob, 1.5, 1, h); r(7, -1+bob, 1.5, 1.2, h); r(10, -0.8+bob, 1.5, 1, h); }
     if(L.style==="long"){ r(3, 2+bob, 1.4, 8, h); r(11.6, 2+bob, 1.4, 8, h); }
+    if(L.style==="shoulder"){ r(3, 2+bob, 1.6, 7, h); r(11.4, 2+bob, 1.6, 7, h); r(2.6, 8+bob, 1.4, 1.2, h); r(12, 8+bob, 1.4, 1.2, h); }
     if(L.style==="bob"){ r(3, 2+bob, 1.6, 5, h); r(11.4, 2+bob, 1.6, 5, h); }
     if(L.style==="bun"){ r(6.5, -2+bob, 3, 2.2, h); r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
     if(L.style==="pony"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); if(dir!=="down") r(dir==="left"?11.8:2.2, 3+bob, 1.8, 5, h); else r(12, 2.4+bob, 1.4, 4, h); }
     if(L.style==="short"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
+    if(L.band) r(3.6, 1.6+bob, 8.8, 1.1, L.band);
   }
   if(dir!=="up"){
     const dx = dir==="left" ? -1 : dir==="right" ? 1 : 0;
@@ -125,6 +130,8 @@ function worldSync(){
   W.p = {x:7, y:7, fx:7, fy:7, dir:"up", path:[], moving:0};
   if(blocked(7,7)) W.p.y = W.p.fy = 8;
   W.walkers = W.theme==="village" || W.theme==="office" ? [] : [{id:W.theme==="lobby"?"vis":"pt", x:13, y:7, fx:13, fy:7, dir:"left", path:[], wait:0}];
+  /* 跑跑小Ｃ：每張地圖都在跑 */
+  if(!W.npcs.some(n => n.id==="xiaoc")) W.walkers.push({id:"xiaoc", fx:1, fy:blocked(1,7)?8:7, dir:"right", path:[], wait:.5, sp:3.6, run:1});
   W.fade = 1;
 }
 function npcOf(id){
@@ -132,6 +139,7 @@ function npcOf(id){
   if(!n){
     const spot = SPOTS.find(([x,y]) => !blocked(x,y) && !(W.p.x===x && W.p.y===y)) || [7,4];
     n = {id, x:spot[0], y:spot[1], dir:"down", ph:0}; W.npcs.push(n);
+    W.walkers = W.walkers.filter(w => w.id !== id);
   }
   return n;
 }
@@ -226,12 +234,12 @@ function drawWorld(){
   else { c.fillStyle = "#b9c4c2"; c.fillRect(0,0,COLS*TW,TW); c.fillStyle="#a7b3b1"; c.fillRect(0,TW-4,COLS*TW,4); }
   W.items.forEach(f => drawItem(c, f));
   const actors = [...W.npcs.map(n => ({id:n.id, x:n.x, y:n.y, dir:n.dir, frame:Math.floor((W.t+n.ph)*1.5)%2 && 0, npc:n})),
-    ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*8) : 0})),
+    ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*(w.run?14:8)) : 0})),
     {id:"me", x:W.p.fx, y:W.p.fy, dir:W.p.dir, frame:W.p.path.length ? Math.floor(W.t*8) : 0, me:1}].sort((p,q) => p.y-q.y);
   actors.forEach(a => {
     const bx = a.x*TW, by = a.y*TW - 10 + (a.npc ? Math.sin(W.t*2+a.npc.ph)*1 : 0);
     drawChar(c, bx, by, a.id, a.dir, a.frame, 2);
-    if(a.npc){
+    if(a.npc || a.id==="xiaoc"){
       const nm = CH[a.id].n.replace(/（.*）/,"");
       c.font = "11px sans-serif"; const w = c.measureText(nm).width + 8;
       c.fillStyle = "rgba(255,255,255,.85)"; c.fillRect(bx+16-w/2, by+42, w, 13);
@@ -243,7 +251,7 @@ function drawWorld(){
     }
   });
   W.bubbles.forEach(b => {
-    const bx = b.n.x*TW+16, by = b.n.y*TW - 22; c.font = "12px sans-serif";
+    const bx = (b.n.fx ?? b.n.x)*TW+16, by = (b.n.fy ?? b.n.y)*TW - 22; c.font = "12px sans-serif";
     const w = Math.min(220, c.measureText(b.text).width + 14);
     const x0 = Math.max(4, Math.min(COLS*TW - w - 4, bx - w/2));
     c.fillStyle = "#fff"; c.strokeStyle = "#334"; c.lineWidth = 1.5; c.beginPath(); c.roundRect ? c.roundRect(x0, by-18, w, 20, 6) : c.rect(x0, by-18, w, 20); c.fill(); c.stroke();
@@ -267,10 +275,10 @@ function tick(dt){
   }
   W.walkers.forEach(w => {
     if(w.path.length){ const [tx,ty] = w.path[0]; w.dir = tx>w.fx?"right":tx<w.fx?"left":ty>w.fy?"down":"up";
-      const dx=tx-w.fx, dy=ty-w.fy, d=Math.hypot(dx,dy), m=1.6*dt; if(d<=m){ w.fx=tx; w.fy=ty; w.path.shift(); } else { w.fx+=dx/d*m; w.fy+=dy/d*m; } }
+      const dx=tx-w.fx, dy=ty-w.fy, d=Math.hypot(dx,dy), m=(w.sp||1.6)*dt; if(d<=m){ w.fx=tx; w.fy=ty; w.path.shift(); } else { w.fx+=dx/d*m; w.fy+=dy/d*m; } }
     else if((w.wait -= dt) < 0){
-      w.wait = 2 + Math.random()*3; const gx = 1+Math.floor(Math.random()*13), gy = 2+Math.floor(Math.random()*6);
-      if(!blocked(gx,gy)){ const path = (() => { const tmp = {x:Math.round(w.fx), y:Math.round(w.fy)}; return bfs(tmp.x, tmp.y, [[gx,gy]]); })(); w.path = (path||[]).slice(0,6); }
+      w.wait = w.run ? .4 + Math.random() : 2 + Math.random()*3; const gx = 1+Math.floor(Math.random()*13), gy = 2+Math.floor(Math.random()*6);
+      if(!blocked(gx,gy)){ const path = (() => { const tmp = {x:Math.round(w.fx), y:Math.round(w.fy)}; return bfs(tmp.x, tmp.y, [[gx,gy]]); })(); w.path = (path||[]).slice(0, w.run ? 14 : 6); }
     }
   });
   W.npcs.forEach(n => { if(n.id !== W.target && Math.random() < dt*.15) n.dir = ["down","left","right","down"][Math.floor(Math.random()*4)]; });
@@ -298,9 +306,12 @@ function worldInit(){
   };
   cv.addEventListener("click", e => {
     const [x,y] = tapTile(e);
+    const xc = W.walkers.find(w => w.id==="xiaoc" && Math.abs(w.fx-x)<1 && (Math.abs(w.fy-y)<1 || Math.abs(w.fy-y-1)<1));
+    if(xc) return mindRead(xc);
     const n = W.npcs.find(n => n.x===x && (n.y===y || n.y===y+1));
     if(n){
       if(n.id === W.target && W.fire) return W.fire();
+      if(n.id === "xiaoc") return mindRead(n);
       return walkTo(n, () => bubble(n, idleLine(n.id)));
     }
     if(!blocked(x,y)){ const path = bfs(W.p.x, W.p.y, [[x,y]]); if(path){ W.p.path = path; W.onArrive = null; } }
@@ -321,9 +332,22 @@ function worldInit(){
     }
   });
 }
+function mindRead(xc){
+  const live = [...V().querySelectorAll(".opt[data-k]:not([disabled])")];
+  const qid = V().dataset.qid, q = qid && QB[qid];
+  if(q && !q.ord && live.length > 2 && V().dataset.read !== qid){
+    const wrong = live.filter(b => +b.dataset.k !== q.a);
+    const b = wrong[Math.floor(Math.random()*wrong.length)];
+    b.disabled = true; b.style.opacity = ".35"; b.style.textDecoration = "line-through";
+    V().dataset.read = qid;
+    return bubble(xc, "讀心術！不是這一個～", 2.4);
+  }
+  bubble(xc, XIAOC_LINES[Math.floor(Math.random()*XIAOC_LINES.length)], 2.4);
+}
+const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，你的安全也第一！","累了就說，不用硬撐。","吃飯了沒？口袋有巧克力。","有問題就問，沒有笨問題！","我看得出來你在想什麼喔。","答題卡關時點我，我幫你讀心一下。"];
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", bai:"這週的班我們重新排過了。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。"};
   return lines[id] || "你好。";
 }

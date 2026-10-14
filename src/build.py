@@ -43,6 +43,8 @@ RPG=[
 ('function run(){\n  if(S.stage<0) return chooseHospital();','function run(){\n  worldSync();\n  if(S.stage<0) return chooseHospital();'),
 ('function av(id){ const c','function av(id){ if(id!=="sys" && LOOK[id]) return `<img class="av pav" src="${portrait(id)}" alt="">`; const c'),
 ]
+RPG.append(('  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {\n    const k = +b.dataset.k, ok = k===q.a;','  V().dataset.qid = id; delete V().dataset.read;\n  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {\n    const k = +b.dataset.k, ok = k===q.a;'))
+RPG.append(('  const v=V(); v.classList.remove("enter");','  const v=V(); delete v.dataset.qid; v.classList.remove("enter");'))
 GAS += RPG
 for a,c in GAS:
     assert e.count(a)==1,a[:60]; e=e.replace(a,c)

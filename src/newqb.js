@@ -91,3 +91,8 @@
   o:["立即 hydrocortisone 100 mg IV，之後每天 200 mg（持續輸注或分次），不必等檢驗結果","先抽 ACTH 刺激試驗，結果出來再治療","加 norepinephrine 就好","停掉所有類固醇觀察"],a:0,
   e:"長期使用類固醇者在手術或感染等壓力下可能發生腎上腺危象。懷疑就治療：hydrocortisone 100 mg IV bolus，接著 200 mg/24 h，加上生理食鹽水補充。可以先抽一管 cortisol 和 ACTH，但不能因等結果而延誤。病情穩定後再逐步減量。",
   s:"Bornstein SR, et al. Diagnosis and Treatment of Primary Adrenal Insufficiency: An Endocrine Society Clinical Practice Guideline. J Clin Endocrinol Metab 2016"}
+,
+ nhidoc:{t:"病歷要寫出醫療必要性",q:"葛長官指著病歷：「穩定的病人 Hb 7.8，輸了 2U PRBC，理由在哪？」哪一種寫法最能說明醫療必要性？",
+  o:["寫出理由：Hb 數值加上症狀（如胸痛、心跳 120、姿勢性低血壓）或出血、手術等原因，並記錄輸後 Hb","寫「依慣例輸血」","只寫「Hb 偏低」","不用寫，醫囑有開就好"],a:0,
+  e:"健保審查依病歷記載判斷醫療必要性。穩定住院成人的輸血門檻是 Hb <7 g/dL，高於門檻時更要寫清楚症狀、出血或手術等理由，並記錄輸後 Hb。病歷寫清楚不只為了申報，也是在保護病人和自己。",
+  s:"衛生福利部中央健康保險署。全民健康保險醫療費用審查注意事項；Carson JL, et al. Red Blood Cell Transfusion: 2023 AABB International Guidelines. JAMA 2023"}

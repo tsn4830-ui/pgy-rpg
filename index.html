@@ -207,11 +207,13 @@ const CH = {
   tsai:  {n:"蔡文淵", role:"婦產科主治醫師", tag:"婦產科主治", col:"#8a3b5c", desc:"資深婦產科醫師，對病人隱私的要求一絲不苟。"},
   kolas: {n:"Kolas 主任", role:"東部衛生所主任", tag:"社區醫學導師", col:"#1f7a6a", desc:"阿美族，回到家鄉服務十五年，騎機車做居家訪視。"},
   shih:  {n:"施雨萱", role:"老年醫學科主治醫師", tag:"老年醫學主治", col:"#5b5ea6", desc:"會蹲下來跟坐輪椅的阿公平視說話。"},
+  xiaoc: {n:"跑跑小Ｃ", role:"醫院老闆", tag:"精神領袖", col:"#e0662b", desc:"齊肩黑髮，白袍配橘色跑鞋，永遠在走廊上小跑步。擅長運動和溝通，還會讀心術：一眼就看出誰累了、誰不敢開口。答題卡關時點地圖上的她，會幫你刪掉一個錯的選項。", twist:"原來小Ｃ每天跑遍全院，是為了在每一科都停一下，用她的讀心術看看大家今天好不好。"},
+  gy:    {n:"葛宜長官", role:"健保署審查委員", tag:"超級龜毛的長官", col:"#3b3f58", desc:"西裝筆挺，拿紅筆逐行看病歷，口頭禪是「依據在哪裡？」", twist:"後來你發現，葛長官退件的病歷，幾乎都是真的沒寫清楚。被退過三次之後，你的病歷是全科寫得最好的。"},
   cheng: {n:"鄭宇安", role:"臨床藥師", tag:"臨床藥師", col:"#3f7f3a", desc:"在電話那頭幫你把劑量算第二遍。"},
   sys:   {n:"旁白", role:"", col:"#5a6b6f"},
   pager: {n:"呼叫器", role:"值班", col:"#b42318"}
 };
-const MET_ORDER = ["hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng"];
+const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy"];
 
 /* ======================= 題庫（每題附出處） ======================= */
 const QB = {
@@ -387,6 +389,8 @@ const QB = {
   o:["約 1:1:1","1:1:4","只輸紅血球","1:0:1"],a:0,
   e:"PROPPR 試驗顯示 1:1:1 比 1:1:2 更快達到止血、出血死亡較少；並在受傷 3 小時內給 tranexamic acid（1 g 靜注 10 分鐘，再 1 g 於 8 小時，CRASH-2）。可用 ABC score ≥2（軀幹穿刺傷、SBP ≤90、HR ≥120、FAST 陽性）預測需要啟動。血品中的檸檬酸會螯合鈣，要追 iCa 並補鈣。注意台灣 1U 只有美國單位的一半，比例不變、數字加倍。",
   s:"Holcomb JB, et al. PROPPR Trial, JAMA 2015；ACS TQIP Massive Transfusion in Trauma Guidelines 2014"},
+
+
  compart:{t:"腔室症候群",q:"脛骨骨折後，腔室症候群最早期、最可靠的徵兆？",
   o:["與傷勢不成比例的疼痛，被動伸展時更痛","摸不到脈搏","皮膚蒼白","完全癱瘓"],a:0,
   e:"無脈搏、癱瘓是晚期表現，等到出現已太遲。懷疑時應鬆開石膏敷料並緊急會診做筋膜切開。",
@@ -536,6 +540,11 @@ lemon:{t:"LEMON 困難呼吸道評估",q:"LEMON 評估中的「3-3-2 法則」�
   o:["立即 hydrocortisone 100 mg IV，之後每天 200 mg（持續輸注或分次），不必等檢驗結果","先抽 ACTH 刺激試驗，結果出來再治療","加 norepinephrine 就好","停掉所有類固醇觀察"],a:0,
   e:"長期使用類固醇者在手術或感染等壓力下可能發生腎上腺危象。懷疑就治療：hydrocortisone 100 mg IV bolus，接著 200 mg/24 h，加上生理食鹽水補充。可以先抽一管 cortisol 和 ACTH，但不能因等結果而延誤。病情穩定後再逐步減量。",
   s:"Bornstein SR, et al. Diagnosis and Treatment of Primary Adrenal Insufficiency: An Endocrine Society Clinical Practice Guideline. J Clin Endocrinol Metab 2016"}
+,
+ nhidoc:{t:"病歷要寫出醫療必要性",q:"葛長官指著病歷：「穩定的病人 Hb 7.8，輸了 2U PRBC，理由在哪？」哪一種寫法最能說明醫療必要性？",
+  o:["寫出理由：Hb 數值加上症狀（如胸痛、心跳 120、姿勢性低血壓）或出血、手術等原因，並記錄輸後 Hb","寫「依慣例輸血」","只寫「Hb 偏低」","不用寫，醫囑有開就好"],a:0,
+  e:"健保審查依病歷記載判斷醫療必要性。穩定住院成人的輸血門檻是 Hb <7 g/dL，高於門檻時更要寫清楚症狀、出血或手術等理由，並記錄輸後 Hb。病歷寫清楚不只為了申報，也是在保護病人和自己。",
+  s:"衛生福利部中央健康保險署。全民健康保險醫療費用審查注意事項；Carson JL, et al. Red Blood Cell Transfusion: 2023 AABB International Guidelines. JAMA 2023"}
 };
 
 /* ======================= 劇本工具 ======================= */
@@ -589,6 +598,10 @@ const HOSP = [
 const STAGES = [
  {y:1,m:3,dept:"一般醫學內科",place:"內科病房",steps:[
   say("sys","七月一日，報到。白袍口袋裡塞著聽診器、筆燈，還有一張印好的「常用藥物劑量表」。"),
+  say("xiaoc","一位齊肩黑髮、白袍配橘色跑鞋的女生從走廊盡頭小跑過來，是大家的精神領袖兼老闆，跑跑小Ｃ。她看了你一眼就笑了：「你在緊張對吧？我看得出來。」「歡迎加入！記住兩件事：病人安全第一，你們自己的安全也是第一。累了就說，不用硬撐。」"),
+  choose("me","跑跑小Ｃ舉起手要跟你擊掌：",[
+   {l:"用力擊掌：「老闆好！」",fx:{mood:4},rel:{xiaoc:3},r:"跑跑小Ｃ笑著說：「叫我小Ｃ就好。」說完又跑去下一站了。"},
+   {l:"有點緊張，輕輕碰一下",fx:{mood:3},rel:{xiaoc:2},r:"「放輕鬆，大家都是這樣開始的。答題卡住的時候，在地圖上點我，我幫你讀心。」小Ｃ塞給你一顆巧克力，又跑走了。"}]),
   say("lin","林振宏護理長看了你寫的第一張醫囑，用紅筆圈起來：「劑量單位寫『u』？會被看成 0。Units 要寫完整。」"),
   choose("me","被當眾糾正，你的反應是？",[
    {l:"謝謝護理長，馬上改",fx:{know:1},rel:{lin:3},r:"林護理長點點頭：「縮寫 U、IU、QD 都是 ISMP 列的易錯縮寫。你改得很快，不錯。」[[ismp_abbr]]"},
@@ -710,6 +723,10 @@ const STAGES = [
  {y:1,m:0,dept:"PGY1 年度評核",place:"教學部",steps:[
   say("sys","PGY1 結束前，教學部安排工作場所評量與學習歷程檢討。"),
   quiz("minicex","zhang","張雅筑學姊擔任你的評核教師："),
+  say("xiaoc","跑跑小Ｃ跑進教學部，手上拿著一疊回饋單：「每個人的評語我都看過了。一年前你們連醫囑都不太敢開，現在會攔下錯誤、會開口求救。這就是成長。」"),
+  choose("me","你想跟小Ｃ說：",[
+   {l:"「謝謝小Ｃ這一年一直都在」",fx:{mood:5},rel:{xiaoc:3},r:"小Ｃ揮揮手：「我只是跑得比較勤。PGY2 見！」"},
+   {l:"「第二年可以少值一點班嗎？」",fx:{mood:3},rel:{xiaoc:2},r:"小Ｃ大笑：「工時上限我們一定守。排班有問題直接來找我。」"}]),
   {t:"yearEnd"}
  ]},
  {y:2,m:3,dept:"內科（進階）",place:"內科病房，你帶 PGY1",steps:[
@@ -721,7 +738,11 @@ const STAGES = [
   quiz("inr","cheng","鄭宇安藥師打電話來："),
   quiz("ffp","zhang","外科會診單寫著「INR 1.6，術前是否需輸 FFP？」張雅筑把單子交給你："),
   quiz("taco","kui","小葵：「12 床輸完血兩個小時開始喘，血氧 88。」"),
-  quiz("apap","cheng"),
+  say("gy","健保署的葛宜長官來院抽審，西裝筆挺，手上一支紅筆。葛長官把你的病歷攤在桌上，逐行唸：「Hb 7.8，輸 PRBC 2U……理由呢？」"),
+  quiz("nhidoc","gy"),
+  choose("me","葛長官把病歷推回來：「下次寫清楚。」你的反應是？",[
+   {l:"「謝謝長官，我會補上症狀和輸後追蹤。」",fx:{know:2,mood:1},rel:{gy:3},r:"葛長官抬了抬眼鏡：「嗯。寫清楚，病人安全，你也安全。」紅筆終於放下了。"},
+   {l:"小聲抱怨「也太龜毛了吧」",fx:{mood:-2},rel:{gy:-1},r:"葛長官聽到了，又在下一頁畫了一個紅圈。張雅筑在旁邊忍住沒笑：「龜毛，但說的對。」"}]),  quiz("apap","cheng"),
   quiz("hypercal","zhang"),
   quiz("adrenal","zhang","骨科會診：術後第一天血壓一直上不來。"),
   say("bai","白芷晴：「我爸出院了，這一年謝謝你幫我爭取彈性排班。這週你的夜班我來換。」"),
@@ -765,7 +786,10 @@ const STAGES = [
  ]},
  {y:2,m:5,dept:"選修",place:"選修五個月（同科最多 2 個月）",elective:2,steps:[
   say("sys","PGY2 不分組訓練有 5 個月選修。你挑兩科深入體驗（其餘月份濃縮帶過）。")]},
- {y:2,m:0,dept:"住院醫師招募",place:"未來",steps:[{t:"ending"}]}
+ {y:2,m:0,dept:"住院醫師招募",place:"未來",steps:[
+  say("xiaoc","招募面試前一晚，跑跑小Ｃ在醫院大廳等你：「不管你選哪一科、去哪一家醫院，都記得當初為什麼想當醫師。去吧，跑起來！」"),
+  {t:"ending"}]}
+
 ];
 
 
@@ -996,7 +1020,7 @@ function stageBanner(st){
 }
 function show(html){
   if(V().hidden) setTab("game");
-  const v=V(); v.classList.remove("enter"); void v.offsetWidth; v.classList.add("enter"); v.innerHTML = html;
+  const v=V(); delete v.dataset.qid; v.classList.remove("enter"); void v.offsetWidth; v.classList.add("enter"); v.innerHTML = html;
   renderSide(); save(); afterRender();
   const r = v.getBoundingClientRect(); if(r.top < 0) window.scrollTo({top: window.scrollY + r.top - 8});
 }
@@ -1168,6 +1192,7 @@ function askQuiz(head, who, lead, id, done){
   S.met[who] = 1;
   const pre = lead ? lead+"\n" : "";
   show(`${head}${speaker(who, pre + q.q)}<div class="opts">${order.map(k=>`<button class="opt" data-k="${k}">${esc(q.o[k])}</button>`).join("")}</div>`);
+  V().dataset.qid = id; delete V().dataset.read;
   V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
     const k = +b.dataset.k, ok = k===q.a;
     V().querySelectorAll(".opt").forEach(x => { x.disabled = true; const kk=+x.dataset.k; if(kk===q.a) x.classList.add("right"); else if(x===b) x.classList.add("wrong"); });
@@ -1385,6 +1410,8 @@ const LOOK = {
   tsai:  {coat:"#f4f6f5", shirt:"#8a3b5c", hair:"#6b6b6b", style:"bob", skin:"#e9bb94"},
   kolas: {coat:"#4c7a3a", shirt:"#e9e1c9", hair:"#111", style:"short", skin:"#b9835c"},
   shih:  {coat:"#f4f6f5", shirt:"#5b5ea6", hair:"#2c2320", style:"long", skin:"#f0c9a6"},
+  xiaoc: {coat:"#f4f6f5", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
+  gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
@@ -1395,6 +1422,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x+8*s, y+19.5*s, 6*s, 1.6*s, 0, 0, 7); c.fill();
   const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0;
   r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40");
+  if(L.shoes){ r(3.5, 18 - step, 4, 1.4, L.shoes); r(8.5, 17 + step, 4, 1.4, L.shoes); }
   r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
   if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); }
   r(1.6, 9+bob + (dir==="left"||dir==="right" ? 0 : step), 1.6, 5, L.coat); r(12.8, 9+bob + (dir==="left"||dir==="right" ? 0 : 1-step), 1.6, 5, L.coat);
@@ -1407,10 +1435,12 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(dir==="up") r(3.6, 2+bob, 8.8, 5, h);
     if(L.style==="spiky"){ r(4, -0.8+bob, 1.5, 1, h); r(7, -1+bob, 1.5, 1.2, h); r(10, -0.8+bob, 1.5, 1, h); }
     if(L.style==="long"){ r(3, 2+bob, 1.4, 8, h); r(11.6, 2+bob, 1.4, 8, h); }
+    if(L.style==="shoulder"){ r(3, 2+bob, 1.6, 7, h); r(11.4, 2+bob, 1.6, 7, h); r(2.6, 8+bob, 1.4, 1.2, h); r(12, 8+bob, 1.4, 1.2, h); }
     if(L.style==="bob"){ r(3, 2+bob, 1.6, 5, h); r(11.4, 2+bob, 1.6, 5, h); }
     if(L.style==="bun"){ r(6.5, -2+bob, 3, 2.2, h); r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
     if(L.style==="pony"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); if(dir!=="down") r(dir==="left"?11.8:2.2, 3+bob, 1.8, 5, h); else r(12, 2.4+bob, 1.4, 4, h); }
     if(L.style==="short"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
+    if(L.band) r(3.6, 1.6+bob, 8.8, 1.1, L.band);
   }
   if(dir!=="up"){
     const dx = dir==="left" ? -1 : dir==="right" ? 1 : 0;
@@ -1494,6 +1524,8 @@ function worldSync(){
   W.p = {x:7, y:7, fx:7, fy:7, dir:"up", path:[], moving:0};
   if(blocked(7,7)) W.p.y = W.p.fy = 8;
   W.walkers = W.theme==="village" || W.theme==="office" ? [] : [{id:W.theme==="lobby"?"vis":"pt", x:13, y:7, fx:13, fy:7, dir:"left", path:[], wait:0}];
+  /* 跑跑小Ｃ：每張地圖都在跑 */
+  if(!W.npcs.some(n => n.id==="xiaoc")) W.walkers.push({id:"xiaoc", fx:1, fy:blocked(1,7)?8:7, dir:"right", path:[], wait:.5, sp:3.6, run:1});
   W.fade = 1;
 }
 function npcOf(id){
@@ -1501,6 +1533,7 @@ function npcOf(id){
   if(!n){
     const spot = SPOTS.find(([x,y]) => !blocked(x,y) && !(W.p.x===x && W.p.y===y)) || [7,4];
     n = {id, x:spot[0], y:spot[1], dir:"down", ph:0}; W.npcs.push(n);
+    W.walkers = W.walkers.filter(w => w.id !== id);
   }
   return n;
 }
@@ -1595,12 +1628,12 @@ function drawWorld(){
   else { c.fillStyle = "#b9c4c2"; c.fillRect(0,0,COLS*TW,TW); c.fillStyle="#a7b3b1"; c.fillRect(0,TW-4,COLS*TW,4); }
   W.items.forEach(f => drawItem(c, f));
   const actors = [...W.npcs.map(n => ({id:n.id, x:n.x, y:n.y, dir:n.dir, frame:Math.floor((W.t+n.ph)*1.5)%2 && 0, npc:n})),
-    ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*8) : 0})),
+    ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*(w.run?14:8)) : 0})),
     {id:"me", x:W.p.fx, y:W.p.fy, dir:W.p.dir, frame:W.p.path.length ? Math.floor(W.t*8) : 0, me:1}].sort((p,q) => p.y-q.y);
   actors.forEach(a => {
     const bx = a.x*TW, by = a.y*TW - 10 + (a.npc ? Math.sin(W.t*2+a.npc.ph)*1 : 0);
     drawChar(c, bx, by, a.id, a.dir, a.frame, 2);
-    if(a.npc){
+    if(a.npc || a.id==="xiaoc"){
       const nm = CH[a.id].n.replace(/（.*）/,"");
       c.font = "11px sans-serif"; const w = c.measureText(nm).width + 8;
       c.fillStyle = "rgba(255,255,255,.85)"; c.fillRect(bx+16-w/2, by+42, w, 13);
@@ -1612,7 +1645,7 @@ function drawWorld(){
     }
   });
   W.bubbles.forEach(b => {
-    const bx = b.n.x*TW+16, by = b.n.y*TW - 22; c.font = "12px sans-serif";
+    const bx = (b.n.fx ?? b.n.x)*TW+16, by = (b.n.fy ?? b.n.y)*TW - 22; c.font = "12px sans-serif";
     const w = Math.min(220, c.measureText(b.text).width + 14);
     const x0 = Math.max(4, Math.min(COLS*TW - w - 4, bx - w/2));
     c.fillStyle = "#fff"; c.strokeStyle = "#334"; c.lineWidth = 1.5; c.beginPath(); c.roundRect ? c.roundRect(x0, by-18, w, 20, 6) : c.rect(x0, by-18, w, 20); c.fill(); c.stroke();
@@ -1636,10 +1669,10 @@ function tick(dt){
   }
   W.walkers.forEach(w => {
     if(w.path.length){ const [tx,ty] = w.path[0]; w.dir = tx>w.fx?"right":tx<w.fx?"left":ty>w.fy?"down":"up";
-      const dx=tx-w.fx, dy=ty-w.fy, d=Math.hypot(dx,dy), m=1.6*dt; if(d<=m){ w.fx=tx; w.fy=ty; w.path.shift(); } else { w.fx+=dx/d*m; w.fy+=dy/d*m; } }
+      const dx=tx-w.fx, dy=ty-w.fy, d=Math.hypot(dx,dy), m=(w.sp||1.6)*dt; if(d<=m){ w.fx=tx; w.fy=ty; w.path.shift(); } else { w.fx+=dx/d*m; w.fy+=dy/d*m; } }
     else if((w.wait -= dt) < 0){
-      w.wait = 2 + Math.random()*3; const gx = 1+Math.floor(Math.random()*13), gy = 2+Math.floor(Math.random()*6);
-      if(!blocked(gx,gy)){ const path = (() => { const tmp = {x:Math.round(w.fx), y:Math.round(w.fy)}; return bfs(tmp.x, tmp.y, [[gx,gy]]); })(); w.path = (path||[]).slice(0,6); }
+      w.wait = w.run ? .4 + Math.random() : 2 + Math.random()*3; const gx = 1+Math.floor(Math.random()*13), gy = 2+Math.floor(Math.random()*6);
+      if(!blocked(gx,gy)){ const path = (() => { const tmp = {x:Math.round(w.fx), y:Math.round(w.fy)}; return bfs(tmp.x, tmp.y, [[gx,gy]]); })(); w.path = (path||[]).slice(0, w.run ? 14 : 6); }
     }
   });
   W.npcs.forEach(n => { if(n.id !== W.target && Math.random() < dt*.15) n.dir = ["down","left","right","down"][Math.floor(Math.random()*4)]; });
@@ -1667,9 +1700,12 @@ function worldInit(){
   };
   cv.addEventListener("click", e => {
     const [x,y] = tapTile(e);
+    const xc = W.walkers.find(w => w.id==="xiaoc" && Math.abs(w.fx-x)<1 && (Math.abs(w.fy-y)<1 || Math.abs(w.fy-y-1)<1));
+    if(xc) return mindRead(xc);
     const n = W.npcs.find(n => n.x===x && (n.y===y || n.y===y+1));
     if(n){
       if(n.id === W.target && W.fire) return W.fire();
+      if(n.id === "xiaoc") return mindRead(n);
       return walkTo(n, () => bubble(n, idleLine(n.id)));
     }
     if(!blocked(x,y)){ const path = bfs(W.p.x, W.p.y, [[x,y]]); if(path){ W.p.path = path; W.onArrive = null; } }
@@ -1690,10 +1726,23 @@ function worldInit(){
     }
   });
 }
+function mindRead(xc){
+  const live = [...V().querySelectorAll(".opt[data-k]:not([disabled])")];
+  const qid = V().dataset.qid, q = qid && QB[qid];
+  if(q && !q.ord && live.length > 2 && V().dataset.read !== qid){
+    const wrong = live.filter(b => +b.dataset.k !== q.a);
+    const b = wrong[Math.floor(Math.random()*wrong.length)];
+    b.disabled = true; b.style.opacity = ".35"; b.style.textDecoration = "line-through";
+    V().dataset.read = qid;
+    return bubble(xc, "讀心術！不是這一個～", 2.4);
+  }
+  bubble(xc, XIAOC_LINES[Math.floor(Math.random()*XIAOC_LINES.length)], 2.4);
+}
+const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，你的安全也第一！","累了就說，不用硬撐。","吃飯了沒？口袋有巧克力。","有問題就問，沒有笨問題！","我看得出來你在想什麼喔。","答題卡關時點我，我幫你讀心一下。"];
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", bai:"這週的班我們重新排過了。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。"};
   return lines[id] || "你好。";
 }
 
