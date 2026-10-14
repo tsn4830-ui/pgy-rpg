@@ -1,0 +1,53 @@
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } }|||/* 每個人用自己的 Claude 帳號存檔；沒有登入時退回這台裝置的瀏覽器存檔 */
+const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0};
+function save(){
+  if(S) S.savedAt = Date.now();
+  if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudWrite, 1200); return; }
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+}
+async function cloudWrite(){
+  if(CLOUD.busy){ CLOUD.again = true; return; }
+  CLOUD.busy = true;
+  try{ const s = JSON.stringify(S); CLOUD.data = S ? JSON.parse(s) : null; await CLOUD.ref.set({s, at:Date.now()}); }
+  catch(e){ setCloudNote("雲端存檔暫時失敗，下一步會再試一次。"); }
+  CLOUD.busy = false;
+  if(CLOUD.again){ CLOUD.again = false; cloudWrite(); }
+}
+function load(){
+  if(CLOUD.ref) return CLOUD.data;
+  try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; }
+}
+function clearSave(){
+  if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.data = null; CLOUD.ref.delete().catch(()=>{}); }
+  try{ localStorage.removeItem(KEY); }catch(e){}
+}
+function setCloudNote(t){ const n = document.getElementById("acct"); if(n) n.textContent = t; }
+function cloudNote(){
+  if(CLOUD.ref) return "☁ 已登入：進度存在你自己的帳號，換電腦或手機也能接著玩；別人看不到你的存檔。";
+  if(!window.claude) return "進度存在這台裝置的瀏覽器，換裝置不會跟著走。";
+  if(CLOUD.ready) return "目前沒有登入，進度只存在這台裝置的瀏覽器。";
+  return "正在確認帳號…";
+}
+(async () => {
+  try{
+    const db = await window.claude?.use?.("db"); const user = await window.claude?.use?.("user");
+    const id = db && user ? await user.id() : null;
+    if(id){
+      const ref = db.collection("data/users/"+id).doc("pgy");
+      const snap = await ref.get();
+      let data = null;
+      if(snap.exists){ try{ data = JSON.parse(snap.data().s); }catch(e){} }
+      else { const local = (() => { try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } })();
+        if(local){ data = local; try{ await ref.set({s:JSON.stringify(local), at:Date.now()}); }catch(e){} } }
+      CLOUD.ref = ref; CLOUD.data = data;
+    }
+  }catch(e){}
+  CLOUD.ready = true;
+  if(!S) titleScreen(); else setCloudNote(cloudNote());
+})();
+@@@
+   <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>`);|||   <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
+   <p class="meta" id="acct">${cloudNote()}</p>`);
+@@@
+  document.getElementById("again").onclick = () => { try{localStorage.removeItem(KEY);}catch(e){} S=null; titleScreen(); };|||  document.getElementById("again").onclick = () => { clearSave(); S=null; titleScreen(); };

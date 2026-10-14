@@ -1,0 +1,178 @@
+<title>呆丸 PGY 物語</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a quiet "life simulator" console — header + control bar on top, the story card on the left,
+   status / 人生地圖 (1 格 = 1 個月) / 工時曲線 / 訓練紀錄 panels on the right; stacks on phones. */
+:root{
+  --bg:#eef1ef;
+  --surface:#ffffff;
+  --surface-2:#f4f6f5;
+  --ink:#1b2a2e;
+  --muted:#5d6d70;
+  --faint:#9aa8a8;
+  --line:#d5dddb;
+  --drape:#2c6e5c;
+  --drape-ink:#ffffff;
+  --stamp:#b42318;
+  --ok:#2f7d4a;
+  --warn:#a86512;
+  --empty:#dfe5e3;
+  --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1517;--surface:#161f22;--surface-2:#1b262a;--ink:#e3ebe8;--muted:#9fb1ad;--faint:#5f7270;--line:#2a393d;
+  --drape:#63b59c;--drape-ink:#0b1513;--stamp:#ff7a6b;--ok:#6fcf8e;--warn:#e9b25a;--empty:#243236;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1517;--surface:#161f22;--surface-2:#1b262a;--ink:#e3ebe8;--muted:#9fb1ad;--faint:#5f7270;--line:#2a393d;
+  --drape:#63b59c;--drape-ink:#0b1513;--stamp:#ff7a6b;--ok:#6fcf8e;--warn:#e9b25a;--empty:#243236;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3}
+h3{font-size:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--drape);outline-offset:2px}
+a{color:var(--drape)}
+.app{max-width:1180px;margin:0 auto;display:grid;gap:12px}
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.top h1{font-size:22px;font-weight:900}
+.ver{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.top .links{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap;font-size:13px}
+/* control bar */
+.ctrl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ctrl button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:13px;white-space:nowrap}
+.ctrl button[aria-pressed="true"]{background:var(--drape);color:var(--drape-ink);border-color:var(--drape)}
+.ctrl .sep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.waiting{font-size:13px;color:var(--stamp);font-weight:700;display:flex;align-items:center;gap:6px}
+.waiting::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--stamp)}
+@media (prefers-reduced-motion:no-preference){.waiting::before{animation:blink 1.4s ease-in-out infinite}@keyframes blink{50%{opacity:.25}}}
+/* columns */
+.cols{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:900px){.cols{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.panel-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel-h h3{font-family:var(--f-body);font-weight:700;font-size:14px;letter-spacing:.06em}
+.hint{font-size:12px;color:var(--muted)}
+/* status bars */
+.stat{display:grid;grid-template-columns:5.2em 1fr 3.4em;align-items:center;gap:8px;font-size:13px;font-variant-numeric:tabular-nums}
+.stat i{display:block;height:8px;border-radius:4px;background:var(--empty);overflow:hidden;position:relative}
+.stat i b{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--drape);transition:width .4s}
+.stat.alert i b{background:var(--stamp)}
+.stat em{font-style:normal;text-align:right;font-family:var(--f-mono);font-size:12px}
+.where{font-size:13px;color:var(--muted)}
+/* life map */
+.map{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.map div{aspect-ratio:1;border-radius:3px;background:var(--empty);max-width:100%}
+.map div.now{outline:2px solid var(--ink);outline-offset:1px}
+@media (prefers-reduced-motion:no-preference){.map div.now{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{outline-color:transparent}}}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend span::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--c)}
+/* curve */
+.curve svg{width:100%;height:auto;display:block}
+.curve text{font-family:var(--f-mono);font-size:10px;fill:var(--muted)}
+/* log */
+.log{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:320px;overflow:auto}
+.log li button{width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:4px 6px;display:grid;grid-template-columns:4.8em 1fr 1.2em;gap:6px;font-size:13px;line-height:1.5}
+.log li button:hover{background:var(--surface-2)}
+.log .when{font-family:var(--f-mono);font-size:11px;color:var(--faint);padding-top:2px}
+.log .star{color:var(--warn)}
+/* story card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:14px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.speaker{display:flex;gap:12px;align-items:flex-start}
+.av{flex:0 0 auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:19px;color:#fff}
+.who{font-weight:700}
+.who small{font-weight:400;color:var(--muted);margin-left:6px;font-size:13px}
+.says{white-space:pre-line;min-width:0}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:10px 14px;line-height:1.5}
+.opt:hover{border-color:var(--drape)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.opt.wrong{border-color:var(--stamp);background:color-mix(in srgb,var(--stamp) 12%,var(--surface))}
+.opt:disabled{cursor:default}
+.primary{justify-self:start;background:var(--drape);color:var(--drape-ink);border:0;border-radius:8px;padding:10px 22px;font-weight:700}
+.ghost{background:none;border:1px solid var(--line);border-radius:8px;padding:8px 16px}
+.feedback{border-left:4px solid var(--drape);background:var(--surface-2);padding:12px 14px;border-radius:0 8px 8px 0;display:grid;gap:6px}
+.feedback.bad{border-left-color:var(--stamp)}
+.src{font-size:13px;color:var(--muted)}
+.study{font-size:13px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.ref{font-family:var(--f-mono);font-size:12px;vertical-align:super;text-decoration:none}
+.stamp{display:inline-block;justify-self:start;font-family:var(--f-display);font-weight:900;color:var(--stamp);border:2px solid var(--stamp);padding:0 8px;border-radius:4px;transform:rotate(-4deg);letter-spacing:.1em}
+.stamp.ok{color:var(--ok);border-color:var(--ok)}
+.fx{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.banner{display:grid;gap:4px;border-bottom:1px dashed var(--line);padding-bottom:12px}
+.banner h2{font-size:clamp(22px,4.5vw,30px)}
+.meta{font-size:14px;color:var(--muted)}
+.hero{display:grid;gap:12px}
+.hero h1{font-size:clamp(34px,8vw,54px);font-weight:900}
+.hero h1 span{color:var(--drape)}
+.hero p{margin:0;max-width:62ch}
+.field{display:grid;gap:4px}
+.field input,.field textarea{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);max-width:420px;width:100%}
+.ads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ad{border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:8px;align-content:start;background:var(--surface-2);text-align:left}
+.ad h3{font-size:18px}
+.ad ul{margin:0;padding-left:1.2em;font-size:14px}
+.ad .tag{font-family:var(--f-mono);font-size:12px;color:var(--drape);letter-spacing:.08em}
+.ad:hover{border-color:var(--drape)}
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.person{display:flex;gap:10px;border:1px solid var(--line);border-radius:var(--r);padding:12px;min-width:0}
+.person p{margin:2px 0 0;font-size:14px}
+.person .tag{font-size:12px;color:var(--muted)}
+.hearts{font-family:var(--f-mono);font-size:12px;color:var(--drape)}
+.kcard{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:4px}
+.kcard:first-of-type{border-top:0;padding-top:0}
+.kcard h3{font-family:var(--f-body);font-size:15px}
+.kcard p{margin:0;font-size:14px}
+ol.refs{margin:0;padding-left:2.4em;display:grid;gap:6px;font-size:14px}
+ol.refs li{padding-left:4px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tablebox{overflow-x:auto}
+.foot{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media (prefers-reduced-motion:no-preference){.card.enter{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1>呆丸 PGY 物語</h1><span class="ver">◐ v3.0 測試版</span>
+    <nav class="links" aria-label="讀書網站">
+      <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
+      <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
+      <a href="https://imreview.drtsengshihting.com/" target="_blank" rel="noopener">內科 Review Hub ↗</a>
+      <a id="gas" hidden target="_blank" rel="noopener">PGY 職前加油站 ↗</a>
+    </nav>
+  </header>
+  <div class="ctrl" id="ctrl">
+    <button id="skip">跳到下一個決定 »</button>
+    <button id="auto" aria-pressed="false">⋯ 自動播放</button>
+    <button id="music" aria-pressed="false">♪ 音樂</button>
+    <button id="theme">◐ 畫面明暗</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button data-tab="game" aria-pressed="true">劇情</button>
+    <button data-tab="people" aria-pressed="false">同事與團隊</button>
+    <button data-tab="cards" aria-pressed="false">知識卡</button>
+    <button data-tab="system" aria-pressed="false">真實制度</button>
+    <button data-tab="refs" aria-pressed="false">參考文獻</button>
+    <span class="waiting" id="waiting" hidden>有決定在等你</span>
+  </div>
+  <div class="cols">
+    <div class="maincol">
+      <main class="card enter" id="view"></main>
+      <section class="card" id="tabview" hidden></section>
+    </div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <p class="foot">醫院與人物皆為虛構。醫學內容依所附參考文獻撰寫，僅供學習；臨床處置請以最新指引與院內規範為準。</p>
+</div>

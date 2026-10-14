@@ -1,0 +1,31 @@
+function askQuiz(head, who, lead, id, done){
+  const q = QB[id]; const order = shuffled(q.o.length);|||function askOrder(head, who, lead, id, done){
+  const q = QB[id]; const order = shuffled(q.ord.length); const picked = [];
+  S.met[who] = 1;
+  show(`${head}<span class="stamp">技能</span>${speaker(who, (lead ? lead+"\n" : "") + q.q)}<p class="hint">依序點選，已選的會標上號碼。</p><div class="opts">${order.map(k=>`<button class="opt" data-k="${k}">${esc(q.ord[k])}</button>`).join("")}</div>`);
+  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    picked.push(+b.dataset.k); b.disabled = true; b.textContent = `${picked.length}. ${q.ord[+b.dataset.k]}`;
+    if(picked.length < q.ord.length) return;
+    const ok = picked.every((k,i) => k===i);
+    V().querySelectorAll(".opt").forEach(x => { const k=+x.dataset.k; x.classList.add(picked.indexOf(k)===k ? "right" : "wrong"); });
+    S.total++; if(ok) S.right++; S.cards[id] = 1;
+    addLog(`${ok?"✓":"✗"} ${q.t}`);
+    const fx = applyFx(ok ? {know:6, mood:3, hours:0.5} : {know:2, hp:-8, mood:-3, hours:0.5});
+    const fb = document.createElement("div");
+    fb.className = "feedback" + (ok ? "" : " bad");
+    fb.innerHTML = `<span class="stamp ${ok?"ok":""}">${ok?"順序正確":"順序有誤"}</span><strong>正確順序</strong><ol style="margin:0;padding-left:1.4em">${q.ord.map(t=>`<li>${esc(t)}</li>`).join("")}</ol><span>${esc(q.e)}<a class="ref" href="#ref-${q.ref}" data-ref="${q.ref}">[${q.ref}]</a></span><span class="src">參考文獻 [${q.ref}]：${esc(q.s)}</span><span class="fx">${fx}　｜已收入知識卡</span>`;
+    const btn = document.createElement("button"); btn.className="primary"; btn.textContent="繼續"; btn.dataset.auto = "1";
+    btn.onclick = () => done(ok);
+    V().append(fb, btn); renderSide(); save(); afterRender(); btn.focus({preventScroll:true});
+  });
+}
+
+function askQuiz(head, who, lead, id, done){
+  if(QB[id].ord) return askOrder(head, who, lead, id, done);
+  const q = QB[id]; const order = shuffled(q.o.length);
+@@@
+return `<div class="kcard"><h3>${esc(q.t)}</h3><p><strong>答案：</strong>${esc(q.o[q.a])}</p>|||return `<div class="kcard"><h3>${esc(q.t)}</h3>${q.ord ? `<ol style="margin:0;padding-left:1.4em;font-size:14px">${q.ord.map(t=>`<li>${esc(t)}</li>`).join("")}</ol>` : `<p><strong>答案：</strong>${esc(q.o[q.a])}</p>`}
+@@@
+   <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。</p>|||   <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
+@@@
+    else verdict = `今年${sp}名額很少，你沒有錄取。Kolas 主任打電話來：「要不要先來衛生所一年？很多好醫師都繞過路。」一年後你再申請，順利錄取。`;|||    else verdict = `第一志願醫院的${sp}名額很少，你沒有錄取。張雅筑學姊陪你整理面試回饋，你去參加其他醫院的第二波招募，最後錄取另一家醫院的${sp}。她說：「第一家沒上很常見，訓練是在哪裡都能好好學的。」`;

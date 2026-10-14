@@ -1,0 +1,43 @@
+e:"血糖 <54 mg/dL 屬第 2 級低血糖；意識不清無法口服時，有靜脈管路就給靜脈葡萄糖，沒有管路可用 glucagon。清醒且能吞嚥者用 15–20 g 葡萄糖口服，15 分鐘後複測。",
+  s:"ADA Standards of Care in Diabetes 2025，第 6 章 Glycemic Goals and Hypoglycemia"}|||e:"血糖 <54 mg/dL 屬第 2 級低血糖。意識不清有靜脈管路：50% 葡萄糖常用 25 g（50 mL）；沒有管路：glucagon 1 mg 肌肉或皮下注射。清醒能吞嚥者口服 15–20 g 葡萄糖，15 分鐘後回測（15-15 法則）。任何一次 <70 mg/dL，隔天都要檢討並調整醫囑。",
+  s:"ADA Standards of Care in Diabetes—2026，第 6、16 章"}
+@@@
+e:"並盡量減少中斷（按壓比例 >60%），每 2 分鐘換手，避免過度通氣。",
+  s:"AHA Guidelines for CPR and ECC 2020（2025 更新延續此建議）"}|||e:"深度至少 5 公分、避免超過 6 公分。按壓位置在胸骨下半部（2025 版強調左心室位於兩乳連線下方，不再說「對準乳頭連線中點」）。盡量減少中斷，每 2 分鐘換手。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"}
+@@@
+e:"靜脈溶栓時間窗為最後正常時間起 4.5 小時內；給藥前先測血糖，血壓須 <185/110，溶栓後 24 小時維持 <180/105。",|||e:"靜脈溶栓時間窗為最後正常時間起 4.5 小時內；給藥前先測血糖，血壓須 <185/110，溶栓後 24 小時維持 <180/105。藥物可用 alteplase 0.9 mg/kg（最大 90 mg）或 tenecteplase 0.25 mg/kg（最大 25 mg）。急性心肌梗塞溶栓的門到針目標是 30 分鐘，中風是 60 分鐘，不要記反。",
+@@@
+e:"可電擊心律（VF／無脈 VT）首要是盡早電擊。Epinephrine 1 mg 每 3–5 分鐘；第三次電擊後仍未恢復可給 amiodarone 300 mg。",
+  s:"AHA Guidelines for CPR and ECC 2020"}|||e:"可電擊心律（VF／無脈 VT）首要是盡早電擊，雙相電擊器依廠商建議（常見 120–200 J），不知道就用最大能量。2025 版強調先把電擊做好：初次電擊失敗後再給 epinephrine 1 mg（每 3–5 分鐘）；第三次電擊後仍未恢復給 amiodarone 300 mg，第二劑 150 mg。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"}
+@@@
+e:"同時給予 aspirin 162–325 mg 嚼服。到院 10 分鐘內完成 12 導程心電圖是一切的起點。",
+  s:"2013 ACCF/AHA Guideline for STEMI；2025 ACC/AHA ACS Guideline"}|||e:"同時給予 aspirin 162–325 mg 嚼服；做 PCI 者 P2Y12 首選 ticagrelor 或 prasugrel。SpO₂ ≥90% 不需常規給氧，舊口訣 MONA 已不適用。到院 10 分鐘內完成 12 導程心電圖是一切的起點。",
+  s:"Rao SV, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation 2025"}
+@@@
+  quiz("ugib","zhang"),
+|||  quiz("ugib","zhang"),
+  quiz("txunit","zhang","另一床 Hb 6.4，沒有出血。張雅筑：「要輸多少？用台灣的單位講。」"),
+  quiz("txstop","kui","半夜，小葵打電話來："),
+
+@@@
+  quiz("adult","kolas"),
+|||  quiz("adult","kolas"),
+  quiz("dengueplt","kolas","夏天，從台南回鄉的阿姨確診登革熱。Kolas 主任問你："),
+
+@@@
+  quiz("inr","cheng","鄭宇安藥師打電話來："),
+|||  quiz("inr","cheng","鄭宇安藥師打電話來："),
+  quiz("ffp","zhang","外科會診單寫著「INR 1.6，術前是否需輸 FFP？」張雅筑把單子交給你："),
+  quiz("taco","kui","小葵：「12 床輸完血兩個小時開始喘，血氧 88。」"),
+
+@@@
+  quiz("hypercal","zhang"),
+|||  quiz("hypercal","zhang"),
+  quiz("adrenal","zhang","骨科會診：術後第一天血壓一直上不來。"),
+
+@@@
+  e:"PROPPR 試驗顯示 1:1:1 比 1:1:2 更快達到止血、出血死亡較少；並在受傷 3 小時內給 tranexamic acid（CRASH-2）。",
+  s:"Holcomb JB, et al. PROPPR Trial, JAMA 2015"},|||  e:"PROPPR 試驗顯示 1:1:1 比 1:1:2 更快達到止血、出血死亡較少；並在受傷 3 小時內給 tranexamic acid（1 g 靜注 10 分鐘，再 1 g 於 8 小時，CRASH-2）。可用 ABC score ≥2（軀幹穿刺傷、SBP ≤90、HR ≥120、FAST 陽性）預測需要啟動。血品中的檸檬酸會螯合鈣，要追 iCa 並補鈣。注意台灣 1U 只有美國單位的一半，比例不變、數字加倍。",
+  s:"Holcomb JB, et al. PROPPR Trial, JAMA 2015；ACS TQIP Massive Transfusion in Trauma Guidelines 2014"},

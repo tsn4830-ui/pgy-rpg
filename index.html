@@ -1,0 +1,1680 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="臺灣 PGY 兩年訓練的角色扮演遊戲，每題附參考文獻。"></head><body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a quiet "life simulator" console — header + control bar on top, the story card on the left,
+   status / 人生地圖 (1 格 = 1 個月) / 工時曲線 / 訓練紀錄 panels on the right; stacks on phones. */
+:root{
+  --bg:#eef1ef;
+  --surface:#ffffff;
+  --surface-2:#f4f6f5;
+  --ink:#1b2a2e;
+  --muted:#5d6d70;
+  --faint:#9aa8a8;
+  --line:#d5dddb;
+  --drape:#2c6e5c;
+  --drape-ink:#ffffff;
+  --stamp:#b42318;
+  --ok:#2f7d4a;
+  --warn:#a86512;
+  --empty:#dfe5e3;
+  --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1517;--surface:#161f22;--surface-2:#1b262a;--ink:#e3ebe8;--muted:#9fb1ad;--faint:#5f7270;--line:#2a393d;
+  --drape:#63b59c;--drape-ink:#0b1513;--stamp:#ff7a6b;--ok:#6fcf8e;--warn:#e9b25a;--empty:#243236;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1517;--surface:#161f22;--surface-2:#1b262a;--ink:#e3ebe8;--muted:#9fb1ad;--faint:#5f7270;--line:#2a393d;
+  --drape:#63b59c;--drape-ink:#0b1513;--stamp:#ff7a6b;--ok:#6fcf8e;--warn:#e9b25a;--empty:#243236;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3}
+h3{font-size:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--drape);outline-offset:2px}
+a{color:var(--drape)}
+.app{max-width:1180px;margin:0 auto;display:grid;gap:12px}
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.top h1{font-size:22px;font-weight:900}
+.ver{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.top .links{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap;font-size:13px}
+/* control bar */
+.ctrl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ctrl button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:13px;white-space:nowrap}
+.ctrl button[aria-pressed="true"]{background:var(--drape);color:var(--drape-ink);border-color:var(--drape)}
+.ctrl .sep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.waiting{font-size:13px;color:var(--stamp);font-weight:700;display:flex;align-items:center;gap:6px}
+.waiting::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--stamp)}
+@media (prefers-reduced-motion:no-preference){.waiting::before{animation:blink 1.4s ease-in-out infinite}@keyframes blink{50%{opacity:.25}}}
+/* columns */
+.cols{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:900px){.cols{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.panel-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel-h h3{font-family:var(--f-body);font-weight:700;font-size:14px;letter-spacing:.06em}
+.hint{font-size:12px;color:var(--muted)}
+/* status bars */
+.stat{display:grid;grid-template-columns:5.2em 1fr 3.4em;align-items:center;gap:8px;font-size:13px;font-variant-numeric:tabular-nums}
+.stat i{display:block;height:8px;border-radius:4px;background:var(--empty);overflow:hidden;position:relative}
+.stat i b{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--drape);transition:width .4s}
+.stat.alert i b{background:var(--stamp)}
+.stat em{font-style:normal;text-align:right;font-family:var(--f-mono);font-size:12px}
+.where{font-size:13px;color:var(--muted)}
+/* life map */
+.map{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.map div{aspect-ratio:1;border-radius:3px;background:var(--empty);max-width:100%}
+.map div.now{outline:2px solid var(--ink);outline-offset:1px}
+@media (prefers-reduced-motion:no-preference){.map div.now{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{outline-color:transparent}}}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend span::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--c)}
+/* curve */
+.curve svg{width:100%;height:auto;display:block}
+.curve text{font-family:var(--f-mono);font-size:10px;fill:var(--muted)}
+/* log */
+.log{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:320px;overflow:auto}
+.log li button{width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:4px 6px;display:grid;grid-template-columns:4.8em 1fr 1.2em;gap:6px;font-size:13px;line-height:1.5}
+.log li button:hover{background:var(--surface-2)}
+.log .when{font-family:var(--f-mono);font-size:11px;color:var(--faint);padding-top:2px}
+.log .star{color:var(--warn)}
+/* story card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:14px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.speaker{display:flex;gap:12px;align-items:flex-start}
+.av{flex:0 0 auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:19px;color:#fff}
+.who{font-weight:700}
+.who small{font-weight:400;color:var(--muted);margin-left:6px;font-size:13px}
+.says{white-space:pre-line;min-width:0}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:10px 14px;line-height:1.5}
+.opt:hover{border-color:var(--drape)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.opt.wrong{border-color:var(--stamp);background:color-mix(in srgb,var(--stamp) 12%,var(--surface))}
+.opt:disabled{cursor:default}
+.primary{justify-self:start;background:var(--drape);color:var(--drape-ink);border:0;border-radius:8px;padding:10px 22px;font-weight:700}
+.ghost{background:none;border:1px solid var(--line);border-radius:8px;padding:8px 16px}
+.feedback{border-left:4px solid var(--drape);background:var(--surface-2);padding:12px 14px;border-radius:0 8px 8px 0;display:grid;gap:6px}
+.feedback.bad{border-left-color:var(--stamp)}
+.src{font-size:13px;color:var(--muted)}
+.study{font-size:13px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.ref{font-family:var(--f-mono);font-size:12px;vertical-align:super;text-decoration:none}
+.stamp{display:inline-block;justify-self:start;font-family:var(--f-display);font-weight:900;color:var(--stamp);border:2px solid var(--stamp);padding:0 8px;border-radius:4px;transform:rotate(-4deg);letter-spacing:.1em}
+.stamp.ok{color:var(--ok);border-color:var(--ok)}
+.fx{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.banner{display:grid;gap:4px;border-bottom:1px dashed var(--line);padding-bottom:12px}
+.banner h2{font-size:clamp(22px,4.5vw,30px)}
+.meta{font-size:14px;color:var(--muted)}
+.hero{display:grid;gap:12px}
+.hero h1{font-size:clamp(34px,8vw,54px);font-weight:900}
+.hero h1 span{color:var(--drape)}
+.hero p{margin:0;max-width:62ch}
+.field{display:grid;gap:4px}
+.field input,.field textarea{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);max-width:420px;width:100%}
+.ads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ad{border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:8px;align-content:start;background:var(--surface-2);text-align:left}
+.ad h3{font-size:18px}
+.ad ul{margin:0;padding-left:1.2em;font-size:14px}
+.ad .tag{font-family:var(--f-mono);font-size:12px;color:var(--drape);letter-spacing:.08em}
+.ad:hover{border-color:var(--drape)}
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.person{display:flex;gap:10px;border:1px solid var(--line);border-radius:var(--r);padding:12px;min-width:0}
+.person p{margin:2px 0 0;font-size:14px}
+.person .tag{font-size:12px;color:var(--muted)}
+.hearts{font-family:var(--f-mono);font-size:12px;color:var(--drape)}
+.kcard{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:4px}
+.kcard:first-of-type{border-top:0;padding-top:0}
+.kcard h3{font-family:var(--f-body);font-size:15px}
+.kcard p{margin:0;font-size:14px}
+ol.refs{margin:0;padding-left:2.4em;display:grid;gap:6px;font-size:14px}
+ol.refs li{padding-left:4px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tablebox{overflow-x:auto}
+.foot{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media (prefers-reduced-motion:no-preference){.card.enter{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1>呆丸 PGY 物語</h1><span class="ver">◐ v5.0 測試版</span>
+    <nav class="links" aria-label="讀書網站">
+      <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
+      <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
+      <a href="https://imreview.drtsengshihting.com/" target="_blank" rel="noopener">內科 Review Hub ↗</a>
+      <a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>
+      <a id="gas" hidden target="_blank" rel="noopener">PGY 職前加油站 ↗</a>
+    </nav>
+  </header>
+  <div class="ctrl" id="ctrl">
+    <button id="skip">跳到下一個決定 »</button>
+    <button id="auto" aria-pressed="false">⋯ 自動播放</button>
+    <button id="music" aria-pressed="false">♪ 音樂</button>
+    <button id="theme">◐ 畫面明暗</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button data-tab="game" aria-pressed="true">劇情</button>
+    <button data-tab="people" aria-pressed="false">同事與團隊</button>
+    <button data-tab="cards" aria-pressed="false">知識卡</button>
+    <button data-tab="system" aria-pressed="false">真實制度</button>
+    <button data-tab="refs" aria-pressed="false">參考文獻</button>
+    <span class="waiting" id="waiting" hidden>有決定在等你</span>
+  </div>
+  <div class="cols">
+    <div class="maincol">
+      <div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>
+      <main class="card enter" id="view"></main>
+      <section class="card" id="tabview" hidden></section>
+    </div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <p class="foot">醫院與人物皆為虛構。醫學內容依所附參考文獻撰寫，僅供學習；臨床處置請以最新指引與院內規範為準。</p>
+</div>
+
+<script>
+"use strict";
+/* ======================= 角色 ======================= */
+const CH = {
+  me:    {n:"你", role:"PGY 醫師", col:"#2c6e5c"},
+  hsu:   {n:"許哲維", role:"PGY 同梯", tag:"惹人厭的同事", col:"#6d4bb3",
+          desc:"交班永遠一句「應該沒事吧」，搶功倒是很快。", twist:"其實很怕被人發現自己不會。學會 ISBAR 後交班變得最清楚的就是他。"},
+  bai:   {n:"白芷晴", role:"PGY 同梯", tag:"惹人厭的同事", col:"#9a5a2a",
+          desc:"群組已讀不回，雜事總能「剛好」落到別人頭上。", twist:"她同時在照顧生病的父親。說開之後，兩人一起排出公平的分工表。"},
+  zhang: {n:"張雅筑", role:"內科 R3，後來升總醫師", tag:"可怕的學姊", col:"#a3342e",
+          desc:"早上六點查房，一路問到你答不出來為止。", twist:"嚴格只針對病人安全。你被家屬罵時，第一個站出來的是她。"},
+  ouyang:{n:"歐陽晉", role:"外科總醫師", tag:"可怕的學長", col:"#30506e",
+          desc:"嗓門大、節奏快，交班漏一項就當場開罵。", twist:"PGY2 那年他請了三個月育嬰假，回來後說：「以前那樣罵人，是我錯了。」"},
+  lin:   {n:"林振宏", role:"內科病房護理長", tag:"指手畫腳的護理長", col:"#4b6b2e",
+          desc:"醫囑格式、手部衛生、給藥前確認……每一樣都要管。", twist:"他管的每一件事，背後都有一次差點出事的病人。"},
+  kui:   {n:"陳葵（小葵）", role:"新手護理師", tag:"可愛的新人", col:"#c2557a",
+          desc:"笑起來很甜，大家都叫她小葵。", twist:"可愛不等於好欺負：她給藥前一定雙重核對，擋下過你的錯誤醫囑。"},
+  rui:   {n:"陳品睿", role:"急診資深護理師", tag:"男護理師", col:"#2a6f86",
+          desc:"ACLS 指導員，急救室裡最冷靜的人。", twist:"被病人叫「男護士」時，他只淡淡回一句：「叫我護理師就好。」"},
+  wang:  {n:"王宛如", role:"急診主治醫師", tag:"急診主治", col:"#7a3f8f", desc:"同時看十床也不提高音量。"},
+  lee:   {n:"李國棟", role:"兒科主治醫師", tag:"兒科主治", col:"#c07a12", desc:"口袋裡永遠有貼紙，跟家長解釋可以講三十分鐘。"},
+  tsai:  {n:"蔡文淵", role:"婦產科主治醫師", tag:"婦產科主治", col:"#8a3b5c", desc:"資深婦產科醫師，對病人隱私的要求一絲不苟。"},
+  kolas: {n:"Kolas 主任", role:"東部衛生所主任", tag:"社區醫學導師", col:"#1f7a6a", desc:"阿美族，回到家鄉服務十五年，騎機車做居家訪視。"},
+  shih:  {n:"施雨萱", role:"老年醫學科主治醫師", tag:"老年醫學主治", col:"#5b5ea6", desc:"會蹲下來跟坐輪椅的阿公平視說話。"},
+  cheng: {n:"鄭宇安", role:"臨床藥師", tag:"臨床藥師", col:"#3f7f3a", desc:"在電話那頭幫你把劑量算第二遍。"},
+  sys:   {n:"旁白", role:"", col:"#5a6b6f"},
+  pager: {n:"呼叫器", role:"值班", col:"#b42318"}
+};
+const MET_ORDER = ["hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng"];
+
+/* ======================= 題庫（每題附出處） ======================= */
+const QB = {
+ sepsis:{t:"敗血性休克的第一小時",q:"72 歲男性，發燒、BP 82/48 mmHg、乳酸 4.6 mmol/L，疑似肺炎。下一步最優先？",
+  o:["抽血液培養後，1 小時內給予經驗性廣效抗生素，並開始晶體輸液（建議前 3 小時 30 mL/kg）","先安排胸部 CT 找到感染源再給抗生素","先給 dopamine 提升血壓，輸液可以晚一點","以白蛋白作為第一線復甦輸液"],a:0,
+  e:"可能為敗血性休克時，建議 1 小時內給抗生素，給藥前盡量先抽血液培養但不可因此延誤。低血壓或乳酸 ≥4 時建議前 3 小時給 30 mL/kg 晶體輸液。升壓劑首選 norepinephrine，目標 MAP ≥65 mmHg；不建議以白蛋白做第一線。",
+  s:"Surviving Sepsis Campaign 國際指引 2021（Evans L, et al. Crit Care Med 2021）"},
+ hyperk:{t:"高血鉀伴心電圖變化",q:"慢性腎病病人，K 7.1 mEq/L，ECG 出現高尖 T 波與 QRS 變寬。第一步？",
+  o:["靜脈注射 10% calcium gluconate 穩定心肌細胞膜","立刻口服 Kayexalate 後觀察","先給 furosemide 利尿","等血液透析排程"],a:0,
+  e:"有心電圖變化時，先用鈣劑穩定心肌膜（不會降低血鉀），接著用 regular insulin 10 單位加葡萄糖把鉀移入細胞，再處理排除（利尿、結合劑、透析）。注射胰島素後要監測血糖。",
+  s:"UK Kidney Association：Clinical Practice Guideline — Treatment of Acute Hyperkalaemia in Adults（2020）"},
+ hypogly:{t:"意識不清的低血糖",q:"糖尿病病人意識不清，指尖血糖 38 mg/dL，已有靜脈管路、無法口服。處置？",
+  o:["靜脈給予葡萄糖（如 50% 葡萄糖液），15 分鐘後再測血糖","先給 regular insulin","請病人喝果汁","先安排腦部 CT"],a:0,
+  e:"血糖 <54 mg/dL 屬第 2 級低血糖。意識不清有靜脈管路：50% 葡萄糖常用 25 g（50 mL）；沒有管路：glucagon 1 mg 肌肉或皮下注射。清醒能吞嚥者口服 15–20 g 葡萄糖，15 分鐘後回測（15-15 法則）。任何一次 <70 mg/dL，隔天都要檢討並調整醫囑。",
+  s:"ADA Standards of Care in Diabetes—2026，第 6、16 章"},
+ hypona:{t:"低血鈉不能矯正太快",q:"慢性低血鈉 Na 112 mmol/L 的病人，矯正速度的重點是？",
+  o:["24 小時內上升不超過約 8–10 mmol/L，以免滲透性去髓鞘症候群","越快越好，最好當天回到 135","只要病人沒症狀就不用監測","一律給 3% 鹽水直到正常"],a:0,
+  e:"慢性低血鈉矯正過快可能造成滲透性去髓鞘症候群（ODS）。歐洲指引建議第一個 24 小時不超過 10 mmol/L、之後每 24 小時不超過 8；酗酒、營養不良、低血鉀等高風險者更保守。需密集追蹤血鈉。",
+  s:"European Clinical Practice Guideline on Hyponatraemia（Spasovski G, et al. Eur J Endocrinol 2014）"},
+ ugib:{t:"上消化道出血的輸血門檻",q:"上消化道出血、血行動力學穩定的病人，一般建議輸紅血球的 Hb 門檻？",
+  o:["Hb < 7 g/dL（限制性輸血）","Hb < 10 g/dL","只要有出血就輸","Hb < 12 g/dL"],a:0,
+  e:"隨機試驗顯示限制性輸血（Hb <7 g/dL）比寬鬆策略死亡率更低、再出血更少；有心血管疾病者門檻可稍高。另應盡早給 PPI 並於 24 小時內安排內視鏡。",
+  s:"Villanueva C, et al. NEJM 2013；ACG Clinical Guideline: Upper GI and Ulcer Bleeding 2021"},
+ kcl:{t:"KCl 是高警訊藥品",q:"病人 K 2.9 mEq/L，你開立 KCl 補充。正確給法？",
+  o:["稀釋後以輸液幫浦緩慢靜脈滴注，周邊管路速率依院內規範（常見每小時不超過 10 mEq）","20 mEq 直接靜脈推注最快","不用稀釋，加在 IV 管路側管快速打完","肌肉注射"],a:0,
+  e:"濃縮 KCl 是國際公認的高警訊藥品，靜脈推注可能致命性心律不整。務必稀釋、用幫浦控制速度、監測血鉀；能口服時優先口服。",
+  s:"ISMP List of High-Alert Medications in Acute Care Settings"},
+ dka:{t:"DKA 何時可以開始打胰島素",q:"DKA 病人，開始靜脈 insulin 之前，血鉀至少要多少？",
+  o:["≥ 3.5 mEq/L（新版共識；舊版為 3.3）","≥ 2.0 mEq/L","不用管血鉀，越早打越好","≥ 6.0 mEq/L"],a:0,
+  e:"胰島素會把鉀推進細胞，血鉀過低時先打可能誘發致命心律不整。2024 年 ADA/EASD 等共識建議 K <3.5 先補鉀、延後胰島素；舊版 2009 共識門檻為 3.3。",
+  s:"Umpierrez GE, et al. Hyperglycemic Crises in Adults With Diabetes: A Consensus Report. Diabetes Care 2024"},
+ curb:{t:"CURB-65",q:"下列哪一項「不是」社區型肺炎嚴重度 CURB-65 的評分項目？",
+  o:["體溫 ≥ 38.5°C","意識混亂（Confusion）","呼吸速率 ≥ 30 次/分","年齡 ≥ 65 歲"],a:0,
+  e:"CURB-65 = Confusion、Urea >7 mmol/L（BUN >19 mg/dL）、Respiratory rate ≥30、Blood pressure（SBP <90 或 DBP ≤60）、年齡 ≥65。體溫不在其中。",
+  s:"Lim WS, et al. Thorax 2003"},
+ hand:{t:"手部衛生五時機",q:"WHO 手部衛生五時機，不包括哪一個？",
+  o:["寫完病歷之後","接觸病人前","執行清潔／無菌操作前","接觸病人周遭環境後"],a:0,
+  e:"五時機：接觸病人前、執行清潔／無菌操作前、暴觸病人體液風險後、接觸病人後、接觸病人周遭環境後。",
+  s:"WHO Guidelines on Hand Hygiene in Health Care（2009）"},
+ checklist:{t:"手術安全查核",q:"WHO 手術安全查核表中的「Time Out」在什麼時候執行？",
+  o:["劃刀前，全體團隊確認病人、術式、部位","麻醉誘導前","病人離開手術室前","術後回到病房時"],a:0,
+  e:"三階段：Sign In（麻醉誘導前）、Time Out（劃刀前）、Sign Out（病人離開手術室前）。",
+  s:"WHO Surgical Safety Checklist（2009）"},
+ tension:{t:"張力性氣胸",q:"車禍病人呼吸窘迫、低血壓、患側呼吸音消失、頸靜脈怒張、氣管偏移。下一步？",
+  o:["立即針頭減壓（成人建議第 4/5 肋間、腋中線前方），不需等 X 光","先照胸部 X 光確認","先插鼻胃管","先做 CT"],a:0,
+  e:"張力性氣胸是臨床診斷，應立即減壓，再放置胸管。ATLS 第 10 版建議成人針頭減壓位置改為第 4/5 肋間、腋中線前方。",
+  s:"ACS Advanced Trauma Life Support（ATLS）第 10 版，2018"},
+ abx:{t:"預防性抗生素時機",q:"手術預防性抗生素（如 cefazolin）應在什麼時候給？",
+  o:["劃刀前 60 分鐘內","術後回病房再給","前一天晚上","劃刀後 2 小時"],a:0,
+  e:"一般在劃刀前 60 分鐘內給予（vancomycin、fluoroquinolone 為 120 分鐘內），手術時間長須依半衰期追加。",
+  s:"Bratzler DW, et al. Clinical practice guidelines for antimicrobial prophylaxis in surgery. Am J Health-Syst Pharm 2013"},
+ alvarado:{t:"Alvarado 評分",q:"下列哪一項「不是」急性闌尾炎 Alvarado 評分項目？",
+  o:["血清澱粉酶升高","右下腹壓痛","轉移性右下腹痛","白血球增多"],a:0,
+  e:"Alvarado（MANTRELS）：轉移痛、食慾不振、噁心嘔吐、右下腹壓痛、反彈痛、發燒、白血球增多、左移。澱粉酶不在內。",
+  s:"Alvarado A. Ann Emerg Med 1986"},
+ burn:{t:"燒燙傷輸液",q:"燒燙傷輸液公式中，前半量要在什麼時間內給完？",
+  o:["從「受傷時間」起算 8 小時內","從到院時間起算 8 小時內","24 小時平均給","前 1 小時內"],a:0,
+  e:"Parkland 公式 4 mL × 體重 × %TBSA（ATLS 第 10 版成人起始改為 2 mL），前半量於受傷後 8 小時內給，從受傷時間起算；再依尿量（成人 0.5 mL/kg/h）調整。",
+  s:"ACS ATLS 第 10 版，2018"},
+ needle:{t:"針扎之後",q:"你被用過的針頭扎到，第一步？",
+  o:["立刻用肥皂與清水清洗傷口，並馬上通報，評估是否需暴露後預防","用力擠出血再消毒，下班再說","用漂白水浸泡傷口","等來源病人報告出來再決定要不要通報"],a:0,
+  e:"以肥皂與清水清洗，不建議擠壓或用刺激性消毒劑。立即通報感控／職安單位，評估來源病人 HBV、HCV、HIV。若需 HIV 暴露後預防（PEP），越早越好，最好 2 小時內、不超過 72 小時。",
+  s:"Kuhar DT, et al. US PHS Guidelines for Occupational HIV Exposure, ICHE 2013；疾病管制署醫療人員血液體液暴觸處理指引"},
+ infant:{t:"新生兒發燒",q:"出生 18 天的嬰兒肛溫 38.3°C，活動力看似不錯。處置？",
+  o:["住院，完整評估（血液、尿液培養，腰椎穿刺）並給予經驗性抗生素","活動力好就回家觀察","給退燒藥後回家","只驗尿就好"],a:0,
+  e:"8–21 天大的發燒嬰兒嚴重細菌感染風險高，即使外觀良好，也建議做血液、尿液、腦脊髓液檢查並住院給抗生素。",
+  s:"AAP Clinical Practice Guideline: Evaluation and Management of Well-Appearing Febrile Infants 8 to 60 Days Old（Pantell RH, et al. Pediatrics 2021）"},
+ kawasaki:{t:"川崎病",q:"5 歲童發燒 6 天，合併雙眼結膜充血、草莓舌、手腳腫、皮疹。治療首選？",
+  o:["IVIG 2 g/kg 合併 aspirin，最好在發燒 10 天內給","只給抗生素","類固醇單獨使用為第一線","退燒觀察即可"],a:0,
+  e:"典型川崎病：發燒 ≥5 天加 5 項主要表現中 ≥4 項。發燒 10 天內給 IVIG 可降低冠狀動脈瘤風險，並需追蹤心臟超音波。",
+  s:"McCrindle BW, et al. AHA Scientific Statement on Kawasaki Disease, Circulation 2017"},
+ ors:{t:"腸胃炎脫水",q:"2 歲童腸胃炎、輕到中度脫水，首選補充方式？",
+  o:["口服電解質液（ORS），少量多次","運動飲料","果汁或汽水","一律打點滴"],a:0,
+  e:"輕中度脫水首選低滲透壓 ORS；運動飲料與果汁含糖高、電解質不適合，可能加重腹瀉。嚴重脫水或無法口服才需靜脈輸液。",
+  s:"WHO／UNICEF 低滲透壓 ORS 建議；AAP 兒童急性腸胃炎處置"},
+ mmr:{t:"疫苗與自閉症",q:"家長問：「MMR 疫苗會不會造成自閉症？」最正確的回答依據？",
+  o:["大型統合分析顯示疫苗與自閉症無關，原始論文已因造假被撤回","有關聯，所以應該延後接種","目前證據不足，看家長意願","只有男孩有風險"],a:0,
+  e:"1998 年 Wakefield 論文已於 2010 年被 Lancet 撤回；2014 年納入逾百萬名兒童的統合分析未發現疫苗與自閉症相關。回答時先傾聽家長擔憂，再提供證據。",
+  s:"Taylor LE, et al. Vaccine 2014；The Lancet 撤稿聲明 2010"},
+ ectopic:{t:"育齡女性腹痛先驗孕",q:"26 歲女性下腹痛、少量陰道出血。最先應做的檢查？",
+  o:["驗孕（尿液或血清 hCG）","先做大腸鏡","直接打止痛藥回家","腹部 X 光"],a:0,
+  e:"所有育齡女性腹痛都要先排除懷孕，特別是子宮外孕破裂可能致命。hCG 陽性再搭配陰道超音波。",
+  s:"ACOG Practice Bulletin No. 193: Tubal Ectopic Pregnancy（2018）"},
+ pph:{t:"產後大出血",q:"產後大出血最常見的原因？",
+  o:["子宮收縮不良（Tone）","胎盤殘留","產道裂傷","凝血功能異常"],a:0,
+  e:"4T：Tone、Trauma、Tissue、Thrombin，其中子宮收縮不良約占七到八成。第一線為子宮按摩與 oxytocin；tranexamic acid 應於產後 3 小時內給予。",
+  s:"WHO Recommendation on Tranexamic Acid for PPH 2017；WOMAN Trial, Lancet 2017"},
+ mg:{t:"硫酸鎂中毒",q:"重度子癲前症使用 MgSO4 預防抽搐，最早出現的中毒徵兆是？",
+  o:["深部肌腱反射消失","心搏過速","血壓升高","瞳孔放大"],a:0,
+  e:"鎂中毒依序為深部肌腱反射消失、呼吸抑制、心跳停止。需監測反射、呼吸與尿量；解毒劑為 calcium gluconate。",
+  s:"ACOG Practice Bulletin No. 222: Gestational Hypertension and Preeclampsia（2020）"},
+ cpr:{t:"高品質 CPR",q:"成人高品質 CPR 的按壓速率與深度？",
+  o:["每分鐘 100–120 下，深度 5–6 公分，每次完全回彈","每分鐘 60 下，深度 3 公分","每分鐘 150 下以上","越深越好，不必回彈"],a:0,
+  e:"深度至少 5 公分、避免超過 6 公分。按壓位置在胸骨下半部（2025 版強調左心室位於兩乳連線下方，不再說「對準乳頭連線中點」）。盡量減少中斷，每 2 分鐘換手。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ ana:{t:"過敏性休克",q:"成人過敏性休克，第一線用藥與途徑？",
+  o:["Epinephrine（1 mg/mL）0.01 mg/kg 肌肉注射於大腿前外側，成人單次最多 0.5 mg","Diphenhydramine 靜脈注射","類固醇靜脈注射","Epinephrine 1 mg 靜脈推注"],a:0,
+  e:"肌肉注射 epinephrine 是唯一第一線藥物，必要時 5–15 分鐘可重複。抗組織胺與類固醇只是輔助。未接監視器時，1 mg 靜脈推注可能造成致命心律不整。",
+  s:"World Allergy Organization Anaphylaxis Guidance 2020"},
+ stroke:{t:"中風靜脈溶栓",q:"急性缺血性中風，靜脈溶栓前血壓應控制在多少以下？",
+  o:["< 185/110 mmHg","< 120/80 mmHg","< 220/120 mmHg","不用管血壓"],a:0,
+  e:"靜脈溶栓時間窗為最後正常時間起 4.5 小時內；給藥前先測血糖，血壓須 <185/110，溶栓後 24 小時維持 <180/105。藥物可用 alteplase 0.9 mg/kg（最大 90 mg）或 tenecteplase 0.25 mg/kg（最大 25 mg）。急性心肌梗塞溶栓的門到針目標是 30 分鐘，中風是 60 分鐘，不要記反。",
+  s:"Powers WJ, et al. AHA/ASA Guidelines for Early Management of Acute Ischemic Stroke 2019"},
+ snake:{t:"臺灣毒蛇咬傷",q:"在臺灣被龜殼花咬傷，應使用哪一種抗蛇毒血清？",
+  o:["抗龜殼花及赤尾鮐蛇毒血清（出血性）","抗雨傘節及飯匙倩蛇毒血清（神經性）","抗百步蛇蛇毒血清","不用血清，切開吸出毒液即可"],a:0,
+  e:"臺灣疾管署供應四種抗蛇毒血清。龜殼花、赤尾青竹絲為出血性毒；雨傘節、眼鏡蛇（飯匙倩）為神經性毒。不要切開、吸吮或用止血帶綁死，應固定患肢、儘速送醫。",
+  s:"衛生福利部疾病管制署 抗蛇毒血清資訊"},
+ op:{t:"有機磷中毒",q:"農藥中毒病人瞳孔縮小、大量流涎、肺部滿是分泌物。主要解毒劑？",
+  o:["Atropine，逐步加量直到肺部分泌物乾燥，並合併 pralidoxime","Naloxone","Flumazenil","N-acetylcysteine"],a:0,
+  e:"有機磷抑制乙醯膽鹼酯酶造成毒蕈鹼症狀。Atropine 的目標是「肺部乾」，不是瞳孔大小或心跳。",
+  s:"Eddleston M, et al. Management of acute organophosphorus pesticide poisoning. Lancet 2008"},
+ vf:{t:"心室顫動",q:"病人在急救室出現 VF、無脈搏。最優先？",
+  o:["立即電擊，之後馬上接續 CPR 2 分鐘","先給 amiodarone","先插管","先做 12 導程心電圖"],a:0,
+  e:"可電擊心律（VF／無脈 VT）首要是盡早電擊，雙相電擊器依廠商建議（常見 120–200 J），不知道就用最大能量。2025 版強調先把電擊做好：初次電擊失敗後再給 epinephrine 1 mg（每 3–5 分鐘）；第三次電擊後仍未恢復給 amiodarone 300 mg，第二劑 150 mg。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ crc:{t:"國健署大腸癌篩檢",q:"臺灣國民健康署大腸癌篩檢的基本對象與頻率？",
+  o:["50–74 歲，每 2 年一次糞便潛血檢查","20 歲以上每年大腸鏡","只有男性","65 歲以上每 5 年一次"],a:0,
+  e:"以免疫法糞便潛血檢查（iFOBT）篩檢，陽性者應接受大腸鏡確診。國健署自 2025 年起另有擴大對象（如有家族史者提早），實際資格以最新公告為準。",
+  s:"衛生福利部國民健康署 癌症篩檢服務"},
+ adult:{t:"成人預防保健",q:"臺灣成人預防保健服務，65 歲以上的補助頻率？",
+  o:["每年一次","每 3 年一次","每 5 年一次","終身一次"],a:0,
+  e:"40–64 歲每 3 年一次、65 歲以上每年一次（原住民 55 歲以上、小兒麻痺患者 35 歲以上亦每年一次）；2025 年起新增 30–39 歲每 5 年一次。",
+  s:"衛生福利部國民健康署 成人預防保健服務"},
+ beers:{t:"長者避免的藥",q:"依 Beers Criteria，下列哪個藥物通常應避免用於長者？",
+  o:["第一代抗組織胺 diphenhydramine","Acetaminophen","維生素 D","Amlodipine"],a:0,
+  e:"第一代抗組織胺抗膽鹼作用強，可能造成譫妄、便秘、尿滯留、跌倒。居家訪視時要檢查多重用藥與成藥。",
+  s:"American Geriatrics Society Beers Criteria 2023 Update, J Am Geriatr Soc 2023"},
+ hla:{t:"HLA-B*15:02 與 carbamazepine",q:"臺灣開立 carbamazepine 前，健保給付哪項基因檢測以預防 SJS/TEN？",
+  o:["HLA-B*15:02","HLA-B*27","BRCA1","CYP2C19"],a:0,
+  e:"臺灣研究（Chung WH 等，Nature 2004）發現漢人 HLA-B*15:02 與 carbamazepine 引起 SJS/TEN 強烈相關，帶因者應避免使用。Allopurinol 則與 HLA-B*58:01 相關。",
+  s:"Chung WH, et al. Nature 2004；中央健康保險署 HLA-B*1502 基因檢測給付規定"},
+ suicide:{t:"詢問自殺意念",q:"關於直接詢問病人是否有自殺想法，何者正確？",
+  o:["直接詢問不會增加自殺風險，且有助於評估與轉介","問了會讓病人想到自殺，應避免","只有精神科醫師才能問","病人沒主動提就不必問"],a:0,
+  e:"研究顯示詢問自殺意念不會提高自殺風險。臺灣可轉介 1925 安心專線（24 小時免付費）。",
+  s:"Dazzi T, et al. Psychol Med 2014；衛生福利部 1925 安心專線"},
+ npo:{t:"術前禁食",q:"健康成人擇期手術，清流質飲料最晚可在麻醉前多久喝？",
+  o:["2 小時","6 小時","8 小時","前一晚 12 點後全禁"],a:0,
+  e:"清流質 2 小時、母乳 4 小時、配方奶與輕食 6 小時、油炸或含脂肪餐點 8 小時。過度禁食反而增加不適與脫水。",
+  s:"ASA Practice Guidelines for Preoperative Fasting, Anesthesiology 2017（2023 更新）"},
+ contrast:{t:"Metformin 與顯影劑",q:"病人服用 metformin，eGFR 25 mL/min/1.73m²，要打碘顯影劑。建議？",
+  o:["檢查時停用 metformin，48 小時後確認腎功能穩定再恢復","不需任何處理","永久停用","改打兩倍顯影劑"],a:0,
+  e:"eGFR <30 或急性腎損傷者，於注射顯影劑時暫停 metformin，48 小時後評估腎功能再恢復；腎功能正常者通常不必停。",
+  s:"ACR Manual on Contrast Media（American College of Radiology）"},
+ eye:{t:"化學性眼灼傷",q:"工人被鹼性清潔劑噴到眼睛，第一步？",
+  o:["立即大量清水或生理食鹽水沖洗，直到 pH 回到中性","先測視力再沖洗","先點抗生素眼藥","先轉眼科門診排隊"],a:0,
+  e:"化學傷是眼科少數「先治療、後檢查」的急症，鹼性比酸性更易造成深層傷害。沖洗至少 30 分鐘並以試紙確認 pH。",
+  s:"American Academy of Ophthalmology：Chemical Eye Injury"},
+ minicex:{t:"Mini-CEX",q:"評核時，主治醫師在旁觀察你實際問診、身體檢查與溝通，並當場回饋。這是哪種工具？",
+  o:["Mini-CEX","DOPS","CbD","OSCE"],a:0,
+  e:"Mini-CEX：觀察臨床面對病人的表現；DOPS：直接觀察操作技術；CbD：以病歷為本的討論；OSCE：客觀結構式臨床測驗站。臺灣 PGY 訓練常用這些工作場所評量。",
+  s:"Norcini JJ, et al. Ann Intern Med 2003；衛福部二年期一般醫學訓練計畫評核規定"},
+ af:{t:"心房顫動抗凝",q:"非瓣膜性心房顫動、CHA₂DS₂-VASc 高分，一般首選口服抗凝劑？",
+  o:["DOAC（直接口服抗凝劑），優先於 warfarin","Aspirin 單獨使用即可","Warfarin 永遠首選","不需抗凝"],a:0,
+  e:"適合者首選 DOAC；機械瓣膜或中重度二尖瓣狹窄者仍用 warfarin。Aspirin 單獨使用不建議作為中風預防。",
+  s:"2023 ACC/AHA/ACCP/HRS Guideline for Atrial Fibrillation, Circulation 2024"},
+ stemi:{t:"STEMI 門到球時間",q:"STEMI 病人送達可做導管的醫院，門到球（door-to-balloon）目標？",
+  o:["≤ 90 分鐘","≤ 6 小時","≤ 24 小時","不限時間"],a:0,
+  e:"同時給予 aspirin 162–325 mg 嚼服；做 PCI 者 P2Y12 首選 ticagrelor 或 prasugrel。SpO₂ ≥90% 不需常規給氧，舊口訣 MONA 已不適用。到院 10 分鐘內完成 12 導程心電圖是一切的起點。",
+  s:"Rao SV, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation 2025"},
+ inr:{t:"Warfarin 過量",q:"病人 INR 12，沒有出血。建議處置？",
+  o:["暫停 warfarin，並給予口服維生素 K","繼續原劑量","立即輸新鮮冷凍血漿","給靜脈 protamine"],a:0,
+  e:"INR >10 無出血：停藥並給口服維生素 K；INR 4.5–10 無出血：停藥觀察，不常規給維生素 K；有嚴重出血：靜脈維生素 K 加凝血酶原複合物（PCC）。Protamine 是 heparin 的解藥。",
+  s:"Holbrook A, et al. ACCP Antithrombotic Therapy Guidelines 9th ed., Chest 2012"},
+ apap:{t:"Acetaminophen 過量",q:"Acetaminophen 一次大量服用，用 Rumack-Matthew 圖判讀血中濃度，最早何時抽血有意義？",
+  o:["服藥後 4 小時","服藥後 30 分鐘","服藥後 48 小時","任何時間都一樣"],a:0,
+  e:"4 小時前藥物仍在吸收，濃度無法判讀。解毒劑為 N-acetylcysteine，8 小時內給效果最好。",
+  s:"Rumack BH, Matthew H. Pediatrics 1975；Chiew AL, et al. Med J Aust 2020（澳紐指引）"},
+ trauma:{t:"創傷初級評估",q:"創傷初級評估（primary survey）的第一步？",
+  o:["呼吸道（Airway）並同時保護頸椎","先處理骨折","先問病史","先送 CT"],a:0,
+  e:"順序為 ABCDE：Airway（含頸椎保護）、Breathing、Circulation（止血）、Disability、Exposure。",
+  s:"ACS ATLS 第 10 版，2018"},
+ mtp:{t:"大量輸血比例",q:"創傷大量輸血，常見的血漿：血小板：紅血球比例？",
+  o:["約 1:1:1","1:1:4","只輸紅血球","1:0:1"],a:0,
+  e:"PROPPR 試驗顯示 1:1:1 比 1:1:2 更快達到止血、出血死亡較少；並在受傷 3 小時內給 tranexamic acid（1 g 靜注 10 分鐘，再 1 g 於 8 小時，CRASH-2）。可用 ABC score ≥2（軀幹穿刺傷、SBP ≤90、HR ≥120、FAST 陽性）預測需要啟動。血品中的檸檬酸會螯合鈣，要追 iCa 並補鈣。注意台灣 1U 只有美國單位的一半，比例不變、數字加倍。",
+  s:"Holcomb JB, et al. PROPPR Trial, JAMA 2015；ACS TQIP Massive Transfusion in Trauma Guidelines 2014"},
+ compart:{t:"腔室症候群",q:"脛骨骨折後，腔室症候群最早期、最可靠的徵兆？",
+  o:["與傷勢不成比例的疼痛，被動伸展時更痛","摸不到脈搏","皮膚蒼白","完全癱瘓"],a:0,
+  e:"無脈搏、癱瘓是晚期表現，等到出現已太遲。懷疑時應鬆開石膏敷料並緊急會診做筋膜切開。",
+  s:"ACS ATLS 第 10 版，2018"},
+ ecg10:{t:"胸痛十分鐘",q:"胸痛病人到急診，12 導程心電圖應在多久內完成判讀？",
+  o:["10 分鐘內","1 小時內","掛號後排隊","等抽血結果"],a:0,
+  e:"10 分鐘內完成並判讀心電圖，是辨識 STEMI 的關鍵。首次正常但症狀持續，應重複做。",
+  s:"2021 AHA/ACC Chest Pain Guideline, Circulation 2021"},
+ nalox:{t:"鴉片類過量",q:"呼吸每分鐘 6 次、瞳孔針尖狀、意識不清，疑似鴉片類過量。解毒劑？",
+  o:["Naloxone","Flumazenil","Atropine","Physostigmine"],a:0,
+  e:"Naloxone 可靜脈、肌肉或鼻噴。作用時間可能比鴉片類短，需持續觀察是否再度抑制呼吸。",
+  s:"AHA 2020 Opioid-Associated Emergency 建議"},
+ gcs:{t:"GCS",q:"GCS 昏迷指數的總分範圍？",
+  o:["3–15","0–15","1–10","0–12"],a:0,
+  e:"睜眼 E1–4、語言 V1–5、運動 M1–6。GCS ≤8 通常需考慮建立確定性呼吸道。",
+  s:"Teasdale G, Jennett B. Lancet 1974"},
+ heat:{t:"熱中暑",q:"戶外勞動者體溫 41°C、意識混亂。最重要的處置？",
+  o:["立即積極降溫，冰水浸泡是最有效的方法","先給 acetaminophen 退燒","慢慢降溫比較安全","先抽血再說"],a:0,
+  e:"熱中暑：核心體溫 >40°C 合併中樞神經異常。退燒藥無效；應「先降溫、後送醫」，目標 30 分鐘內降到約 39°C 以下。",
+  s:"Wilderness Medical Society Clinical Practice Guidelines for Heat Illness 2019"},
+ cam:{t:"CAM 譫妄評估",q:"CAM（Confusion Assessment Method）診斷譫妄的必要條件是？",
+  o:["急性發作且波動，加上注意力不集中，再加上思考紊亂或意識程度改變其中之一","只要有失智症就算","只要晚上睡不著就算","病人自己說混亂才算"],a:0,
+  e:"譫妄是急症，要找原因：感染、藥物、電解質、尿滯留、便秘、疼痛、缺氧等。",
+  s:"Inouye SK, et al. Ann Intern Med 1990"},
+ delir:{t:"譫妄的第一線處置",q:"住院長者夜間譫妄、拔管路。最優先？",
+  o:["找出並處理誘因，加上非藥物介入（定向、睡眠、家屬陪伴）","立即給 benzodiazepine","直接約束到天亮","把燈全關讓他睡"],a:0,
+  e:"Benzodiazepine 可能加重譫妄（酒精戒斷除外）。抗精神病藥只在危及安全時短期低劑量使用。約束本身也會加重譫妄。",
+  s:"AGS Beers Criteria 2023；NICE Guideline CG103 Delirium"},
+ tug:{t:"跌倒風險",q:"計時起走測試（TUG）超過幾秒，表示跌倒風險增加？",
+  o:["12 秒以上","3 秒以上","60 秒以上","不能用來評估跌倒"],a:0,
+  e:"美國 CDC STEADI 以 ≥12 秒作為跌倒風險增加的參考。另需檢視用藥、視力、居家環境。",
+  s:"CDC STEADI：Timed Up & Go Assessment"},
+ dyspnea:{t:"末期呼吸困難",q:"末期癌症病人呼吸喘，已排除可逆原因。症狀緩解的藥物首選？",
+  o:["低劑量鴉片類（如 morphine）","大劑量 benzodiazepine","立即插管","不給藥，避免成癮"],a:0,
+  e:"低劑量鴉片類可有效緩解末期呼吸困難，依症狀調整時不會加速死亡。搭配電扇吹臉、調整姿勢等非藥物方法。",
+  s:"ASCO Guideline: Management of Dyspnea in Advanced Cancer 2021"},
+ dnr:{t:"安寧緩和醫療條例",q:"末期病人已意識昏迷，事前未簽署意願書。依《安寧緩和醫療條例》，不施行心肺復甦術可由誰出具同意書？",
+  o:["最近親屬","主治醫師單獨決定","護理長","任何一位朋友"],a:0,
+  e:"病人無法表達意願時，由最近親屬出具同意書（配偶、成年子女孫子女、父母…依序）；並須經兩位醫師診斷為末期病人，其中一位具相關專科資格。",
+  s:"安寧緩和醫療條例 第 7 條（全國法規資料庫）"},
+ acp:{t:"病人自主權利法",q:"依《病人自主權利法》，簽署「預立醫療決定」前必須先完成什麼？",
+  o:["預立醫療照護諮商（ACP），並經公證或兩位見證人見證、註記於健保卡","只要家屬同意","主治醫師簽名即可","不需要任何程序"],a:0,
+  e:"病主法於 2019 年 1 月 6 日施行，具完全行為能力者可預立醫療決定，在五種臨床條件下選擇接受或拒絕維持生命治療或人工營養及流體餵養。",
+  s:"病人自主權利法 第 8、9 條（全國法規資料庫）"},
+ hypercal:{t:"惡性腫瘤高血鈣",q:"癌症病人血鈣 14.2 mg/dL、脫水、意識變差。第一步？",
+  o:["靜脈生理食鹽水補充水分","立刻給 thiazide 利尿劑","補充鈣片","限制喝水"],a:0,
+  e:"先補足水分，再給 bisphosphonate（數天後起效）或 denosumab；calcitonin 起效快但短暫。Thiazide 反而會升高血鈣。",
+  s:"Endocrine Society Clinical Practice Guideline: Treatment of Hypercalcemia of Malignancy, JCEM 2023"},
+ isbar:{t:"ISBAR 交班",q:"ISBAR 交班中的「S」代表？",
+  o:["Situation：病人現在發生什麼事","Signature：簽名","Symptom：所有症狀列表","Schedule：排程"],a:0,
+  e:"I（Identify 自我與病人辨識）、S（Situation 現況）、B（Background 背景）、A（Assessment 評估）、R（Recommendation 建議）。結構化交班可減少遺漏。",
+  s:"WHO Patient Safety Solutions：Communication During Patient Hand-overs（2007）；醫策會病人安全年度目標"},
+ htn:{t:"住院無症狀高血壓",q:"凌晨 3 點：8 床 BP 182/98，病人無胸痛、頭痛、神經學症狀。最適當的處置？",
+  o:["親自評估、找原因（疼痛、尿滯留、漏服藥），通常不需緊急靜脈降壓","立刻靜脈推注降壓藥","舌下 nifedipine","不用理會"],a:0,
+  e:"無器官損傷的住院高血壓多不需急降，靜脈降壓反而可能造成低血壓與缺血。舌下 nifedipine 會突然大幅降壓，已不建議使用。",
+  s:"Anderson TS, et al. JAMA Intern Med 2019；2017 ACC/AHA Hypertension Guideline"},
+lemon:{t:"LEMON 困難呼吸道評估",q:"LEMON 評估中的「3-3-2 法則」在看什麼？",
+  o:["張口約 3 指寬、頦尖到舌骨 3 指、舌骨到甲狀軟骨上緣 2 指，評估喉頭鏡視野是否容易對齊","頸圍 3 吋、體重 3 倍、年齡 2 倍","GCS 的睜眼、語言、運動分數","最多插 3 次、換人 3 次、放棄 2 次"],a:0,
+  e:"LEMON：Look（外觀，如顏面外傷、鬍鬚、短頸）、Evaluate 3-3-2、Mallampati 分級、Obstruction（呼吸道阻塞）、Neck mobility（頸部活動度）。預期困難時，先準備備案與求援。",
+  s:"Reed MJ, et al. Can an airway assessment score predict difficulty at intubation in the emergency department? Emerg Med J 2005"},
+ preox:{t:"插管前預給氧",q:"自主呼吸的病人準備快速序列插管（RSI），預給氧的標準做法？",
+  o:["面罩緊密貼合，100% 氧氣正常呼吸至少 3 分鐘（或 8 次深呼吸），頭抬高擺位","吸室內空氣就夠了","先用甦醒球大力擠壓高潮氣量","插管失敗之後再給氧"],a:0,
+  e:"預給氧把肺內氮氣換成氧氣，延長無呼吸時的安全時間。頭抬高（肥胖者採 ramped 擺位，使外耳道與胸骨切跡同高），可加上鼻導管做無呼吸期給氧。",
+  s:"Frerk C, et al. Difficult Airway Society 2015 guidelines for management of unanticipated difficult intubation in adults. Br J Anaesth 2015"},
+ etco2:{t:"確認氣管內管位置",q:"插管後，確認氣管內管在氣管內最可靠的方法？",
+  o:["持續波形呼氣末二氧化碳（waveform capnography）","聽診上腹部有沒有聲音","看管壁有沒有起霧","胸部 X 光"],a:0,
+  e:"「No trace = wrong place」：沒有持續 CO₂ 波形就要懷疑在食道。聽診與起霧都不可靠；胸部 X 光用來確認深度（管尖約在隆凸上 3–5 公分），不能分辨氣管或食道。",
+  s:"Frerk C, et al. Difficult Airway Society 2015 guidelines, Br J Anaesth 2015；Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ succ:{t:"Succinylcholine 的禁忌",q:"RSI 時，下列哪位病人應避免使用 succinylcholine？",
+  o:["洗腎病人，血鉀 6.8 mEq/L","健康年輕人，急性闌尾炎","氣喘急性發作","上消化道出血"],a:0,
+  e:"Succinylcholine 會讓血鉀上升約 0.5 mEq/L；高血鉀、惡性高熱病史，以及受傷一段時間後的大面積燒燙傷、擠壓傷、長期臥床或神經肌肉疾病都應避免。替代藥物為 rocuronium 1.0–1.2 mg/kg，可用 sugammadex 逆轉。",
+  s:"Tran DTT, et al. Rocuronium versus succinylcholine for rapid sequence induction intubation. Cochrane Database Syst Rev 2015"},
+ failed:{t:"插管失敗怎麼辦",q:"插管兩次失敗，SpO₂ 開始往下掉。依 DAS 指引下一步？",
+  o:["停止反覆嘗試，放聲門上呼吸道（如喉罩）先維持氧合；無法插管也無法氧合（CICO）時，立即行環甲膜切開","繼續插到成功為止","先拔掉氧氣讓視野清楚","等主治醫師來，期間先不要通氣"],a:0,
+  e:"DAS 流程：Plan A 喉頭鏡插管（最多 3 次，較資深者可第 4 次）→ Plan B 聲門上呼吸道 → Plan C 面罩通氣 → Plan D 前頸部緊急呼吸道（建議手術刀環甲膜切開）。重點是氧合，不是插管成功。",
+  s:"Frerk C, et al. Difficult Airway Society 2015 guidelines, Br J Anaesth 2015"},
+ ratio:{t:"按壓與通氣比",q:"成人 CPR，尚未放進階呼吸道時按壓通氣比？放好氣管內管之後呢？",
+  o:["30:2；插管後持續按壓不中斷，每 6 秒給 1 次通氣（每分鐘 10 次）","15:2；插管後每 2 秒通氣 1 次","30:2；插管後仍要停下來做 30:2","5:1"],a:0,
+  e:"放置進階呼吸道後不再停下來通氣；過度通氣會升高胸內壓、減少回心血量。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ etco2cpr:{t:"CPR 中的 EtCO₂",q:"CPR 進行中，EtCO₂ 一直 < 10 mmHg，代表什麼？",
+  o:["按壓品質可能不足，應檢討深度、速率與中斷；若 EtCO₂ 突然明顯上升要想到 ROSC","病人已恢復自發循環","應該立即停止急救","代表氣管內管一定在食道，要立刻拔掉"],a:0,
+  e:"已插管病人的 EtCO₂ 可以監測按壓品質（理想 >20 mmHg）與早期辨識 ROSC。2025 版看「突然上升」（升幅超過約 10 mmHg），不再背 35–40 的絕對值。數值低時先改善 CPR，也要排除管路位置問題。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ pea:{t:"Asystole 的處置",q:"監視器顯示 asystole（已確認導程與增益）。處置？",
+  o:["持續 CPR，盡快給 epinephrine 1 mg，每 3–5 分鐘重複，並找可逆原因","立即電擊 200 焦耳","給 amiodarone 300 mg","給 atropine 1 mg"],a:0,
+  e:"Asystole 與 PEA 屬不可電擊心律，電擊無益。Atropine 已不再建議用於 asystole／PEA。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ hts:{t:"H's & T's",q:"下列何者「不屬於」心跳停止的可逆原因 H's & T's？",
+  o:["高血糖（Hyperglycemia）","低血氧（Hypoxia）","心包膜填塞（Tamponade）","張力性氣胸（Tension pneumothorax）"],a:0,
+  e:"H：Hypovolemia、Hypoxia、Hydrogen ion（酸中毒）、Hypo/Hyperkalemia、Hypothermia。T：Tension pneumothorax、Tamponade、Toxins、Thrombosis（肺栓塞、冠狀動脈）。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ rosc:{t:"ROSC 後照護",q:"ROSC 後病人仍昏迷，體溫處置建議？",
+  o:["主動體溫控制在 32–37.5°C，總時長至少 36 小時，並避免發燒","不需要特別處理","主動加溫到 39°C","只有院外心跳停止才需要"],a:0,
+  e:"2025 版數值：體溫控制 32–37.5°C 至少 36 小時（舊版 32–36°C、24 小時）；SpO₂ 90–98%、PaCO₂ 35–45 mmHg、MAP ≥65 mmHg、血糖避免 <70 或 >180 mg/dL。做 12 導程心電圖，STEMI 緊急心導管；預後判斷要多模態、延到 ROSC 後至少 72 小時。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ brady:{t:"有症狀的心搏過緩",q:"心跳 34、血壓 78/40、病人頭暈。第一線藥物？",
+  o:["Atropine 1 mg IV，每 3–5 分鐘可重複，最多 3 mg；無效時經皮節律器或 dopamine／epinephrine 滴注","Adenosine 6 mg","Amiodarone 150 mg","Metoprolol 5 mg"],a:0,
+  e:"同時找可逆原因：急性心肌梗塞、高血鉀、藥物（β 阻斷劑、鈣離子阻斷劑、digoxin）。高度房室阻滯合併寬 QRS、心臟移植病人 atropine 可能無效，直接經皮節律。2025 版新增：藥物無效仍不穩定時，暫時性經靜脈節律器是合理選擇。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ svt:{t:"穩定的 SVT",q:"血行動力學穩定的規則窄 QRS 心搏過速，迷走神經刺激無效。下一步？",
+  o:["Adenosine 6 mg 快速靜脈推注並立刻用生理食鹽水沖，無效可給 12 mg","非同步電擊 200 焦耳","Atropine 1 mg","Epinephrine 1 mg"],a:0,
+  e:"不穩定（低血壓、意識變差、休克、胸痛、急性心衰竭）時改做同步電擊，2025 版窄 QRS 起始能量為 100 J（心房顫動與心房撲動 200 J）。推 adenosine 前先告知病人可能短暫胸悶。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ pedcpr:{t:"兒童 CPR",q:"兩位施救者幫 8 歲兒童做 CPR，按壓通氣比？",
+  o:["15:2","30:2","5:1","3:1"],a:0,
+  e:"兒童與嬰兒：單人 30:2、雙人 15:2；按壓深度約胸廓前後徑的 1/3（兒童約 5 公分、嬰兒約 4 公分）。2025 版嬰兒按壓改用單手掌根或雙拇指環抱法，傳統兩指法不再建議。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025（Pediatric Basic and Advanced Life Support）"},
+ intorder:{t:"RSI 步驟排序",q:"依正確順序點選快速序列插管（RSI）的步驟：",
+  ord:["評估困難呼吸道（LEMON），準備器材、藥物與備案","擺位並預給氧","給予鎮靜誘導劑與肌肉鬆弛劑","喉頭鏡（直接或影像）置入氣管內管","波形 EtCO₂ 確認位置，固定並照胸部 X 光確認深度"],
+  e:"先評估再動手，給藥前一定已預給氧；插完一定用波形 EtCO₂ 確認。任何一步卡住，就回到「維持氧合」。",
+  s:"Frerk C, et al. Difficult Airway Society 2015 guidelines, Br J Anaesth 2015"},
+ cprorder:{t:"成人 OHCA 處置順序",q:"依正確順序點選成人心跳停止的處置：",
+  ord:["確認環境安全，拍肩呼叫並同時看有無正常呼吸（不超過 10 秒）","呼救並請人拿 AED","立即開始高品質胸外按壓","AED 到達，貼片分析心律，需要時電擊","電擊後立刻恢復按壓 2 分鐘，再分析"],
+  e:"按壓越早越好，電擊前後的按壓中斷越短越好。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ fbao:{t:"成人異物哽塞（2025 新版）",q:"清醒的成人突然抓著脖子、無法說話也咳不出聲。2025 AHA 建議？",
+  o:["5 次背部拍打與 5 次腹部快速推壓交替，直到異物排出或失去意識；失去意識就立即 CPR","只做腹部快速推壓（哈姆立克法）","鼓勵他大聲咳嗽就好","用手指盲目伸進喉嚨挖"],a:0,
+  e:"2025 版改為背部拍打優先，理由是成功率高、傷害較少，也和兒童一致。孕婦末期或環抱不住改做胸部快速推壓；嬰兒是 5 次背部拍打加 5 次胸部快速推壓，不可壓腹。還能大聲咳嗽代表呼吸道仍通，先鼓勵咳出。",
+  s:"Del Rios M, et al. 2025 AHA Guidelines for CPR and ECC. Circulation 2025"},
+ periop:{t:"手術前一晚的胰島素",q:"明天早上開刀、今晚起禁食的第 2 型糖尿病病人，平常睡前打 glargine 20 單位。今晚建議？",
+  o:["給平常劑量的 75–80%（約 15–16 單位），禁食期間每 2–4 小時測血糖","照打 20 單位","減半打 10 單位","完全不打"],a:0,
+  e:"長效基礎胰島素術前給 75–80%，NPH 給 50%；手術壓力會讓血糖上升，基礎胰島素砍半常常不夠。Metformin 手術當天停，SGLT2 抑制劑術前 3 天停（ertugliflozin 4 天）。第 1 型糖尿病即使禁食也絕不能停基礎胰島素。",
+  s:"ADA Standards of Care in Diabetes—2026，第 16 章 Diabetes Care in the Hospital"}
+,
+ txunit:{t:"台灣血品單位與紅血球門檻",q:"穩定、沒有出血的住院成人，Hb 6.4 g/dL，沒有心血管疾病。合理的輸血醫囑？",
+  o:["PRBC 2U（台灣一袋），輸完再評估 Hb 與症狀","PRBC 4U，目標 Hb 10","PRBC 1U 就好，台灣 1U 可升 Hb 1 g/dL","Hb 大於 6 不需要輸"],a:0,
+  e:"AABB 2023：穩定住院成人 Hb <7 g/dL 才輸（心臟手術 7.5；骨科手術或已有心血管疾病 8）。台灣 1U 由 250 mL 全血製成，約美國 1 unit 的一半，1U 約升 Hb 0.5 g/dL。國外「一次一單位」在台灣相當於開 2U，輸完再評估，不要一次開 4U。",
+  s:"Carson JL, et al. Red Blood Cell Transfusion: 2023 AABB International Guidelines. JAMA 2023；台灣血液基金會血品規格（1U = 250 mL 全血）"},
+ txstop:{t:"輸血中發燒",q:"護理師來電：「15 床輸血中發燒 38.4 度，可以先給 Panadol 繼續輸嗎？」你的第一句話？",
+  o:["先停輸、保留管路用生理食鹽水維持，床邊再核對血袋，血袋和新抽的血一起送血庫","可以，給 Panadol 繼續輸完","把速度調慢，繼續輸","拔掉點滴，明天再說"],a:0,
+  e:"輸血中出現任何新症狀都先停輸。發燒可能是發熱性非溶血反應，也可能是急性溶血或細菌污染，退燒藥會掩蓋這些表現。高燒、寒顫或低血壓時，加做病人血液培養與血袋培養。只有單純蕁麻疹、沒有發燒、喘或低血壓的輕微過敏，緩解後才可以慢慢恢復同一袋。",
+  s:"ISBT Working Party on Haemovigilance. Standard definitions for surveillance of non-infectious adverse transfusion reactions (2013; TACO revised 2018)"},
+ taco:{t:"輸血後喘：TACO 還是 TRALI",q:"80 歲心衰竭病人輸完 2U PRBC 兩小時後開始喘，SpO₂ 88%，血壓 172/90，頸靜脈怒張，兩側肺囉音。最可能？",
+  o:["TACO（輸血相關循環負荷過量）：坐起、給氧、利尿劑","TRALI：給利尿劑就好","輕微過敏：抗組織胺後繼續輸","院內肺炎：先加抗生素"],a:0,
+  e:"TACO 在輸血後 12 小時內出現，常見血壓升高、頸靜脈怒張、BNP 上升，利尿劑有效。TRALI 在 6 小時內出現，常低血壓、可發燒，利尿劑無效甚至有害，要通報血庫追查捐血者。心衰竭、腎衰竭、高齡者要放慢速度、分次輸；輸血前常規打一支 furosemide 沒有證據支持。",
+  s:"ISBT. Revised TACO surveillance definition (2018)；Vlaar APJ, et al. A consensus redefinition of transfusion-related acute lung injury. Transfusion 2019"},
+ ffp:{t:"INR 1.6 要不要輸 FFP",q:"明天擇期手術的病人沒有出血、沒有吃 warfarin，INR 1.6。外科問要不要術前先輸 FFP？",
+  o:["不常規輸；先找 INR 偏高的原因，和主刀與麻醉討論","輸 FFP 2U，把 INR 拉回 1.0","輸冷凍沉澱品","輸血小板"],a:0,
+  e:"輕度 INR 升高不能可靠預測手術出血；INR ≤1.85 時輸 FFP 幾乎拉不下來，還多了 TACO、TRALI 與過敏風險。真的需要時劑量是 10–20 mL/kg，成人常要台灣單位 8–10U，開 2U 通常不夠。吃 warfarin 的病人用維生素 K；需要緊急手術或大出血時用 4F-PCC 加 IV 維生素 K。",
+  s:"Abdel-Wahab OI, Healy B, Dzik WH. Effect of fresh-frozen plasma transfusion on prothrombin time and bleeding in patients with mild coagulation abnormalities. Transfusion 2006"},
+ dengueplt:{t:"登革熱的血小板",q:"登革熱病人血小板 15,000/µL，沒有出血。要不要預防性輸血小板？",
+  o:["不輸；監測出血徵象與體液狀態","低於 20,000 就輸一袋分離術血小板","輸 FFP","輸 PRBC"],a:0,
+  e:"2025 AABB/ICTMG 指引強烈建議：登革熱血小板低下、沒有大出血時不要預防性輸血小板，可能有害。對照幾個門檻：化療後低增生者 <10,000 才預防性輸；腰椎穿刺 <20,000；可壓迫部位放中心靜脈導管 <10,000；重大非神經軸手術 <50,000。TTP 與 HIT 除非致命出血，也避免輸血小板。",
+  s:"Metcalf RA, et al. Platelet Transfusion: 2025 AABB and ICTMG International Clinical Practice Guidelines. JAMA 2025"},
+ adrenal:{t:"腎上腺危象",q:"長期吃 prednisolone 的類風濕性關節炎病人，術後低血壓、低血鈉、噁心，輸液後血壓仍低。最優先？",
+  o:["立即 hydrocortisone 100 mg IV，之後每天 200 mg（持續輸注或分次），不必等檢驗結果","先抽 ACTH 刺激試驗，結果出來再治療","加 norepinephrine 就好","停掉所有類固醇觀察"],a:0,
+  e:"長期使用類固醇者在手術或感染等壓力下可能發生腎上腺危象。懷疑就治療：hydrocortisone 100 mg IV bolus，接著 200 mg/24 h，加上生理食鹽水補充。可以先抽一管 cortisol 和 ACTH，但不能因等結果而延誤。病情穩定後再逐步減量。",
+  s:"Bornstein SR, et al. Diagnosis and Treatment of Primary Adrenal Insufficiency: An Endocrine Society Clinical Practice Guideline. J Clin Endocrinol Metab 2016"}
+};
+
+/* ======================= 劇本工具 ======================= */
+const say = (who,text) => ({t:"say",who,text});
+const choose = (who,text,opts) => ({t:"choice",who,text,opts});
+const quiz = (id,who,lead) => ({t:"quiz",id,who,lead});
+const boss = (who,intro,ids,pass,win,lose,rel) => ({t:"boss",who,intro,ids,pass,win,lose,rel});
+const shift = (n) => ({t:"night",n});
+
+/* 夜班呼叫器 */
+const NIGHT = [
+ [say("pager","「12 床說他睡不著，可以給安眠藥嗎？」"),
+  choose("me","你要怎麼回？",[
+   {l:"先去看病人再決定",fx:{hp:-3,know:2,hours:1},r:"你到床邊發現他喘、SpO₂ 89%。不是失眠，是缺氧。幸好你先來看。\n（夜間躁動或失眠可能是缺氧、疼痛、尿滯留或譫妄的表現。）"},
+   {l:"電話口頭開一顆安眠藥",fx:{mood:-4},r:"小葵複誦後皺眉：「學長姐，他剛剛有點喘耶，要不要先來看一下？」你只好爬起來。她是對的。",rel:{kui:2}}])],
+ [say("pager","「8 床血壓 182/98，要處理嗎？」"), quiz("htn","pager")],
+ [say("pager","「新病人從急診上來，交班單只寫『肺炎，應該沒事』。」"),
+  choose("hsu","許哲維在群組補一句：「我急診那邊很忙，你看著辦。」",[
+   {l:"打電話用 ISBAR 問清楚",fx:{know:2,hours:1},rel:{hsu:2},r:"你一項一項問，他越答越清楚。掛電話前他小聲說：「謝了，我下次會寫完整。」"},
+   {l:"在群組公開嗆他",fx:{mood:2},rel:{hsu:-3},r:"群組一片安靜。爽了三秒，但問題還是沒問清楚。"}])],
+ [say("pager","「凌晨四點，你已經連續工作 20 小時，眼皮在打架。」"),
+  choose("me","值班室的床在招手。",[
+   {l:"把待辦交給下一班，睡 90 分鐘",fx:{hp:12,mood:4},r:"疲勞是醫療錯誤的風險因子。睡醒後你寫的病程紀錄沒有錯字。"},
+   {l:"硬撐把所有病歷寫完",fx:{hp:-10,know:1,hours:2},r:"你寫完了，但隔天早上發現把兩床的檢驗值貼錯。"}])]
+];
+
+/* 選修科 */
+const ELECTIVES = {
+ derm:{n:"皮膚科",steps:[say("cheng","鄭宇安：「神經科要開 carbamazepine 給一位新診斷的病人。開之前呢？」"),quiz("hla","cheng")]},
+ psy:{n:"精神科",steps:[say("sys","門診一位大學生說最近什麼都不想做。你猶豫要不要直接問自殺的想法。"),quiz("suicide","sys")]},
+ anes:{n:"麻醉科",steps:[say("sys","術前訪視：病人說他凌晨餓到偷喝了一杯運動飲料。"),quiz("npo","sys")]},
+ rad:{n:"放射科",steps:[say("sys","CT 預約單上寫著：metformin 1000 mg BID，eGFR 25。"),quiz("contrast","sys")]},
+ eye:{n:"眼科",steps:[say("sys","急診廣播：眼科會診，「清潔劑噴到眼睛」。"),quiz("eye","sys")]},
+ hospice:{n:"家醫科（安寧緩和）",steps:[say("sys","安寧病房的阿伯一直喘，家屬很害怕「打嗎啡會不會讓他早走」。"),quiz("dyspnea","sys")]}
+};
+
+/* ======================= 醫院（虛構招募廣告） ======================= */
+const HOSP = [
+ {id:"mc",n:"呆丸大學附設醫院",kind:"醫學中心｜北部",tag:"RECRUIT 116",
+  pts:["PGY 容額多，全院導師制，每 2 位學員 1 位導師","國際交換見習（選修月）","社區醫學合作點：東部衛生所","病例數多、學習曲線陡"],
+  fx:{know:6,maxhp:-10,mood:-4},note:"知識成長快，但比較累。"},
+ {id:"rg",n:"港灣區域教學醫院",kind:"區域醫院｜南部",tag:"RECRUIT 116",
+  pts:["小班制，主治直接帶 bedside teaching","PGY 有固定的 debrief 時間","手術、操作機會多","離海邊 10 分鐘"],
+  fx:{know:3,mood:4},note:"均衡型，操作機會多。"},
+ {id:"rr",n:"山海地區教學醫院",kind:"地區醫院｜東部",tag:"RECRUIT 116",
+  pts:["提供員工宿舍","與原鄉衛生所長期合作","跨專業團隊（藥師、社工、個管師）緊密","夜班呼叫較少"],
+  fx:{maxhp:10,mood:8,rel:{kolas:3}},note:"體力與心情好，人情味重。"}
+];
+
+/* ======================= 關卡 ======================= */
+const STAGES = [
+ {y:1,m:3,dept:"一般醫學內科",place:"內科病房",steps:[
+  say("sys","七月一日，報到。白袍口袋裡塞著聽診器、筆燈，還有一張印好的「常用藥物劑量表」。"),
+  say("lin","林振宏護理長看了你寫的第一張醫囑，用紅筆圈起來：「劑量單位寫『u』？會被看成 0。Units 要寫完整。」"),
+  choose("me","被當眾糾正，你的反應是？",[
+   {l:"謝謝護理長，馬上改",fx:{know:1},rel:{lin:3},r:"林護理長點點頭：「縮寫 U、IU、QD 都是 ISMP 列的易錯縮寫。你改得很快，不錯。」[[ismp_abbr]]"},
+   {l:"小聲抱怨「護理師管這麼多」",fx:{mood:-2},rel:{lin:-3},r:"他聽到了，沒說話，只是把 ISMP 易錯縮寫表貼在你的電腦旁邊。你後來發現，那張表救過你兩次。"}]),
+  quiz("hand","lin","林護理長抽考："),
+  say("bai","白芷晴：「欸，我那床的出院病摘可以幫我寫嗎？我今天有事。」這是她這週第三次。"),
+  choose("me","你要怎麼處理？",[
+   {l:"私下問她最近是不是遇到什麼事",fx:{mood:2,hours:1},rel:{bai:4},r:"她沉默一下才說，父親剛中風住在別家醫院，她每天下班要趕去顧。你們一起去找導師調整分工，把「家庭照顧需求」正式提出來，而不是私下硬撐。"},
+   {l:"直接拒絕，說這是她的工作",fx:{mood:1},rel:{bai:-1},r:"界線清楚是對的。她愣了一下說「好啦」，自己寫完了。"},
+   {l:"默默幫她寫，加班到九點",fx:{hp:-8,hours:3},rel:{bai:1},r:"病摘寫完了，你的晚餐沒了。一直吸收別人的工作，不會讓問題消失。"}]),
+  quiz("sepsis","zhang","凌晨，急診上來一位病人。張雅筑學姊站在你後面：「你打算怎麼做？」"),
+  quiz("kcl","kui","小葵拿著你開的醫囑跑來："),
+  say("kui","小葵：「學長姐，你剛剛開的 KCl 寫 IV push，我不敢給，所以先打給你確認。」\n你背後一陣冷汗。"),
+  choose("me","",[
+   {l:"謝謝妳攔下來，馬上改，並主動通報異常事件",fx:{know:2},rel:{kui:4,lin:2},r:"「跡近錯失」通報不是為了懲罰，是讓系統改進。林護理長隔週就推動系統在 KCl 醫囑加上強制稀釋提醒。"},
+   {l:"「妳是新人，照做就好」",fx:{mood:-6},rel:{kui:-5,lin:-4},r:"小葵眼眶紅了，但仍然堅持不給。林護理長找你去談：「她做的是對的事。」"}]),
+  shift(0),
+  quiz("hyperk","zhang"),
+  quiz("hypogly","rui","陳品睿從急診打來支援評估："),
+  shift(1),
+  quiz("ugib","zhang"),
+  quiz("txunit","zhang","另一床 Hb 6.4，沒有出血。張雅筑：「要輸多少？用台灣的單位講。」"),
+  quiz("txstop","kui","半夜，小葵打電話來："),
+  boss("zhang","早上六點查房。張雅筑學姊：「三題，答對兩題就讓你去吃早餐。」",["dka","curb","hypona"],2,
+   "張雅筑：「不錯。你知道為什麼我問這麼兇嗎？因為病人不會等你準備好。」她遞給你一杯咖啡。",
+   "張雅筑：「沒關係，今天下班前把 DKA 共識讀一遍，明天我再問你。」語氣很硬，但她真的隔天又問了，還幫你畫重點。",{zhang:4}),
+  quiz("isbar","hsu","交班時許哲維又只說了「應該沒事」。你決定教他："),
+  say("hsu","許哲維：「……喔，原來要這樣講。我一直以為交班就是講診斷。」")
+ ]},
+ {y:1,m:2,dept:"一般醫學外科",place:"開刀房與外科病房",steps:[
+  say("ouyang","歐陽晉總醫師在開刀房外大吼：「誰交班沒寫 NPO？病人早上吃了一碗粥，刀開不了！」"),
+  choose("me","那床是你交班的。你要？",[
+   {l:"冷靜承認，說明當時狀況，提出改善做法",fx:{know:1},rel:{ouyang:3},r:"他愣了一下，音量降下來：「……好。之後交班單加一欄 NPO。」"},
+   {l:"沉默挨罵，事後一個人在樓梯間哭",fx:{mood:-8},r:"你哭完後，陳品睿剛好經過，遞給你一包面紙：「被罵不代表你不適合當醫師。」",rel:{rui:2}},
+   {l:"當場頂回去「你自己也沒看！」",fx:{mood:-2},rel:{ouyang:-4},r:"開刀房外一片寂靜。對錯先不論，這不是解決問題的地方。"}]),
+  quiz("checklist","ouyang"),
+  quiz("abx","ouyang","刀前十五分鐘，麻醉科問："),
+  say("ouyang","歐陽晉這週第三次當著病人面罵你「笨」。旁邊的小葵也嚇到了。"),
+  choose("me","嚴格教學和言語霸凌之間，是有界線的。",[
+   {l:"整理事件時間與內容，找導師或教學部的申訴管道",fx:{mood:3},rel:{ouyang:1},r:"教學部依程序處理並安排溝通。依《職業安全衛生法》，雇主應預防員工執行職務時遭受不法侵害，並建立申訴、調查及處理程序[[law_osh]]。歐陽晉後來在 M&M 會議公開道歉。"},
+   {l:"忍下來，反正外科只有兩個月",fx:{mood:-6},r:"你撐過去了，但下一屆 PGY 也會遇到一樣的事。"}]),
+  quiz("tension","rui","急診紅區叫外科："),
+  quiz("needle","sys","縫合時一個不小心——"),
+  quiz("alvarado","ouyang"),
+  boss("ouyang","燒燙傷病人送進來。歐陽晉：「我問，你答。答錯病人等你。」",["burn","trauma","compart"],2,
+   "歐陽晉：「……可以。下週那台闌尾切除，你當第一助手。」",
+   "歐陽晉沒罵你，只說：「回去讀 ATLS 第 10 版，下次再來。」這大概是他最溫柔的版本。",{ouyang:4})
+ ]},
+ {y:1,m:1,dept:"一般醫學兒科",place:"兒科病房與急診",steps:[
+  say("lee","李國棟主治從口袋拿出恐龍貼紙：「兒科第一課：先跟小孩打招呼，再跟家長打招呼。」"),
+  quiz("infant","lee","半夜兒科急診："),
+  quiz("ors","lee"),
+  quiz("pedcpr","rui","兒科急救訓練，陳品睿來當教練："),
+  say("sys","一位母親抱著孩子：「我在網路上看到 MMR 會造成自閉症，所以不想打。」"),
+  quiz("mmr","lee","李國棟看著你，示意由你來回答："),
+  choose("me","你要怎麼開口？",[
+   {l:"先問她最擔心什麼，再說明證據",fx:{know:1,mood:2},rel:{lee:3},r:"她說哥哥家的孩子有自閉症，所以很怕。你先同理，再講研究。最後她說：「我回去跟先生討論，下週來打。」"},
+   {l:"直接說「網路都是假的」",fx:{mood:-2},rel:{lee:-1},r:"她抱著孩子轉身走了。正確的資訊，也需要正確的說法。"}]),
+  boss("lee","李國棟：「最後一題。這個 5 歲的孩子燒了 6 天。」",["kawasaki"],1,
+   "李國棟：「很好。記得也要排心臟超音波。」他給了你一張暴龍貼紙。",
+   "李國棟：「沒關係，川崎病很容易被當成病毒感染。重點是燒超過五天要想到它。」",{lee:4})
+ ]},
+ {y:1,m:1,dept:"一般醫學婦產科",place:"產房與婦科門診",steps:[
+  say("tsai","蔡文淵主治：「不管醫師是什麼性別，做乳房或骨盆檢查前都要先說明、取得同意，並請第三人陪同。這是保護病人，也保護你。」[[gmc]]"),
+  choose("me","一位病人說「我想換女醫師檢查」，而你剛好是男性；或是她說「我想要男醫師」，而你剛好是女性。",[
+   {l:"尊重她的選擇，協助安排",fx:{mood:1},rel:{tsai:3},r:"蔡醫師點頭：「病人的自主與舒適優先，這不是在否定你的能力。」"},
+   {l:"堅持「醫師都一樣」",fx:{mood:-2},rel:{tsai:-2},r:"病人越來越緊張，最後拒絕檢查。專業和尊重並不衝突。"}]),
+  quiz("ectopic","tsai","急診會診婦產科："),
+  quiz("pph","rui","產房警鈴響起，陳品睿從急診支援過來推急救車："),
+  boss("tsai","蔡醫師：「子癲前症的病人已經上了硫酸鎂。」",["mg"],1,
+   "蔡醫師：「對。你每兩小時要去敲一次她的膝蓋。」",
+   "蔡醫師：「是深部肌腱反射。記住，鎂中毒會先讓反射消失，再來是呼吸。」",{tsai:4})
+ ]},
+ {y:1,m:1,dept:"急診醫學",place:"急診",steps:[
+  say("wang","王宛如主治：「急診每月班表約 168–192 小時，夜班不超過 8 班、每班不超過 13 小時，這是訓練計畫寫的。睡眠是你的責任，也是病人安全。」[[mohw]]"),
+  say("sys","一位阿伯大聲說：「男護士喔？叫女的來打針啦！」陳品睿正要幫他打針。"),
+  choose("me","你在旁邊，要怎麼反應？",[
+   {l:"平靜地說：「陳護理師是我們急診最資深的，交給他很放心。」",fx:{mood:2},rel:{rui:4},r:"阿伯哼了一聲，伸出手臂。陳品睿一針就上：「叫我護理師就好。」"},
+   {l:"當作沒聽到",fx:{},rel:{rui:-1},r:"陳品睿已經習慣了。但「習慣」不代表「沒關係」。"}]),
+  quiz("cpr","rui","OHCA 送到，陳品睿：「換你壓！」"),
+  quiz("ana","wang"),
+  quiz("stroke","wang","「最後正常時間兩小時前」，中風小組啟動："),
+  quiz("snake","rui","花蓮來的登山客，被蛇咬了。陳品睿：「有拍到蛇的照片，是龜殼花。」"),
+  quiz("op","wang"),
+  boss("rui","急救室裡，監視器變成一團亂波。陳品睿：「醫師，你帶 code。」",["vf"],1,
+   "ROSC。陳品睿和你擊了一下拳：「帶得很好。」王宛如在旁邊默默把你的名字寫進教學評核。",
+   "陳品睿冷靜接手：「先電擊，充電 200 焦耳。」病人最後恢復心跳。你在學習單上寫下：可電擊心律，先電擊。",{rui:4,wang:2})
+ ]},
+{y:1,m:0,dept:"技能關卡：急救與呼吸道",place:"臨床技能中心 · DOPS 考核",steps:[
+  say("rui","陳品睿：「急診月的最後一關。ACLS 我考，呼吸道王醫師考。我們只認指引，不認『學長說』。」"),
+  quiz("cprorder","rui","擬真假人倒在走廊："),
+  quiz("ratio","rui"),
+  quiz("hts","rui","假人第二輪心律是 PEA。陳品睿：「找原因。」"),
+  quiz("fbao","rui","下一站：餐廳情境。「有人噎到了！」"),
+  boss("wang","王宛如：「換呼吸道。擬真病人：肺炎合併呼吸衰竭，要插管。三題答對兩題才能拿喉頭鏡。」",["lemon","preox","etco2"],2,
+   "王宛如把喉頭鏡交給你：「評估、給氧、確認，你都想到了。」",
+   "王宛如：「插管最危險的不是插不進去，是忘了病人需要氧氣。回去讀 DAS 指引，下次再來。」",{wang:3}),
+  quiz("intorder","wang","正式上場前，把 RSI 步驟排好："),
+  boss("wang","王宛如：「最後兩題，是你一個人值夜班時會遇到的。」",["succ","failed"],1,
+   "王宛如：「很好。記住，插不進去不丟臉，讓病人缺氧才是。」陳品睿在評核表上簽了名。",
+   "王宛如：「重點是氧合，不是插管成功。喉罩先放上去，然後大聲求援。」",{wang:2,rui:2})
+ ]},
+ {y:1,m:2,dept:"社區醫學",place:"東部衛生所（社區合作）",steps:[
+  say("kolas","Kolas 主任把安全帽丟給你：「社區醫學兩個月，不用回原醫院值班。今天去部落做居家訪視。」[[mohw]]"),
+  quiz("crc","kolas","衛生所辦大腸癌篩檢活動，主任問："),
+  quiz("adult","kolas"),
+  quiz("dengueplt","kolas","夏天，從台南回鄉的阿姨確診登革熱。Kolas 主任問你："),
+  say("sys","居家訪視：88 歲阿嬤由印尼籍看護 Siti 照顧。阿嬤最近晚上會亂講話、走路不穩。桌上有一包成藥「綜合感冒藥」，含 diphenhydramine。"),
+  quiz("beers","kolas"),
+  choose("me","Siti 中文不太流利，但她照顧得非常仔細。你要怎麼衛教？",[
+   {l:"請她用母語說明她觀察到的，透過翻譯協助並用圖卡衛教",fx:{know:1,mood:2},rel:{kolas:3},r:"Siti 拿出手機，裡面記錄了阿嬤每天的血壓和睡眠。她是照護團隊重要的一員。（勞動部 1955 專線提供外籍工作者多語諮詢。）[[mol1955]]"},
+   {l:"只跟阿嬤的兒子講",fx:{},rel:{kolas:-1},r:"兒子一個月才回來一次。真正照顧的人沒聽到衛教。"}]),
+  say("kolas","Kolas 主任：「長照需求可以打 1966。醫療不只在醫院裡。」[[ltc1966]]"),
+  boss("kolas","回到衛生所，主任：「最後一題，給你在都市看不到的。」",["heat"],1,
+   "主任：「答對。夏天部落的農忙期，這題會救命。」",
+   "主任：「先降溫，後送醫。這裡離醫院一個小時，等不起。」",{kolas:4})
+ ]},
+ {y:1,m:2,dept:"選修",place:"選修兩個月（每月一科）",elective:2,steps:[]},
+ {y:1,m:0,dept:"PGY1 年度評核",place:"教學部",steps:[
+  say("sys","PGY1 結束前，教學部安排工作場所評量與學習歷程檢討。"),
+  quiz("minicex","zhang","張雅筑學姊擔任你的評核教師："),
+  {t:"yearEnd"}
+ ]},
+ {y:2,m:3,dept:"內科（進階）",place:"內科病房，你帶 PGY1",steps:[
+  say("zhang","張雅筑升總醫師了：「今年你帶 PGY1。記得你去年怎麼被教的嗎？選你想要的方式。」"),
+  say("hsu","許哲維也升 PGY2，交班單寫得比你還整齊。他尷尬地說：「去年……謝謝你。」"),
+  quiz("af","zhang"),
+  quiz("stemi","rui","急診胸痛病人，ECG 是 inferior STEMI："),
+  shift(2),
+  quiz("inr","cheng","鄭宇安藥師打電話來："),
+  quiz("ffp","zhang","外科會診單寫著「INR 1.6，術前是否需輸 FFP？」張雅筑把單子交給你："),
+  quiz("taco","kui","小葵：「12 床輸完血兩個小時開始喘，血氧 88。」"),
+  quiz("apap","cheng"),
+  quiz("hypercal","zhang"),
+  quiz("adrenal","zhang","骨科會診：術後第一天血壓一直上不來。"),
+  say("bai","白芷晴：「我爸出院了，這一年謝謝你幫我爭取彈性排班。這週你的夜班我來換。」"),
+  boss("zhang","家庭會議前，張雅筑：「你來主持。先確認法律你懂。」",["acp","dnr"],2,
+   "家屬會議結束，病人女兒握著你的手說：「謝謝你讓我們知道媽媽想要什麼。」",
+   "張雅筑接手補充說明，會後陪你把病主法和安寧條例條文讀一遍。",{zhang:4,shih:2})
+ ]},
+ {y:2,m:2,dept:"外科（進階）",place:"外科與創傷",steps:[
+  say("ouyang","歐陽晉剛從三個月育嬰假回來：「以前那樣罵人，是我錯了。這次我們好好來。」"),
+  choose("me","你要怎麼回？",[
+   {l:"「謝謝學長。我們一起把交班表改好吧。」",fx:{mood:4},rel:{ouyang:4},r:"你們一起設計了新的外科交班表，NPO、抗凝血劑、過敏都有勾選欄。"},
+   {l:"保持距離，只談公事",fx:{},rel:{ouyang:1},r:"沒關係，修復關係本來就需要時間。"}]),
+  quiz("mtp","ouyang","大量輸血啟動："),
+  quiz("compart","ouyang"),
+  quiz("periop","cheng","明天要開刀的糖尿病病人，藥師鄭宇安問你："),
+  quiz("needle","sys","這次是你帶的 PGY1 被針扎，他慌了。你先告訴他："),
+  boss("ouyang","創傷小組會議，歐陽晉：「考你兩題，答對一題就好。」",["trauma","burn"],1,
+   "歐陽晉：「很穩。考慮來外科嗎？我們缺人，而且現在工時有守法。」",
+   "歐陽晉：「沒關係，我們一起再看一次 ATLS。」這次他真的沒有罵人。",{ouyang:3})
+ ]},
+ {y:2,m:1,dept:"急診醫學（夜班）",place:"急診",steps:[
+  quiz("ecg10","wang"),
+  quiz("nalox","rui"),
+  quiz("gcs","rui"),
+  shift(3),
+  quiz("brady","rui","監視器警報：心跳 34，血壓 78/40，病人說頭暈。"),
+  quiz("svt","wang"),
+  boss("wang","凌晨四點，院內 CPR 廣播。王宛如：「你今晚當資深，你帶 code。」",["pea","etco2cpr","rosc"],2,
+   "王宛如：「你已經可以照顧整個急診的夜晚了。」",
+   "王宛如：「不急，下一次你會更快。」",{wang:4})
+ ]},
+ {y:2,m:1,dept:"老年醫學",place:"老年醫學病房",steps:[
+  say("shih","施雨萱主治蹲下來跟輪椅上的阿公平視：「阿公，今天是幾月幾號？」"),
+  quiz("cam","shih"),
+  quiz("delir","shih","半夜，阿公要拔鼻胃管。值班的小葵打給你："),
+  quiz("tug","shih"),
+  quiz("beers","cheng","鄭宇安做用藥整合時問你："),
+  boss("shih","施醫師：「最後，安寧照護。」",["dyspnea"],1,
+   "施醫師：「好的醫師不只會救命，也會陪病人好好走完。」",
+   "施醫師：「鴉片類在末期呼吸困難是對的藥。我們一起跟家屬說明。」",{shih:4})
+ ]},
+ {y:2,m:5,dept:"選修",place:"選修五個月（同科最多 2 個月）",elective:2,steps:[
+  say("sys","PGY2 不分組訓練有 5 個月選修。你挑兩科深入體驗（其餘月份濃縮帶過）。")]},
+ {y:2,m:0,dept:"住院醫師招募",place:"未來",steps:[{t:"ending"}]}
+];
+
+
+/* ======================= 讀書網站與參考文獻 ======================= */
+const GAS_URL = ""; // PGY 職前加油站網址（待補）
+const SITES = {
+  pocket:{n:"2026 內科小手冊", u:"https://pocket.drtsengshihting.com/"},
+  guide:{n:"內科指引索引", u:"https://guideline.drtsengshihting.com/"},
+  review:{n:"內科 Review Hub", u:"https://imreview.drtsengshihting.com/"},
+  gas:{n:"PGY 職前加油站", u:GAS_URL},
+  gas_acls:{n:"PGY職前加油站", u:"https://drive.google.com/file/d/17JVBn0DX4lUnHOVogluVhGuwibQtRf7N/view?usp=drivesdk", hide:true},
+  gas_glu:{n:"PGY職前加油站", u:"https://drive.google.com/file/d/1M8rVEmyVDHBEvMnPl_vlCQkMlxa71S7x/view?usp=drivesdk", hide:true},
+  gas_tx:{n:"PGY職前加油站", u:"https://drive.google.com/file/d/1JWHO6oeknX-4uJTcC_0u-CxbFPXaAoUn/view?usp=drivesdk", hide:true},
+  endo:{n:"內分泌代謝實證教室（需密碼）", u:"https://endoclass.drtsengshihting.com/"}
+};
+const GAS_ACLS = ["cpr","ratio","etco2cpr","pea","hts","rosc","brady","svt","vf","cprorder","lemon","preox","failed","intorder","etco2","succ","pedcpr","fbao","stemi","stroke","ecg10"];
+const STUDY = {
+  sepsis:[["pocket","抗生素B：經驗性用藥（敗血症 SSC 2021）"],["guide","敗血症"]],
+  curb:[["pocket","抗生素B：社區型肺炎 CAP"],["guide","肺炎"]],
+  hyperk:[["pocket","電解質"]], hypona:[["pocket","電解質"]], kcl:[["pocket","電解質"]],
+  hypogly:[["pocket","血糖/糖尿病"]], dka:[["pocket","血糖/糖尿病、內分泌急症"]],
+  hypercal:[["pocket","內分泌急症"]], af:[["pocket","抗凝血"],["guide","心房顫動"]],
+  inr:[["pocket","抗凝血"]], stemi:[["pocket","抗血小板"],["guide","急性冠心症"]],
+  htn:[["pocket","高血壓"]], cam:[["pocket","鎮靜/譫妄/抗癲癇"]], delir:[["pocket","鎮靜/譫妄/抗癲癇"]],
+  ugib:[["guide","上消化道出血"],["review","消化道出血文獻"]], beers:[["pocket","病房常用對症藥"]]
+};
+const SYS_REFS = [
+  {k:"mohw", t:"衛生福利部。二年期醫師畢業後一般醫學訓練計畫（民國 115 年 6 月 24 日衛部醫字第 1151665161 號修正公告）。", u:"https://www.mohw.gov.tw/dl-100937-17468d96-d034-49a9-919f-771bbe96cba7.html"},
+  {k:"cgmh", t:"長庚醫療財團法人。住院醫師納入勞基法之權益及相關配套措施（2019 年 8 月），整理衛福部《住院醫師勞動權益保障及工作時間指引》。", u:"https://www1.cgmh.org.tw/intr/intr6/c52000/files/R/201908住院醫師納入勞基法之權益及相關配套措施.pdf"},
+  {k:"pts", t:"公視新聞網。受僱醫師納勞基法 僅限住院醫師部分（2018）。", u:"https://news.pts.org.tw/article/408695"},
+  {k:"ntuh1", t:"臺大醫院教學部。PGY 學員基本課程說明。", u:"https://www.ntuh.gov.tw/ckfinder_file/EDU-education/files/PGY%E5%AD%B8%E5%93%A1%E5%9F%BA%E6%9C%AC%E8%AA%B2%E7%A8%8B%E8%AA%AA%E6%98%8E.pdf"},
+  {k:"ntuh2", t:"臺大醫院。110 學年度 PGY 招生說明會簡報。", u:"https://www.ntuh.gov.tw/ckfinder_file/EDU-education/files/%E8%87%BA%E5%A4%A7%E9%86%AB%E9%99%A2110%E5%AD%B8%E5%B9%B4%E5%BA%A6PGY%E6%8B%9B%E7%94%9F%E8%AA%AA%E6%98%8E%E6%9C%83%E7%B0%A1%E5%A0%B1.pdf"},
+  {k:"cch", t:"彰化基督教醫院。113 學年度 PGY 招募說明會公告（2023）。", u:"https://dpt.cch.org.tw/upload/site_news/3610/5149/彰化基督教醫院113學年度PGY招募說明會-1121217(公告).pdf"},
+  {k:"law_hospice", t:"安寧緩和醫療條例，第 7 條。全國法規資料庫。", u:"https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0020066"},
+  {k:"law_par", t:"病人自主權利法，第 8、9 條。全國法規資料庫。", u:"https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0020189"},
+  {k:"law_osh", t:"職業安全衛生法，第 6 條第 2 項（預防執行職務遭受不法侵害）。全國法規資料庫。", u:"https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0060001"},
+  {k:"ismp_abbr", t:"Institute for Safe Medication Practices. ISMP List of Error-Prone Abbreviations, Symbols, and Dose Designations (2021)."},
+  {k:"gmc", t:"General Medical Council. Intimate examinations and chaperones (2024).", u:"https://www.gmc-uk.org/professional-standards/the-professional-standards/intimate-examinations-and-chaperones"},
+  {k:"ltc1966", t:"衛生福利部。長照服務專線 1966。", u:"https://1966.gov.tw/"},
+  {k:"mol1955", t:"勞動部。1955 勞工諮詢申訴專線（提供多語服務）。"},
+  {k:"mohw1925", t:"衛生福利部。1925 安心專線（24 小時免付費心理諮詢）。"},
+  {k:"gas_acls", t:"黃品叡。PGY 職前加油站：ACLS 破題解析（2026 版；依 2025 AHA ECC、2025 ACC/AHA ACS、2026 AHA/ASA Stroke 指引整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/17JVBn0DX4lUnHOVogluVhGuwibQtRf7N/view?usp=drivesdk"},
+  {k:"gas_glu", t:"黃品叡。PGY 職前加油站：住院血糖值班生存講義（依 ADA Standards of Care 2026 整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1M8rVEmyVDHBEvMnPl_vlCQkMlxa71S7x/view?usp=drivesdk"},
+  {k:"gas_tx", t:"黃品叡。PGY 職前加油站：輸血醫囑值班講義（依 AABB 2023 紅血球、AABB/ICTMG 2025 血小板指引與 ISBT 定義整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1JWHO6oeknX-4uJTcC_0u-CxbFPXaAoUn/view?usp=drivesdk"}
+];
+GAS_ACLS.forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_acls","ACLS 破題解析 2026"]));
+["hypogly","dka","periop"].forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_glu","住院血糖值班生存講義"]));
+["txunit","txstop","taco","ffp","dengueplt","ugib","mtp","inr"].forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_tx","輸血醫囑值班講義"]));
+Object.entries({hypogly:"低血糖",dka:"DKA 與 HHS",periop:"住院與圍術期血糖",hypercal:"高血鈣",hypona:"低血鈉",adrenal:"腎上腺功能不全"}).forEach(([id,ch]) => (STUDY[id] = STUDY[id] || []).push(["endo",ch]));
+const REFS = []; const REF_NO = {};
+SYS_REFS.forEach(r => { REFS.push(r); REF_NO[r.k] = REFS.length; });
+Object.entries(QB).forEach(([id,q]) => { const k = "q:"+q.s; if(!REF_NO[k]){ REFS.push({k, t:q.s}); REF_NO[k] = REFS.length; } q.ref = REF_NO[k]; });
+
+/* ======================= 狀態 ======================= */
+const KEY = "pgy-rpg-v2";
+let S = null;
+function fresh(name){
+  return {name, hosp:null, hp:100, maxhp:100, mood:70, know:0, hours:230, month:0,
+    stage:-1, step:0, rel:{}, met:{}, cards:{}, right:0, total:0, burnout:0, electDone:[], electQueue:null,
+    log:[], hourLog:[], note:""};
+}
+/* 每個人用自己的 Claude 帳號存檔；沒有登入時退回這台裝置的瀏覽器存檔 */
+const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0};
+function save(){
+  if(S) S.savedAt = Date.now();
+  if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudWrite, 1200); return; }
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+}
+async function cloudWrite(){
+  if(CLOUD.busy){ CLOUD.again = true; return; }
+  CLOUD.busy = true;
+  try{ const s = JSON.stringify(S); CLOUD.data = S ? JSON.parse(s) : null; await CLOUD.ref.set({s, at:Date.now()}); }
+  catch(e){ setCloudNote("雲端存檔暫時失敗，下一步會再試一次。"); }
+  CLOUD.busy = false;
+  if(CLOUD.again){ CLOUD.again = false; cloudWrite(); }
+}
+function load(){
+  if(CLOUD.ref) return CLOUD.data;
+  try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; }
+}
+function clearSave(){
+  if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.data = null; CLOUD.ref.delete().catch(()=>{}); }
+  try{ localStorage.removeItem(KEY); }catch(e){}
+}
+function setCloudNote(t){ const n = document.getElementById("acct"); if(n) n.textContent = t; }
+function cloudNote(){
+  if(CLOUD.ref) return "☁ 已登入：進度存在你自己的帳號，換電腦或手機也能接著玩；別人看不到你的存檔。";
+  if(!window.claude) return "進度存在這台裝置的瀏覽器，換裝置不會跟著走。";
+  if(CLOUD.ready) return "目前沒有登入，進度只存在這台裝置的瀏覽器。";
+  return "正在確認帳號…";
+}
+(async () => {
+  try{
+    const db = await window.claude?.use?.("db"); const user = await window.claude?.use?.("user");
+    const id = db && user ? await user.id() : null;
+    if(id){
+      const ref = db.collection("data/users/"+id).doc("pgy");
+      const snap = await ref.get();
+      let data = null;
+      if(snap.exists){ try{ data = JSON.parse(snap.data().s); }catch(e){} }
+      else { const local = (() => { try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } })();
+        if(local){ data = local; try{ await ref.set({s:JSON.stringify(local), at:Date.now()}); }catch(e){} } }
+      CLOUD.ref = ref; CLOUD.data = data;
+    }
+  }catch(e){}
+  CLOUD.ready = true;
+  if(!S) titleScreen(); else setCloudNote(cloudNote());
+})();
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rich = s => esc(s).replace(/\[\[(\w+)\]\]/g, (m,k) => REF_NO[k] ? `<a class="ref" href="#ref-${REF_NO[k]}" data-ref="${REF_NO[k]}">[${REF_NO[k]}]</a>` : "");
+const plain = s => String(s).replace(/\[\[(\w+)\]\]/g, "");
+
+function monthLabel(){ const y = S.month < 12 ? 1 : 2; const m = S.month < 12 ? S.month+1 : S.month-11; return `Y${y}·${String(Math.min(m,12)).padStart(2,"0")}月`; }
+function addLog(txt){ if(!S) return; S.log.unshift({w:monthLabel(), t:txt, s:0}); if(S.log.length>200) S.log.length=200; }
+
+function applyFx(fx={}, rel={}){
+  const out = [];
+  if(fx.maxhp){ S.maxhp += fx.maxhp; S.hp = clamp(S.hp+fx.maxhp,0,S.maxhp); out.push(`體力上限 ${fx.maxhp>0?"+":""}${fx.maxhp}`); }
+  if(fx.hp){ S.hp = clamp(S.hp+fx.hp,0,S.maxhp); out.push(`健康 ${fx.hp>0?"+":""}${fx.hp}`); }
+  if(fx.mood){ S.mood = clamp(S.mood+fx.mood,0,100); out.push(`幸福 ${fx.mood>0?"+":""}${fx.mood}`); }
+  if(fx.know){ S.know += fx.know; out.push(`知識 +${fx.know}`); }
+  if(fx.hours){ S.hours += fx.hours*8; out.push(`工時 +${fx.hours*8} 小時`); }
+  for(const [k,v] of Object.entries(rel||{})){ S.rel[k]=(S.rel[k]||0)+v; S.met[k]=1; out.push(`${CH[k].n} ${v>0?"+":""}${v}`); }
+  return out.join("　");
+}
+
+/* ======================= 側欄：狀態／人生地圖／工時曲線／訓練紀錄 ======================= */
+const DEPT_COL = [["內科","#2c6e5c"],["外科","#30506e"],["兒科","#c07a12"],["婦產","#8a3b5c"],["急診","#a3342e"],["社區","#1f7a6a"],["老年","#5b5ea6"],["選修","#7a5bb3"]];
+const colOf = d => (DEPT_COL.find(([k]) => d.includes(k)) || ["","#888"])[1];
+function socialScore(){ const ks = Object.keys(S.met).filter(k => CH[k] && MET_ORDER.includes(k)); if(!ks.length) return 50; const avg = ks.reduce((a,k)=>a+(S.rel[k]||0),0)/ks.length; return clamp(Math.round(50+avg*10),0,100); }
+function renderSide(){
+  const side = document.getElementById("side");
+  if(!S || S.stage<0){ side.innerHTML = introSide(); return; }
+  const st = STAGES[Math.min(S.stage, STAGES.length-1)];
+  const bar = (lab,v,max,alert,txt) => `<div class="stat ${alert?"alert":""}"><span>${lab}</span><i><b style="width:${clamp(v/max*100,0,100)}%"></b></i><em>${txt ?? Math.round(v)}</em></div>`;
+  const know100 = clamp(Math.round(S.know/2.5),0,100);
+  // map
+  let cells = [], m = 0;
+  STAGES.forEach(s => { for(let k=0;k<s.m;k++){ cells.push({c:colOf(s.dept), d:s.dept, i:m}); m++; } });
+  const mapHtml = cells.map(c => `<div title="${esc(c.d)}" class="${c.i===S.month?"now":""}" style="${c.i<S.month?`background:${c.c}`:""}"></div>`).join("");
+  const legend = DEPT_COL.map(([k,c]) => `<span style="--c:${c}">${k}</span>`).join("");
+  side.innerHTML = `
+  <section class="panel" aria-label="狀態">
+    <div class="panel-h"><h3>DR. ${esc(S.name)}</h3><span class="where">${S.month<12?"PGY1":"PGY2"} · ${esc(st.dept)}</span></div>
+    ${bar("健康",S.hp,S.maxhp,S.hp<30)}${bar("幸福",S.mood,100,S.mood<25)}${bar("知識",know100,100,false)}${bar("人際關係",socialScore(),100,false)}
+    ${bar("四週工時",S.hours,320,S.hours>280,S.hours+"h")}
+  </section>
+  <section class="panel" aria-label="人生地圖">
+    <div class="panel-h"><h3>人生地圖</h3><span class="hint">1 格 = 1 個月 · ${S.month}/24</span></div>
+    <div class="map">${mapHtml}</div><div class="legend">${legend}</div>
+  </section>
+  <section class="panel curve" aria-label="工時曲線">
+    <div class="panel-h"><h3>工時曲線</h3><span class="hint">各科結束時的四週工時</span></div>${curve()}
+  </section>
+  <section class="panel" aria-label="訓練紀錄">
+    <div class="panel-h"><h3>訓練紀錄</h3><span class="hint">新的在上 · 點一下加☆</span></div>
+    ${S.log.length ? `<ul class="log">${S.log.map((l,i)=>`<li><button data-log="${i}"><span class="when">${esc(l.w)}</span><span>${esc(l.t)}</span><span class="star">${l.s?"☆":""}</span></button></li>`).join("")}</ul>` : `<p class="hint">做出第一個選擇後，這裡會留下紀錄。</p>`}
+  </section>`;
+  side.querySelectorAll("[data-log]").forEach(b => b.onclick = () => { const l = S.log[+b.dataset.log]; l.s = l.s?0:1; save(); renderSide(); });
+}
+function introSide(){
+  return `<section class="panel"><div class="panel-h"><h3>這是什麼遊戲</h3></div>
+   <p class="meta" style="margin:0">一款以真實制度為骨架的文字 RPG。兩年 24 格人生地圖，每一格是一個月的輪訓。題目答完會收進知識卡，並附參考文獻與讀書網站的延伸閱讀。</p></section>
+   <section class="panel"><div class="panel-h"><h3>延伸讀書</h3></div>
+   <div class="study">${Object.values(SITES).filter(s=>s.u&&!s.hide).map(s=>`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)} ↗</a>`).join("")}</div></section>`;
+}
+function curve(){
+  const pts = S.hourLog;
+  if(!pts.length) return `<p class="hint" style="margin:0">完成第一個科別後出現。上限 320 小時／四週[[cgmh]]。</p>`.replace("[[cgmh]]", `<a class="ref" href="#ref-${REF_NO.cgmh}" data-ref="${REF_NO.cgmh}">[${REF_NO.cgmh}]</a>`);
+  const W=300,H=120,L=30,R=8,T=10,B=22, max=360;
+  const x = i => L + (pts.length===1 ? (W-L-R)/2 : i*(W-L-R)/(pts.length-1));
+  const y = v => T + (1-v/max)*(H-T-B);
+  const line = pts.map((p,i)=>`${x(i).toFixed(1)},${y(p.h).toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="各科四週工時">
+   ${[0,160,320].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1" ${v===320?'stroke-dasharray="4 3" stroke="var(--stamp)"':""}/><text x="${L-4}" y="${y(v)+3}" text-anchor="end">${v}</text>`).join("")}
+   <text x="${W-R}" y="${y(320)-4}" text-anchor="end" style="fill:var(--stamp)">上限 320h</text>
+   <polyline points="${line}" fill="none" stroke="var(--drape)" stroke-width="2"/>
+   ${pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.h)}" r="${i===pts.length-1?4:2.5}" fill="${p.h>320?"var(--stamp)":"var(--drape)"}"/>`).join("")}
+   <text x="${x(0)}" y="${H-6}" text-anchor="${pts.length===1?"middle":"start"}">${esc(pts[0].lab)}</text>
+   ${pts.length>1?`<text x="${x(pts.length-1)}" y="${H-6}" text-anchor="end">${esc(pts[pts.length-1].lab)}</text>`:""}
+  </svg>`;
+}
+
+/* ======================= 畫面 ======================= */
+const V = () => document.getElementById("view");
+function av(id){ if(id!=="sys" && LOOK[id]) return `<img class="av pav" src="${portrait(id)}" alt="">`; const c = CH[id]||CH.sys; const ch = id==="me" ? (S?.name||"你")[0] : c.n[0]; return `<div class="av" style="background:${c.col}" aria-hidden="true">${esc(ch)}</div>`; }
+function speaker(id, text){
+  const c = CH[id]||CH.sys; const name = id==="me" ? (S?.name||"你") : c.n;
+  return `<div class="speaker">${av(id)}<div class="says"><div class="who">${esc(name)}<small>${esc(c.role||"")}</small></div>${rich(text)}</div></div>`;
+}
+const nxBtn = (label="繼續") => `<button class="primary" id="nx" data-auto="1">${esc(label)}</button>`;
+function stageBanner(st){
+  const yr = st.y===1?"PGY1":"PGY2";
+  return `<div class="banner"><span class="eyebrow">${yr} · ${esc(st.place)}</span><h2>${esc(st.dept)}</h2>${st.m?`<span class="meta">訓練期間 ${st.m} 個月（依衛福部二年期一般醫學訓練計畫）${rich("[[mohw]]")}</span>`:""}</div>`;
+}
+function show(html){
+  if(V().hidden) setTab("game");
+  const v=V(); v.classList.remove("enter"); void v.offsetWidth; v.classList.add("enter"); v.innerHTML = html;
+  renderSide(); save(); afterRender();
+  const r = v.getBoundingClientRect(); if(r.top < 0) window.scrollTo({top: window.scrollY + r.top - 8});
+}
+function afterRender(){
+  document.getElementById("waiting").hidden = !V().querySelector(".opt:not([disabled]), #nm, .ad");
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("a.ref"); if(!a) return;
+  e.preventDefault(); setTab("refs");
+  const li = document.getElementById("ref-"+a.dataset.ref); if(li){ li.scrollIntoView({block:"center"}); li.style.background="var(--surface-2)"; }
+});
+
+function titleScreen(){
+  const saved = load();
+  show(`<div class="hero"><span class="eyebrow">Taiwan Post-Graduate Year · 人生模擬</span>
+   <h1>呆丸 <span>PGY</span> 物語</h1>
+   <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
+   <p>路上有搶功的同梯、凶巴巴的學長姐、管東管西的護理長，也有擋下你錯誤醫囑的護理師。每一道臨床題都附參考文獻，並連到內科小手冊與指引索引的對應章節。</p></div>
+   <div class="field"><label for="nm">你的名字</label><input id="nm" maxlength="8" placeholder="例如：林小安" value="${esc(saved?.name||"")}"></div>
+   <div class="row"><button class="primary" id="go">開始報到</button>${saved && saved.stage>=0 ? `<button class="ghost" id="cont">繼續上次進度（${saved.month<12?"PGY1":"PGY2"}，第 ${saved.month} 個月）</button>`:""}</div>
+   <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
+   <p class="meta" id="acct">${cloudNote()}</p>`);
+  document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); chooseHospital(); };
+  const c = document.getElementById("cont"); if(c) c.onclick = () => resume(saved);
+}
+
+function chooseHospital(){
+  S.stage = -1;
+  show(`<div class="banner"><span class="eyebrow">畢業前一年 · PGY 招募季</span><h2>選擇你的訓練醫院</h2>
+   <span class="meta">各醫院會在前一年辦招募說明會，公告容額、課程特色、社區合作點與面試日期${rich("[[ntuh2]][[cch]]")}。以下三家醫院與廣告均為虛構，只借用說明會的格式。</span></div>
+   <div class="ads">${HOSP.map((h,i)=>`<button class="ad" data-i="${i}"><span class="tag">${h.tag}</span><h3>${esc(h.n)}</h3><span class="meta">${esc(h.kind)}</span><ul>${h.pts.map(p=>`<li>${esc(p)}</li>`).join("")}</ul><span class="meta">${esc(h.note)}</span></button>`).join("")}</div>`);
+  V().querySelectorAll(".ad").forEach(b => b.onclick = () => {
+    const h = HOSP[+b.dataset.i]; S.hosp = h.id;
+    const fx = applyFx(h.fx, h.fx.rel);
+    S.stage = 0; S.step = 0; S.hours = 230;
+    addLog(`錄取「${h.n}」`);
+    show(`${speaker("sys",`你錄取了「${h.n}」！`)}<p class="fx">${fx}</p>${nxBtn("七月一日，報到")}`);
+    document.getElementById("nx").onclick = run;
+  });
+}
+
+/* ======================= 主流程 ======================= */
+function run(){
+  worldSync();
+  if(S.stage<0) return chooseHospital();
+  const st = STAGES[S.stage];
+  if(!st) return ending();
+  if(st.elective && S.step >= st.steps.length){
+    if(!S.electQueue) return pickElective(st);
+    if(S.electQueue.length){
+      const e = ELECTIVES[S.electQueue[0]];
+      const idx = S.step - st.steps.length;
+      if(idx < e.steps.length) return step(e.steps[idx], st);
+      S.electQueue.shift(); S.step = st.steps.length; save();
+      if(S.electQueue.length) return run();
+      if(S.electCount < st.elective) return pickElective(st);
+    }
+    return endStage();
+  }
+  if(S.step >= st.steps.length) return endStage();
+  step(st.steps[S.step], st);
+}
+function next(){ S.step++; save(); checkLimits() || run(); }
+
+function checkLimits(){
+  if(S.hours > 320){
+    addLog(`四週工時 ${S.hours}h，超過上限被叫回家`);
+    S.hours = 300;
+    show(`${speaker("lin","林振宏護理長擋在你面前：「你這四週已經超過 320 小時了。住院醫師納入勞基法後總工時有上限，值班日單次勤務含延長最多 28 小時，兩次勤務之間至少休 10 小時。回去睡覺。」[[cgmh]]")}
+     <div class="feedback"><strong>真實制度</strong><span>住院醫師自 2019 年 9 月 1 日起適用勞動基準法；《住院醫師勞動權益保障及工作時間指引》以四週為單位，總工時上限 320 小時${rich("[[cgmh]][[pts]]")}。</span></div>
+     <p class="fx">${applyFx({hp:15,mood:-3},{lin:2})}</p>${nxBtn("去休息")}`);
+    document.getElementById("nx").onclick = run; return true;
+  }
+  if(S.hp <= 0){
+    S.burnout++; addLog("過勞倒下，休息兩天");
+    show(`${speaker("rui","你在護理站眼前一黑。醒來時陳品睿正在幫你量血壓：「你今天幾點吃飯的？……沒吃？」")}
+     <p>教學部安排你休息兩天。疲勞不是意志力問題，是病人安全問題。</p>
+     <p class="fx">${applyFx({hp:60,mood:-8},{rui:2})}</p>${nxBtn("回到崗位")}`);
+    document.getElementById("nx").onclick = run; return true;
+  }
+  if(S.mood <= 0){
+    addLog("白芷晴陪你聊了一晚");
+    show(`${speaker("bai","白芷晴坐到你旁邊：「你最近看起來很不好。醫院有員工協助方案可以約心理師；半夜撐不住也可以打 1925 安心專線。我也去過，真的有用。」[[mohw1925]]")}
+     <p class="fx">${applyFx({mood:45},{bai:3})}</p>${nxBtn("謝謝你")}`);
+    document.getElementById("nx").onclick = run; return true;
+  }
+  return false;
+}
+
+function choiceScreen(head, s, done){
+  show(`${head}${speaker(s.who,s.text)}<div class="opts">${s.opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o.l)}</button>`).join("")}</div>`);
+  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const o = s.opts[+b.dataset.i];
+    const fx = applyFx(o.fx, o.rel);
+    addLog(`選擇：${o.l}`);
+    show(`${speaker("sys", o.r)}<p class="fx">${fx}</p>${nxBtn()}`);
+    document.getElementById("nx").onclick = done;
+  });
+}
+
+function step(s, st){
+  worldSync();
+  gate(s.t==="night" ? "kui" : s.who, (S.step===0) ? stageBanner(st) : "", () => step0(s, st));
+}
+function step0(s, st){
+  const head = (S.step===0) ? stageBanner(st) : "";
+  if(s.who) S.met[s.who] = 1;
+  if(s.t==="say"){
+    show(`${head}${speaker(s.who,s.text)}${nxBtn()}`);
+    document.getElementById("nx").onclick = next;
+  } else if(s.t==="choice"){
+    choiceScreen(head, s, next);
+  } else if(s.t==="quiz"){
+    askQuiz(head, s.who, s.lead, s.id, () => next());
+  } else if(s.t==="boss"){
+    runBoss(head, s);
+  } else if(s.t==="night"){
+    const ev = NIGHT[s.n % NIGHT.length];
+    S.met.kui = 1; applyFx({hours:2}); addLog("夜班");
+    runSeq(head + `<span class="stamp">夜班</span>`, ev, next);
+  } else if(s.t==="yearEnd"){
+    yearEnd();
+  } else if(s.t==="ending"){
+    ending();
+  }
+}
+
+function runSeq(head, list, done, i=0){
+  if(i>=list.length) return done();
+  const s = list[i];
+  const go = () => runSeq("", list, done, i+1);
+  if(s.t==="say"){ show(`${head}${speaker(s.who,s.text)}${nxBtn()}`); document.getElementById("nx").onclick = go; }
+  else if(s.t==="quiz"){ askQuiz(head, s.who, s.lead, s.id, go); }
+  else if(s.t==="choice"){ choiceScreen(head, s, go); }
+}
+
+function shuffled(n){ const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function studyLinks(id){
+  const list = (STUDY[id]||[]).filter(([k]) => SITES[k].u);
+  if(SITES.gas.u) list.push(["gas","PGY 職前準備"]);
+  if(!list.length) return "";
+  return `<div class="study"><span>延伸閱讀：</span>${list.map(([k,ch]) => `<a href="${SITES[k].u}" target="_blank" rel="noopener">${esc(SITES[k].n)}｜${esc(ch)} ↗</a>`).join("")}</div>`;
+}
+
+function askOrder(head, who, lead, id, done){
+  const q = QB[id]; const order = shuffled(q.ord.length); const picked = [];
+  S.met[who] = 1;
+  show(`${head}<span class="stamp">技能</span>${speaker(who, (lead ? lead+"\n" : "") + q.q)}<p class="hint">依序點選，已選的會標上號碼。</p><div class="opts">${order.map(k=>`<button class="opt" data-k="${k}">${esc(q.ord[k])}</button>`).join("")}</div>`);
+  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    picked.push(+b.dataset.k); b.disabled = true; b.textContent = `${picked.length}. ${q.ord[+b.dataset.k]}`;
+    if(picked.length < q.ord.length) return;
+    const ok = picked.every((k,i) => k===i);
+    V().querySelectorAll(".opt").forEach(x => { const k=+x.dataset.k; x.classList.add(picked.indexOf(k)===k ? "right" : "wrong"); });
+    S.total++; if(ok) S.right++; worldReact(ok); S.cards[id] = 1;
+    addLog(`${ok?"✓":"✗"} ${q.t}`);
+    const fx = applyFx(ok ? {know:6, mood:3, hours:0.5} : {know:2, hp:-8, mood:-3, hours:0.5});
+    const fb = document.createElement("div");
+    fb.className = "feedback" + (ok ? "" : " bad");
+    fb.innerHTML = `<span class="stamp ${ok?"ok":""}">${ok?"順序正確":"順序有誤"}</span><strong>正確順序</strong><ol style="margin:0;padding-left:1.4em">${q.ord.map(t=>`<li>${esc(t)}</li>`).join("")}</ol><span>${esc(q.e)}<a class="ref" href="#ref-${q.ref}" data-ref="${q.ref}">[${q.ref}]</a></span><span class="src">參考文獻 [${q.ref}]：${esc(q.s)}</span><span class="fx">${fx}　｜已收入知識卡</span>`;
+    const btn = document.createElement("button"); btn.className="primary"; btn.textContent="繼續"; btn.dataset.auto = "1";
+    btn.onclick = () => done(ok);
+    V().append(fb, btn); renderSide(); save(); afterRender(); btn.focus({preventScroll:true});
+  });
+}
+
+function askQuiz(head, who, lead, id, done){
+  if(QB[id].ord) return askOrder(head, who, lead, id, done);
+  const q = QB[id]; const order = shuffled(q.o.length);
+  S.met[who] = 1;
+  const pre = lead ? lead+"\n" : "";
+  show(`${head}${speaker(who, pre + q.q)}<div class="opts">${order.map(k=>`<button class="opt" data-k="${k}">${esc(q.o[k])}</button>`).join("")}</div>`);
+  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const k = +b.dataset.k, ok = k===q.a;
+    V().querySelectorAll(".opt").forEach(x => { x.disabled = true; const kk=+x.dataset.k; if(kk===q.a) x.classList.add("right"); else if(x===b) x.classList.add("wrong"); });
+    S.total++; if(ok) S.right++; worldReact(ok);
+    S.cards[id] = 1;
+    addLog(`${ok?"✓":"✗"} ${q.t}`);
+    const fx = applyFx(ok ? {know:4, mood:2, hours:0.5} : {know:1, hp:-8, mood:-3, hours:0.5});
+    const fb = document.createElement("div");
+    fb.className = "feedback" + (ok ? "" : " bad");
+    fb.innerHTML = `<span class="stamp ${ok?"ok":""}">${ok?"答對":"再想想"}</span><strong>${esc(q.t)}</strong><span>${esc(q.e)}<a class="ref" href="#ref-${q.ref}" data-ref="${q.ref}">[${q.ref}]</a></span><span class="src">參考文獻 [${q.ref}]：${esc(q.s)}</span>${studyLinks(id)}<span class="fx">${fx}　｜已收入知識卡</span>`;
+    const btn = document.createElement("button"); btn.className="primary"; btn.textContent="繼續"; btn.dataset.auto = "1";
+    btn.onclick = () => done(ok);
+    V().append(fb, btn); renderSide(); save(); afterRender(); btn.focus({preventScroll:true});
+  });
+}
+
+function runBoss(head, s){
+  let i = 0, score = 0;
+  const intro = () => {
+    show(`${head}<span class="stamp">關主</span>${speaker(s.who, s.intro)}<button class="primary" id="nx">接受挑戰</button>`);
+    document.getElementById("nx").onclick = ask;
+  };
+  const ask = () => {
+    if(i >= s.ids.length) return result();
+    askQuiz("", s.who, `（第 ${i+1}／${s.ids.length} 題）`, s.ids[i], ok => { if(ok) score++; i++; ask(); });
+  };
+  const result = () => {
+    const win = score >= s.pass;
+    const fx = applyFx(win ? {know:5, mood:6} : {mood:-4}, win ? s.rel : {});
+    addLog(`關主 ${CH[s.who].n}：${win?"過關":"補強"}（${score}/${s.ids.length}）`);
+    show(`<span class="stamp ${win?"ok":""}">${win?"過關":"補強"}</span>${speaker(s.who, win ? s.win : s.lose)}<p class="fx">答對 ${score}／${s.ids.length}　${fx}</p>${nxBtn()}`);
+    document.getElementById("nx").onclick = next;
+  };
+  intro();
+}
+
+function pickElective(st){
+  if(S.electCount === undefined || S.electStage !== S.stage){ S.electCount = 0; S.electStage = S.stage; }
+  const avail = Object.entries(ELECTIVES).filter(([k]) => !S.electDone.includes(k));
+  show(`${S.electCount===0?stageBanner(st):""}${speaker("sys", `選擇第 ${S.electCount+1} 個選修科（共選 ${st.elective} 科）。PGY1 選修每月選一科、不可重複同科。[[mohw]]`)}
+   <div class="opts">${avail.map(([k,e])=>`<button class="opt" data-k="${k}">${esc(e.n)}</button>`).join("")}</div>`);
+  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const k = b.dataset.k; S.electDone.push(k); S.electCount++; S.electQueue = [k]; S.step = st.steps.length;
+    addLog(`選修：${ELECTIVES[k].n}`); save(); run();
+  });
+}
+
+function endStage(){
+  const st = STAGES[S.stage];
+  if(st.m){ S.hourLog.push({lab:st.dept.replace("一般醫學",""), h:S.hours}); addLog(`完成 ${st.dept}（${st.m} 個月）`); }
+  S.month += st.m;
+  const rest = st.m ? applyFx({hp:25, mood:5}) : "";
+  S.hours = 230;
+  S.stage++; S.step = 0; S.electQueue = null;
+  const nx = STAGES[S.stage];
+  if(!nx) return ending();
+  if(st.m === 0){ return run(); }
+  show(`<div class="banner"><span class="eyebrow">輪訓結束 · ${S.month}/24 個月</span><h2>${esc(st.dept)} 完成</h2></div>
+   <p>換科前休了一天假，四週工時重新起算。人生地圖又填滿了 ${st.m} 格。</p><p class="fx">${rest}</p>${nxBtn("前往：" + nx.dept)}`);
+  document.getElementById("nx").onclick = run;
+}
+
+function yearEnd(){
+  const pct = S.total ? Math.round(S.right/S.total*100) : 0;
+  addLog("PGY1 結業");
+  show(`<div class="banner"><span class="eyebrow">PGY1 結業</span><h2>第一年，撐過來了</h2></div>
+   <p>臨床題答對率 <strong>${pct}%</strong>（${S.right}／${S.total}），醫學知識 ${S.know}。</p>
+   <p>第二年依計畫可選「分組」（內科、外科、兒科或婦產科組，含急診、社區醫院、安寧照護共 9 個月，加老年醫學 1 個月與選修 2 個月），或「不分組」（內科 3、外科 2、急診 1、老年醫學 1、選修 5 個月）${rich("[[mohw]]")}。本遊戲走「不分組」路線。</p>
+   ${nxBtn("進入 PGY2")}`);
+  document.getElementById("nx").onclick = next;
+}
+
+const SPECIALTIES = ["內科","外科","兒科","婦產科","急診醫學科","家庭醫學科","精神科","麻醉科","放射診斷科","皮膚科","眼科","老年醫學（經內科／家醫科）"];
+function ending(){
+  const pct = S.total ? S.right/S.total : 0;
+  show(`<div class="banner"><span class="eyebrow">PGY 結訓 · 住院醫師招募</span><h2>兩年過去了，你想走哪一科？</h2>
+   <span class="meta">完成 PGY 訓練後，才能申請進入各專科住院醫師訓練${rich("[[mohw]]")}。</span></div>
+   <div class="opts">${SPECIALTIES.map((s,i)=>`<button class="opt" data-i="${i}">${esc(s)}</button>`).join("")}</div>`);
+  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const sp = SPECIALTIES[+b.dataset.i];
+    const rels = MET_ORDER.filter(k => (S.rel[k]||0) >= 5);
+    let verdict;
+    if(pct >= 0.75 && S.know >= 120) verdict = `面試時，主任翻著你的學習歷程說：「Mini-CEX 評語寫你『臨床推理清楚、尊重團隊』。歡迎加入${sp}。」你錄取了第一志願。`;
+    else if(pct >= 0.55) verdict = `面試有點緊張，但你把 PGY 兩年的病人故事講得很真誠。你錄取了${sp}。`;
+    else verdict = `第一志願醫院的${sp}名額很少，你沒有錄取。張雅筑學姊陪你整理面試回饋，你去參加其他醫院的第二波招募，最後錄取另一家醫院的${sp}。她說：「第一家沒上很常見，訓練是在哪裡都能好好學的。」`;
+    addLog(`申請 ${sp}`);
+    S.stage = STAGES.length; S.spec = sp; S.verdict = verdict; save();
+    finalScreen();
+  });
+}
+function finalScreen(){
+  const pct = S.total ? S.right/S.total : 0;
+  const rels = MET_ORDER.filter(k => (S.rel[k]||0) >= 5);
+  const epi = rels.length ? rels.map(k => `<li><strong>${esc(CH[k].n)}</strong>：${esc(CH[k].twist || "謝謝你這兩年的照顧。")}</li>`).join("") : "<li>這兩年你比較少跟人深交。醫療是團隊工作，下一段路試著多交幾個戰友吧。</li>";
+  show(`<div class="banner"><span class="eyebrow">結局</span><h2>${esc(S.name)} 醫師，${esc(S.spec)}</h2></div>
+   <p>${esc(S.verdict)}</p>
+   <p>答對率 ${Math.round(pct*100)}%（${S.right}／${S.total}）· 醫學知識 ${S.know} · 知識卡 ${Object.keys(S.cards).length}／${Object.keys(QB).length} · 過勞倒下 ${S.burnout} 次</p>
+   <h3>那些人後來</h3><ul>${epi}</ul>
+   <div class="field"><label for="note">✎ 留下一句話（給兩年前的自己）</label><textarea id="note" rows="2" maxlength="120">${esc(S.note||"")}</textarea></div>
+   <div class="row"><button class="primary" id="again">重新開始</button><button class="ghost" id="cards">看知識卡</button></div>`);
+  const note = document.getElementById("note");
+  note.oninput = () => { S.note = note.value; save(); };
+  document.getElementById("again").onclick = () => { clearSave(); S=null; titleScreen(); };
+  document.getElementById("cards").onclick = () => setTab("cards");
+}
+
+/* ======================= 分頁 ======================= */
+function setTab(tab){
+  document.querySelectorAll("#ctrl [data-tab]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tab===tab));
+  const tv = document.getElementById("tabview");
+  V().hidden = tab!=="game"; tv.hidden = tab==="game";
+  if(tab==="people") tv.innerHTML = peopleView();
+  if(tab==="cards") tv.innerHTML = cardsView();
+  if(tab==="system") tv.innerHTML = systemView();
+  if(tab==="refs") tv.innerHTML = refsView();
+  if(tab!=="game") window.scrollTo({top:0});
+}
+function peopleView(){
+  const list = S ? MET_ORDER.filter(k => S.met[k]) : [];
+  if(!list.length) return `<h2>同事與團隊</h2><p>還沒遇到任何人。去病房走走吧。</p>`;
+  return `<h2>同事與團隊</h2><p class="meta">第一印象常常不是全部。好感度高的角色，會揭露他們的另一面。</p><div class="people">${list.map(k => {
+    const c = CH[k], r = S.rel[k]||0;
+    return `<div class="person">${av(k)}<div style="min-width:0"><div class="who">${esc(c.n)}</div><div class="tag">${esc(c.role)}${c.tag?` · 「${esc(c.tag)}」`:""}</div><p>${esc(c.desc)}</p>${r>=5&&c.twist?`<p><em>${esc(c.twist)}</em></p>`:""}<div class="hearts">好感 ${r>0?"♥".repeat(Math.min(r,10)):r<0?"✕".repeat(Math.min(-r,10)):"—"}</div></div></div>`;
+  }).join("")}</div>`;
+}
+function cardsView(){
+  const ids = S ? Object.keys(S.cards) : [];
+  return `<h2>知識卡 ${ids.length}／${Object.keys(QB).length}</h2><p class="meta">每答一題（不論對錯）就收入一張，可以當成 PGY 口袋書。</p>
+   ${ids.length ? ids.map(id => { const q = QB[id]; return `<div class="kcard"><h3>${esc(q.t)}</h3>${q.ord ? `<ol style="margin:0;padding-left:1.4em;font-size:14px">${q.ord.map(t=>`<li>${esc(t)}</li>`).join("")}</ol>` : `<p><strong>答案：</strong>${esc(q.o[q.a])}</p>`}<p>${esc(q.e)}<a class="ref" href="#ref-${q.ref}" data-ref="${q.ref}">[${q.ref}]</a></p>${studyLinks(id)}</div>`; }).join("") : "<p>還沒有知識卡。</p>"}`;
+}
+function refsView(){
+  return `<h2>參考文獻</h2><p class="meta">制度內容與劇情中引用的規定列在前面，之後是各臨床題的出處。正文中的 [數字] 對應下列編號。</p>
+   <ol class="refs">${REFS.map((r,i)=>`<li id="ref-${i+1}">${esc(r.t)}${r.u?` <a href="${esc(r.u)}" target="_blank" rel="noopener">連結 ↗</a>`:""}</li>`).join("")}</ol>`;
+}
+function systemView(){
+  const R = k => rich(`[[${k}]]`);
+  return `<h2>真實的臺灣 PGY 制度</h2>
+  <p>「二年期醫師畢業後一般醫學訓練計畫」（PGY）自 2019 年 8 月起實施，對象是通過醫師國考第二階段、領有醫師證書的新科醫師，在進入專科住院醫師訓練前接受兩年一般醫學訓練${R("mohw")}。</p>
+  <div class="tablebox"><table><thead><tr><th>年度</th><th>課程</th><th>月數</th></tr></thead><tbody>
+  <tr><td rowspan="7">PGY1</td><td>一般醫學內科</td><td>3</td></tr><tr><td>一般醫學外科</td><td>2</td></tr><tr><td>一般醫學兒科</td><td>1</td></tr><tr><td>一般醫學婦產科</td><td>1</td></tr><tr><td>急診醫學</td><td>1</td></tr><tr><td>社區醫學（合作機構）</td><td>2</td></tr><tr><td>選修（每月一科，不可重複）</td><td>2</td></tr>
+  <tr><td rowspan="2">PGY2</td><td>分組：內／外／兒／婦產組擇一（含急診、社區醫院、安寧照護）＋老年醫學＋選修</td><td>9＋1＋2</td></tr>
+  <tr><td>不分組：內科 3、外科 2、急診 1、老年醫學 1、選修 5</td><td>12</td></tr></tbody></table></div>
+  <p class="hint">表格整理自衛福部訓練計畫${R("mohw")}。</p>
+  <h3>工時與照護量</h3>
+  <ul><li>住院醫師自 2019 年 9 月 1 日起適用勞動基準法。依《住院醫師勞動權益保障及工作時間指引》，每四週總工時上限 320 小時；值班日單次勤務含延長工時不超過 28 小時；兩次勤務間隔至少 10 小時${R("cgmh")}${R("pts")}。</li>
+  <li>PGY 急診月：每月約 168–192 小時、夜班不超過 8 班、每班不超過 13 小時${R("mohw")}。</li>
+  <li>每日照護病人數原則：內科約 4–10 床、外科約 4–8 床、兒科約 3–8 床、婦產科約 4–10 床；社區醫學期間不需回原醫院值班${R("mohw")}。</li></ul>
+  <h3>課程與評量</h3><p>基本課程含小組討論、案例分析、感控實地穿戴等，須於訓練期間完成${R("ntuh1")}。常用工作場所評量包括 Mini-CEX、DOPS、CbD，以及學習歷程與導師回饋${R("mohw")}。</p>
+  <h3>招募</h3><p>各訓練醫院於前一年舉辦招募說明會，公告容額、課程特色、社區合作點與面試方式${R("ntuh2")}${R("cch")}。遊戲中的三家醫院為虛構。</p>
+  <h3>延伸讀書</h3><div class="study">${Object.values(SITES).filter(s=>s.u&&!s.hide).map(s=>`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)} ↗</a>`).join("")}</div>`;
+}
+
+/* ======================= 控制列 ======================= */
+document.getElementById("ctrl").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b) setTab(b.dataset.tab); });
+function advanceOnce(){
+  if(!V().hidden && !V().querySelector(".opt:not([disabled])")){
+    const b = V().querySelector('button.primary[data-auto="1"]');
+    if(b){ b.click(); return true; }
+  }
+  return false;
+}
+document.getElementById("skip").onclick = () => { setTab("game"); let n = 0; while(n++ < 40 && advanceOnce()){} };
+let autoTimer = null;
+document.getElementById("auto").onclick = e => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", on);
+  clearInterval(autoTimer); if(on) autoTimer = setInterval(advanceOnce, 2800);
+};
+document.getElementById("theme").onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+};
+/* 安靜的背景音：柔和的和弦循環 */
+let audio = null;
+document.getElementById("music").onclick = e => {
+  const btn = e.currentTarget;
+  if(audio){ audio.ctx.close(); audio = null; btn.setAttribute("aria-pressed", false); return; }
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const master = ctx.createGain(); master.gain.value = 0.035; master.connect(ctx.destination);
+    const chords = [[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66]];
+    let i = 0;
+    const play = () => {
+      const t = ctx.currentTime;
+      chords[i++ % chords.length].forEach(f => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = f/2;
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t+1.2); g.gain.linearRampToValueAtTime(0, t+4.2);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t+4.3);
+      });
+    };
+    play(); const timer = setInterval(play, 4000);
+    audio = {ctx, timer}; ctx.addEventListener("statechange", () => { if(ctx.state==="closed") clearInterval(timer); });
+    btn.setAttribute("aria-pressed", true);
+  }catch(err){ btn.textContent = "♪ 無法播放"; }
+};
+if(GAS_URL){ const g = document.getElementById("gas"); g.href = GAS_URL; g.hidden = false; }
+
+
+/* ======================= 角色扮演地圖 ======================= */
+/* 15×9 格的病房地圖。角色、家具都用程式畫，不載入圖檔。 */
+const TW = 32, COLS = 15, ROWS = 9;
+const LOOK = {
+  me:    {coat:"#f4f6f5", shirt:"#2c6e5c", hair:"#2a211c", style:"short", skin:"#f1c8a5"},
+  hsu:   {coat:"#f4f6f5", shirt:"#6d4bb3", hair:"#5a3a22", style:"spiky", skin:"#e9bf98", glasses:1},
+  bai:   {coat:"#f4f6f5", shirt:"#9a5a2a", hair:"#1d1a1a", style:"long", skin:"#f3d0b0"},
+  zhang: {coat:"#f4f6f5", shirt:"#a3342e", hair:"#2b1d18", style:"bun", skin:"#eec4a0", glasses:1},
+  ouyang:{coat:"#3f7d6e", shirt:"#3f7d6e", hair:"#3f7d6e", style:"cap", skin:"#d9a77f"},
+  lin:   {coat:"#30506e", shirt:"#30506e", hair:"#8c8c8c", style:"short", skin:"#e2b48c"},
+  kui:   {coat:"#e78fae", shirt:"#e78fae", hair:"#3a2a22", style:"bob", skin:"#f6d2b8"},
+  rui:   {coat:"#2a8a9a", shirt:"#2a8a9a", hair:"#141414", style:"short", skin:"#d7a47a"},
+  wang:  {coat:"#f4f6f5", shirt:"#7a3f8f", hair:"#1f1714", style:"pony", skin:"#e6b994"},
+  lee:   {coat:"#f4f6f5", shirt:"#c07a12", hair:"#bdbdbd", style:"short", skin:"#efc39e", glasses:1},
+  tsai:  {coat:"#f4f6f5", shirt:"#8a3b5c", hair:"#6b6b6b", style:"bob", skin:"#e9bb94"},
+  kolas: {coat:"#4c7a3a", shirt:"#e9e1c9", hair:"#111", style:"short", skin:"#b9835c"},
+  shih:  {coat:"#f4f6f5", shirt:"#5b5ea6", hair:"#2c2320", style:"long", skin:"#f0c9a6"},
+  cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
+  pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
+  vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
+};
+function drawChar(c, x, y, id, dir="down", frame=0, s=2){
+  const L = LOOK[id] || LOOK.pt;
+  const r = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(x + a*s, y + b*s, w*s, h*s); };
+  c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x+8*s, y+19.5*s, 6*s, 1.6*s, 0, 0, 7); c.fill();
+  const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0;
+  r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40");
+  r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
+  if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); }
+  r(1.6, 9+bob + (dir==="left"||dir==="right" ? 0 : step), 1.6, 5, L.coat); r(12.8, 9+bob + (dir==="left"||dir==="right" ? 0 : 1-step), 1.6, 5, L.coat);
+  r(1.6, 13.6+bob, 1.6, 1.2, L.skin); r(12.8, 13.6+bob, 1.6, 1.2, L.skin);
+  r(4, 1+bob, 8, 7, L.skin);
+  const h = L.hair;
+  if(L.style==="cap"){ r(3.4, 0+bob, 9.2, 3, h); r(3.4, 3+bob, 1, 1.4, h); r(11.6, 3+bob, 1, 1.4, h); }
+  else {
+    r(3.6, 0+bob, 8.8, 2.6, h);
+    if(dir==="up") r(3.6, 2+bob, 8.8, 5, h);
+    if(L.style==="spiky"){ r(4, -0.8+bob, 1.5, 1, h); r(7, -1+bob, 1.5, 1.2, h); r(10, -0.8+bob, 1.5, 1, h); }
+    if(L.style==="long"){ r(3, 2+bob, 1.4, 8, h); r(11.6, 2+bob, 1.4, 8, h); }
+    if(L.style==="bob"){ r(3, 2+bob, 1.6, 5, h); r(11.4, 2+bob, 1.6, 5, h); }
+    if(L.style==="bun"){ r(6.5, -2+bob, 3, 2.2, h); r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
+    if(L.style==="pony"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); if(dir!=="down") r(dir==="left"?11.8:2.2, 3+bob, 1.8, 5, h); else r(12, 2.4+bob, 1.4, 4, h); }
+    if(L.style==="short"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
+  }
+  if(dir!=="up"){
+    const dx = dir==="left" ? -1 : dir==="right" ? 1 : 0;
+    r(5.8+dx, 4.4+bob, 1.2, 1.4, "#222"); r(9+dx, 4.4+bob, 1.2, 1.4, "#222");
+    if(L.glasses){ r(5+dx, 4+bob, 2.8, .5, "#555"); r(8.2+dx, 4+bob, 2.8, .5, "#555"); }
+    r(7+dx, 6.6+bob, 2, .6, "#b4685a");
+  }
+}
+const PORTRAIT = {};
+function portrait(id){
+  if(PORTRAIT[id]) return PORTRAIT[id];
+  try{
+    const cv = document.createElement("canvas"); cv.width = 48; cv.height = 48;
+    const c = cv.getContext("2d"); c.fillStyle = (CH[id]||CH.sys).col; c.fillRect(0,0,48,48);
+    drawChar(c, 8, 6, LOOK[id] ? id : "pt", "down", 0, 2);
+    PORTRAIT[id] = cv.toDataURL();
+  }catch(e){ PORTRAIT[id] = ""; }
+  return PORTRAIT[id];
+}
+
+/* 場景：依科別換地板與家具 */
+function themeOf(dept){
+  if(!dept) return "lobby";
+  if(/急診|技能/.test(dept)) return "er";
+  if(/外科/.test(dept)) return "or";
+  if(/兒科/.test(dept)) return "peds";
+  if(/婦產/.test(dept)) return "ob";
+  if(/社區/.test(dept)) return "village";
+  if(/評核|招募/.test(dept)) return "office";
+  return "ward";
+}
+const FLOOR = {lobby:["#e8e2d4","#e1dacb"], ward:["#dfe9e5","#d6e2dd"], er:["#dcdfe3","#d2d6db"], or:["#cfe3e0","#c4dbd7"],
+  peds:["#f3ead0","#ece1c3"], ob:["#f2e1e6","#ead6dc"], village:["#9cc77f","#93bf76"], office:["#e6dccb","#ddd2be"]};
+function furniture(theme){
+  const bedsTop = [2,5,8,11].map(x => ({k:"bed", x, y:1}));
+  switch(theme){
+    case "lobby": return [{k:"desk",x:5,y:1,w:5},{k:"sign",x:5,y:0,w:5,t:"呆丸醫院 · 教學部"},{k:"chair",x:1,y:6},{k:"chair",x:2,y:6},{k:"chair",x:12,y:6},{k:"chair",x:13,y:6},{k:"plant",x:1,y:1},{k:"plant",x:13,y:1},{k:"door",x:7,y:8}];
+    case "er": return [{k:"resus",x:2,y:1},{k:"resus",x:5,y:1},{k:"resus",x:8,y:1},{k:"desk",x:1,y:6,w:3},{k:"cart",x:11,y:1},{k:"door",x:14,y:4,t:"救護車"},{k:"plant",x:13,y:7}];
+    case "or": return [{k:"ortable",x:6,y:3},{k:"lamp",x:6,y:2},{k:"sink",x:1,y:1},{k:"sink",x:2,y:1},{k:"cart",x:10,y:2},{k:"monitor",x:9,y:3}];
+    case "peds": return [...bedsTop.map(b => ({...b,k:"cot"})),{k:"desk",x:10,y:6,w:3},{k:"toy",x:2,y:6},{k:"toy",x:3,y:7},{k:"plant",x:13,y:7}];
+    case "ob": return [{k:"bed",x:2,y:1},{k:"bed",x:5,y:1},{k:"crib",x:8,y:1},{k:"crib",x:10,y:1},{k:"desk",x:10,y:6,w:3},{k:"plant",x:1,y:7}];
+    case "village": return [{k:"house",x:1,y:1,w:4,t:"衛生所"},{k:"tree",x:9,y:1},{k:"tree",x:12,y:2},{k:"tree",x:13,y:6},{k:"tree",x:2,y:7},{k:"path"}];
+    case "office": return [{k:"desk",x:2,y:2,w:3},{k:"desk",x:9,y:2,w:3},{k:"shelf",x:6,y:0,w:3},{k:"plant",x:1,y:7},{k:"plant",x:13,y:7}];
+    default: return [...bedsTop,{k:"desk",x:1,y:6,w:3,t:"護理站"},{k:"cart",x:13,y:1},{k:"plant",x:13,y:7},{k:"sink",x:7,y:7}];
+  }
+}
+const SPOTS = [[4,4],[9,5],[12,4],[6,6],[2,4],[11,6],[7,4],[13,5],[5,5],[10,3],[3,6],[8,6]];
+const W = {key:null, theme:"lobby", items:[], block:new Set(), npcs:[], walkers:[], p:{x:7,y:6,fx:7,fy:6,dir:"up",path:[],moving:0},
+  target:null, onArrive:null, lastWho:null, bubbles:[], parts:[], shake:0, fade:0, title:"", t:0, raf:0, cv:null};
+function blocked(x,y){ return x<0||y<0||x>=COLS||y>=ROWS||W.block.has(x+","+y)||W.npcs.some(n=>n.x===x&&n.y===y); }
+function buildBlock(){
+  W.block = new Set();
+  for(let x=0;x<COLS;x++){ W.block.add(x+",0"); }
+  W.items.forEach(f => {
+    if(f.k==="path"||f.k==="sign"||f.k==="lamp") return;
+    const w = f.w || (f.k==="bed"||f.k==="resus"||f.k==="cot"?2:f.k==="ortable"?3:f.k==="house"?4:1);
+    const h = f.k==="bed"||f.k==="resus"||f.k==="cot"||f.k==="house"?2:1;
+    if(f.k==="door") return;
+    for(let i=0;i<w;i++) for(let j=0;j<h;j++) W.block.add((f.x+i)+","+(f.y+j));
+  });
+}
+function stageWhos(){
+  if(!S || S.stage<0) return ["zhang","rui","kui","ouyang","bai","hsu","lin"];
+  const st = STAGES[S.stage]; if(!st) return [];
+  let list = st.steps.slice();
+  if(st.elective && S.electQueue && S.electQueue.length) list = list.concat(ELECTIVES[S.electQueue[0]].steps);
+  const out = [];
+  list.forEach(s => { const w = s.t==="night" ? "kui" : s.who; if(w && CH[w] && w!=="sys" && w!=="me" && !out.includes(w)) out.push(w); });
+  return out.slice(0, SPOTS.length);
+}
+function worldSync(){
+  const st = S && S.stage>=0 ? STAGES[S.stage] : null;
+  const key = S ? `${S.stage}:${S.electQueue&&S.electQueue[0]||""}` : "title";
+  if(key === W.key) return;
+  W.key = key; W.lastWho = null; W.target = null;
+  const elect = st && st.elective && S.electQueue && S.electQueue.length ? ELECTIVES[S.electQueue[0]] : null;
+  W.theme = themeOf(elect ? elect.n : st && st.dept);
+  W.title = !S ? "畢業典禮後 · 醫院大廳" : S.stage<0 ? "招募季 · 醫院大廳" : st ? `${st.y===1?"PGY1":"PGY2"} · ${elect ? elect.n : st.dept}` : "";
+  W.items = furniture(W.theme); W.npcs = []; buildBlock();
+  stageWhos().forEach((id,i) => { const [x,y] = SPOTS[i]; if(!blocked(x,y)) W.npcs.push({id, x, y, dir:"down", ph:Math.random()*6}); });
+  W.p = {x:7, y:7, fx:7, fy:7, dir:"up", path:[], moving:0};
+  if(blocked(7,7)) W.p.y = W.p.fy = 8;
+  W.walkers = W.theme==="village" || W.theme==="office" ? [] : [{id:W.theme==="lobby"?"vis":"pt", x:13, y:7, fx:13, fy:7, dir:"left", path:[], wait:0}];
+  W.fade = 1;
+}
+function npcOf(id){
+  let n = W.npcs.find(n => n.id===id);
+  if(!n){
+    const spot = SPOTS.find(([x,y]) => !blocked(x,y) && !(W.p.x===x && W.p.y===y)) || [7,4];
+    n = {id, x:spot[0], y:spot[1], dir:"down", ph:0}; W.npcs.push(n);
+  }
+  return n;
+}
+function bfs(sx,sy,goals){
+  const k = (x,y) => x+","+y, prev = new Map([[k(sx,sy),null]]), q = [[sx,sy]];
+  while(q.length){
+    const [x,y] = q.shift();
+    if(goals.some(([gx,gy]) => gx===x && gy===y)){
+      const path = []; let cur = k(x,y);
+      while(cur && cur !== k(sx,sy)){ const [a,b] = cur.split(",").map(Number); path.unshift([a,b]); cur = prev.get(cur); }
+      return path;
+    }
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const nx = x+dx, ny = y+dy, kk = k(nx,ny);
+      if(!prev.has(kk) && !blocked(nx,ny)){ prev.set(kk, k(x,y)); q.push([nx,ny]); }
+    }
+  }
+  return null;
+}
+function walkTo(n, then){
+  const goals = [[n.x,n.y+1],[n.x-1,n.y],[n.x+1,n.y],[n.x,n.y-1]];
+  if(goals.some(([x,y]) => x===W.p.x && y===W.p.y)){ face(n); return then && then(); }
+  const path = bfs(W.p.x, W.p.y, goals);
+  W.p.path = path || []; W.onArrive = () => { face(n); then && then(); };
+  if(!path || !path.length){ const f = W.onArrive; W.onArrive = null; f(); }
+}
+function face(n){
+  const dx = n.x - W.p.x, dy = n.y - W.p.y;
+  W.p.dir = Math.abs(dx) > Math.abs(dy) ? (dx>0?"right":"left") : (dy>0?"down":"up");
+  n.dir = {left:"right", right:"left", up:"down", down:"up"}[W.p.dir];
+}
+function bubble(n, text, t=2.6){ W.bubbles = W.bubbles.filter(b => b.n!==n); W.bubbles.push({n, text, t}); }
+
+/* 走到 NPC 身邊才開始對話 */
+function gate(who, head, go){
+  if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
+  const n = npcOf(who); W.target = who;
+  let done = false;
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, "……", 1.2); go(); };
+  W.fire = () => walkTo(n, fire);
+  const c = CH[who];
+  show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
+  const wr = document.getElementById("world").getBoundingClientRect(); if(wr.top < 0) window.scrollTo({top: window.scrollY + wr.top - 8});
+  document.getElementById("nx").onclick = e => { if(!e.isTrusted || REDUCED) fire(); else { W.fire(); setTimeout(fire, 1800); } };
+}
+function worldReact(ok){
+  const px = W.p.fx*TW + TW/2, py = W.p.fy*TW;
+  if(ok){ for(let i=0;i<18;i++) W.parts.push({x:px, y:py, vx:(Math.random()-.5)*160, vy:-60-Math.random()*120, t:1, col:["#2c6e5c","#f2b630","#e78fae","#4aa3c7"][i%4]}); }
+  else { W.shake = .35; }
+  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, ok ? "很好！" : "再想想。", 1.6);
+}
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* 繪製 */
+function drawItem(c, f){
+  const X = f.x*TW, Y = f.y*TW, r = (x,y,w,h,col) => { c.fillStyle = col; c.fillRect(X+x, Y+y, w, h); };
+  const z = Math.sin(W.t*2)*2;
+  switch(f.k){
+    case "bed": case "cot": case "resus":
+      r(2,4,TW*2-4,TW*2-10, f.k==="resus" ? "#c8d2da" : "#fafafa"); r(2,4,TW*2-4,6,"#9fb4c2");
+      r(10,12,14,10,"#fff"); r(8,26,TW*2-16,24, f.k==="cot" ? "#f2c463" : f.k==="resus" ? "#7fa7c9" : "#8fb9a8");
+      drawHead(c, X+17, Y+13); if(f.k!=="resus"){ c.fillStyle="#6b7c86"; c.font="bold 11px sans-serif"; c.fillText("z", X+34, Y+8+z); }
+      if(f.k==="resus"){ r(TW*2-12,0,10,10,"#222"); c.strokeStyle="#4ef08a"; c.beginPath(); for(let i=0;i<9;i++){ const yy = (i===4? -3 : i===5 ? 3 : 0); c.lineTo(X+TW*2-12+i, Y+5+yy); } c.stroke(); }
+      break;
+    case "crib": r(4,8,24,18,"#f6efe4"); r(4,8,24,3,"#c79a6a"); drawHead(c, X+12, Y+12, 0.7); break;
+    case "desk": r(0,8,(f.w||1)*TW,TW-8,"#b98b5e"); r(0,8,(f.w||1)*TW,5,"#d3a679"); r(8,0,14,10,"#33424c"); r(10,2,10,6,"#7fd0e0");
+      if(f.t){ c.fillStyle="#fff"; c.font="bold 11px sans-serif"; c.fillText(f.t, X+30, Y+26); } break;
+    case "sign": r(0,2,(f.w||1)*TW,22,"#2c6e5c"); c.fillStyle="#fff"; c.font="bold 13px sans-serif"; c.textAlign="center"; c.fillText(f.t, X+(f.w||1)*TW/2, Y+18); c.textAlign="left"; break;
+    case "chair": r(6,10,20,14,"#4a7c9a"); r(6,6,20,6,"#3b6680"); break;
+    case "plant": r(10,18,12,12,"#b06a3b"); c.fillStyle="#3f8f4a"; c.beginPath(); c.arc(X+16,Y+14+z*.3,10,0,7); c.fill(); break;
+    case "door": r(0,TW-6,TW,6,"#7a8a94"); if(f.t){ c.fillStyle="#a3342e"; c.font="bold 10px sans-serif"; c.fillText(f.t, X-14, Y+12); } break;
+    case "cart": r(4,6,24,20,"#c8483f"); r(4,6,24,4,"#e0675e"); r(6,26,4,4,"#333"); r(22,26,4,4,"#333"); break;
+    case "sink": r(4,6,24,16,"#cfd8dc"); r(10,10,12,8,"#9ec5d6"); break;
+    case "ortable": r(0,8,TW*3,16,"#5f8f9a"); r(4,10,TW*3-8,12,"#89b8c2"); break;
+    case "lamp": c.fillStyle="rgba(255,250,210,.55)"; c.beginPath(); c.ellipse(X+48,Y+28,40,12,0,0,7); c.fill(); r(40,0,16,8,"#ddd"); break;
+    case "monitor": r(4,2,24,18,"#222"); r(6,4,20,14,"#103"); c.strokeStyle="#4ef08a"; c.beginPath(); for(let i=0;i<20;i++){ c.lineTo(X+6+i, Y+11 + ((i+Math.floor(W.t*12))%10===0 ? -5 : 0)); } c.stroke(); break;
+    case "toy": r(6,14,10,10,"#e05a47"); r(16,18,10,8,"#3b8bd0"); r(10,8,8,8,"#f2c230"); break;
+    case "house": r(0,10,TW*4,TW*2-10,"#efe6d2"); c.fillStyle="#b2513b"; c.beginPath(); c.moveTo(X-4,Y+12); c.lineTo(X+TW*2,Y-6); c.lineTo(X+TW*4+4,Y+12); c.fill();
+      r(TW*2-8,TW*2-22,16,22,"#7a5a3a"); c.fillStyle="#2c6e5c"; c.font="bold 12px sans-serif"; c.fillText(f.t, X+18, Y+30); break;
+    case "tree": r(12,18,8,14,"#7a5432"); c.fillStyle="#3d7f3a"; c.beginPath(); c.arc(X+16,Y+12,14,0,7); c.fill(); break;
+    case "shelf": r(0,0,(f.w||1)*TW,TW,"#8a6542"); for(let i=0;i<9;i++) r(4+i*10,6,7,20,["#c8483f","#3b8bd0","#f2c230","#2c6e5c"][i%4]); break;
+  }
+}
+function drawHead(c, x, y, s=1){ c.fillStyle="#eac29c"; c.fillRect(x, y, 12*s, 10*s); c.fillStyle="#5b4a3f"; c.fillRect(x, y, 12*s, 3*s); }
+function drawWorld(){
+  const cv = W.cv, c = cv.getContext("2d");
+  c.save();
+  if(W.shake > 0) c.translate((Math.random()-.5)*8, 0);
+  const [a,b] = FLOOR[W.theme];
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){ c.fillStyle = (x+y)%2 ? a : b; c.fillRect(x*TW, y*TW, TW, TW); }
+  if(W.theme==="village"){ c.fillStyle="#d8c39a"; c.fillRect(0, 5*TW, COLS*TW, TW); c.fillRect(6*TW, 3*TW, TW, 6*TW); }
+  else { c.fillStyle = "#b9c4c2"; c.fillRect(0,0,COLS*TW,TW); c.fillStyle="#a7b3b1"; c.fillRect(0,TW-4,COLS*TW,4); }
+  W.items.forEach(f => drawItem(c, f));
+  const actors = [...W.npcs.map(n => ({id:n.id, x:n.x, y:n.y, dir:n.dir, frame:Math.floor((W.t+n.ph)*1.5)%2 && 0, npc:n})),
+    ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*8) : 0})),
+    {id:"me", x:W.p.fx, y:W.p.fy, dir:W.p.dir, frame:W.p.path.length ? Math.floor(W.t*8) : 0, me:1}].sort((p,q) => p.y-q.y);
+  actors.forEach(a => {
+    const bx = a.x*TW, by = a.y*TW - 10 + (a.npc ? Math.sin(W.t*2+a.npc.ph)*1 : 0);
+    drawChar(c, bx, by, a.id, a.dir, a.frame, 2);
+    if(a.npc){
+      const nm = CH[a.id].n.replace(/（.*）/,"");
+      c.font = "11px sans-serif"; const w = c.measureText(nm).width + 8;
+      c.fillStyle = "rgba(255,255,255,.85)"; c.fillRect(bx+16-w/2, by+42, w, 13);
+      c.fillStyle = "#223"; c.textAlign = "center"; c.fillText(nm, bx+16, by+52); c.textAlign = "left";
+      if(W.target === a.id){
+        const jy = by - 14 + Math.sin(W.t*6)*3;
+        c.fillStyle = "#f2b630"; c.fillRect(bx+10, jy, 12, 14); c.fillStyle = "#222"; c.font = "bold 12px sans-serif"; c.textAlign = "center"; c.fillText("！", bx+16, jy+12); c.textAlign = "left";
+      }
+    }
+  });
+  W.bubbles.forEach(b => {
+    const bx = b.n.x*TW+16, by = b.n.y*TW - 22; c.font = "12px sans-serif";
+    const w = Math.min(220, c.measureText(b.text).width + 14);
+    const x0 = Math.max(4, Math.min(COLS*TW - w - 4, bx - w/2));
+    c.fillStyle = "#fff"; c.strokeStyle = "#334"; c.lineWidth = 1.5; c.beginPath(); c.roundRect ? c.roundRect(x0, by-18, w, 20, 6) : c.rect(x0, by-18, w, 20); c.fill(); c.stroke();
+    c.fillStyle = "#223"; c.fillText(b.text.length > 18 ? b.text.slice(0,17)+"…" : b.text, x0+7, by-4);
+  });
+  W.parts.forEach(p => { c.globalAlpha = Math.max(0,p.t); c.fillStyle = p.col; c.fillRect(p.x, p.y, 5, 5); }); c.globalAlpha = 1;
+  c.fillStyle = "rgba(20,30,34,.72)"; c.font = "bold 12px sans-serif"; const tw = c.measureText(W.title).width + 16; c.fillRect(6, 6, tw, 20); c.fillStyle="#fff"; c.fillText(W.title, 14, 20);
+  if(W.fade > 0){ c.fillStyle = `rgba(10,16,18,${W.fade})`; c.fillRect(0,0,cv.width,cv.height); c.fillStyle = `rgba(255,255,255,${W.fade})`; c.font = "bold 20px sans-serif"; c.textAlign="center"; c.fillText(W.title, cv.width/2, cv.height/2); c.textAlign="left"; }
+  c.restore();
+}
+function tick(dt){
+  W.t += dt;
+  const sp = REDUCED ? 99 : 7;
+  const p = W.p;
+  if(p.path.length){
+    const [tx,ty] = p.path[0];
+    p.dir = tx>p.x ? "right" : tx<p.x ? "left" : ty>p.y ? "down" : "up";
+    const dx = tx - p.fx, dy = ty - p.fy, d = Math.hypot(dx,dy), m = sp*dt;
+    if(d <= m){ p.fx = p.x = tx; p.fy = p.y = ty; p.path.shift(); if(!p.path.length && W.onArrive){ const f = W.onArrive; W.onArrive = null; f(); } }
+    else { p.fx += dx/d*m; p.fy += dy/d*m; }
+  }
+  W.walkers.forEach(w => {
+    if(w.path.length){ const [tx,ty] = w.path[0]; w.dir = tx>w.fx?"right":tx<w.fx?"left":ty>w.fy?"down":"up";
+      const dx=tx-w.fx, dy=ty-w.fy, d=Math.hypot(dx,dy), m=1.6*dt; if(d<=m){ w.fx=tx; w.fy=ty; w.path.shift(); } else { w.fx+=dx/d*m; w.fy+=dy/d*m; } }
+    else if((w.wait -= dt) < 0){
+      w.wait = 2 + Math.random()*3; const gx = 1+Math.floor(Math.random()*13), gy = 2+Math.floor(Math.random()*6);
+      if(!blocked(gx,gy)){ const path = (() => { const tmp = {x:Math.round(w.fx), y:Math.round(w.fy)}; return bfs(tmp.x, tmp.y, [[gx,gy]]); })(); w.path = (path||[]).slice(0,6); }
+    }
+  });
+  W.npcs.forEach(n => { if(n.id !== W.target && Math.random() < dt*.15) n.dir = ["down","left","right","down"][Math.floor(Math.random()*4)]; });
+  W.bubbles.forEach(b => b.t -= dt); W.bubbles = W.bubbles.filter(b => b.t > 0);
+  W.parts.forEach(q => { q.x += q.vx*dt; q.y += q.vy*dt; q.vy += 260*dt; q.t -= dt*1.2; }); W.parts = W.parts.filter(q => q.t > 0);
+  if(W.shake > 0) W.shake -= dt;
+  if(W.fade > 0) W.fade = Math.max(0, W.fade - dt*(REDUCED ? 9 : 0.9));
+}
+function worldInit(){
+  const wrap = document.getElementById("world"), cv = document.getElementById("map");
+  if(!cv || !cv.getContext) return;
+  W.cv = cv; cv.width = COLS*TW; cv.height = ROWS*TW;
+  worldSync();
+  let last = performance.now();
+  const loop = now => {
+    const dt = Math.min(.05, (now-last)/1000); last = now;
+    const hide = V().hidden; if(wrap.hidden !== hide) wrap.hidden = hide;
+    if(!hide){ tick(dt); drawWorld(); }
+    W.raf = requestAnimationFrame(loop);
+  };
+  W.raf = requestAnimationFrame(loop);
+  const tapTile = e => {
+    const r = cv.getBoundingClientRect();
+    return [Math.floor((e.clientX - r.left) / r.width * COLS), Math.floor((e.clientY - r.top + 10*r.height/cv.height) / r.height * ROWS)];
+  };
+  cv.addEventListener("click", e => {
+    const [x,y] = tapTile(e);
+    const n = W.npcs.find(n => n.x===x && (n.y===y || n.y===y+1));
+    if(n){
+      if(n.id === W.target && W.fire) return W.fire();
+      return walkTo(n, () => bubble(n, idleLine(n.id)));
+    }
+    if(!blocked(x,y)){ const path = bfs(W.p.x, W.p.y, [[x,y]]); if(path){ W.p.path = path; W.onArrive = null; } }
+  });
+  document.addEventListener("keydown", e => {
+    if(V().hidden || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    const d = {ArrowUp:[0,-1,"up"],KeyW:[0,-1,"up"],ArrowDown:[0,1,"down"],KeyS:[0,1,"down"],ArrowLeft:[-1,0,"left"],KeyA:[-1,0,"left"],ArrowRight:[1,0,"right"],KeyD:[1,0,"right"]}[e.code];
+    if(d){
+      e.preventDefault(); W.p.dir = d[2];
+      if(!W.p.path.length && !blocked(W.p.x+d[0], W.p.y+d[1])) W.p.path = [[W.p.x+d[0], W.p.y+d[1]]];
+      return;
+    }
+    if(e.code==="Space" && !(e.target.closest && e.target.closest("button"))){
+      const [fx,fy] = {up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[W.p.dir];
+      const near = W.npcs.filter(n => Math.abs(n.x-W.p.x)+Math.abs(n.y-W.p.y)===1);
+      const n = near.find(n => n.x===W.p.x+fx && n.y===W.p.y+fy) || near.find(n => n.id===W.target) || near[0];
+      if(n){ e.preventDefault(); face(n); if(n.id===W.target && W.fire) W.fire(); else bubble(n, idleLine(n.id)); }
+    }
+  });
+}
+function idleLine(id){
+  const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
+    wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", bai:"這週的班我們重新排過了。"};
+  return lines[id] || "你好。";
+}
+
+/* ======================= 啟動 ======================= */
+function resume(d){
+  S = d;
+  if(S.stage >= STAGES.length && S.spec) return finalScreen();
+  run();
+}
+function start(){ S = null; titleScreen(); }
+worldInit();
+window.claude?.hot?.snapshot?.(() => ({S}));
+if(window.claude?.hot?.ready){ window.claude.hot.ready(d => { if(d && d.S){ resume(d.S); } else start(); }); }
+else { const d = window.claude?.hot?.data; if(d && d.S){ resume(d.S); } else start(); }
+</script>
+
+</body></html>
