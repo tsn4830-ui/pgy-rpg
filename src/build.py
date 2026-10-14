@@ -36,6 +36,9 @@ GAS.append(('["hypogly","dka","periop"].forEach(id => (STUDY[id] = STUDY[id] || 
 GAS.append(('Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1M8rVEmyVDHBEvMnPl_vlCQkMlxa71S7x/view?usp=drivesdk"}\n];','Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1M8rVEmyVDHBEvMnPl_vlCQkMlxa71S7x/view?usp=drivesdk"},\n  {k:"gas_tx", t:"黃品叡。PGY 職前加油站：輸血醫囑值班講義（依 AABB 2023 紅血球、AABB/ICTMG 2025 血小板指引與 ISBT 定義整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1JWHO6oeknX-4uJTcC_0u-CxbFPXaAoUn/view?usp=drivesdk"}\n];'))
 for x in open('cloud.txt',encoding='utf-8').read().strip().split('\n@@@\n'):
     GAS.append((x.split('|||')[0], x.split('|||')[1]))
+_e = e.index('/* 安靜的背景音：柔和的和弦循環 */'); _f = e.index('if(GAS_URL){ const g = document.getElementById("gas")')
+e = e[:_e] + open('music.js',encoding='utf-8').read() + e[_f:]
+assert e.count('function ending(){')==1; e = e.replace('function ending(){', 'function ending(){ BGM.end = true; musicTo("ending");')
 RPG=[
 ('/* ======================= 啟動 ======================= */', open('rpg.js',encoding='utf-8').read()+'\n/* ======================= 啟動 ======================= */'),
 ('function start(){ S = null; titleScreen(); }','function start(){ S = null; titleScreen(); }\nworldInit();'),
@@ -71,6 +74,29 @@ e = e.replace(k2, '  if(SITES.gas.u && !list.some(([x]) => SITES[x].u === SITES.
 assert n1==3 and n2==3 and 'drive.google' not in e, (n1,n2)
 CSS='.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}\n'
 h=open('head.html',encoding='utf-8').read().replace('◐ v3.0','◐ v5.0').replace('<main class="card enter" id="view"></main>','<div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>\n      <main class="card enter" id="view"></main>').replace('</style>',CSS+'</style>',1).replace('<button id="theme">◐ 畫面明暗</button>','<button id="theme">◐ 畫面明暗</button>\n    <button id="login" hidden>☁ 用 Google 登入</button>').replace('PGY 職前加油站 ↗','PGY學院 ↗').replace('<a id="gas" hidden','<a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>\n      <a id="gas" hidden')
+
+# 以光田綜合醫院為藍圖：虛構的「光甜綜合醫院」，各科人物名字用科別諧音
+KT_HOSP = [('{id:"mc",n:"呆丸大學附設醫院",kind:"醫學中心｜北部"', '{id:"mc",n:"光甜綜合醫院・香尚總院",kind:"總院｜臺中海線"'),
+  ('{id:"rg",n:"港灣區域教學醫院",kind:"區域醫院｜南部"', '{id:"rg",n:"光甜綜合醫院・大佳院區",kind:"院區｜海線北端"'),
+  ('{id:"rr",n:"山海地區教學醫院",kind:"地區醫院｜東部"', '{id:"rr",n:"光甜綜合醫院・通笑院區",kind:"院區｜山海之間"')]
+for a,b in KT_HOSP:
+    assert d.count(a)==1, a; d = d.replace(a,b)
+KT_PUN = {"wang":"急診","lee":"兒科","tsai":"婦產","shih":"老年","cheng":"藥師","zhang":"內科","ouyang":"外科","lin":"護理"}
+for k,p in KT_PUN.items():
+    m = re.search(r'\n  '+k+r':\s*\{n:"[^"]*",[^}]*?desc:"', d)
+    assert m, k
+    d = d[:m.end()] + '名字諧音「'+p+'」。' + d[m.end():]
+KT_NAMES = [("歐陽晉","歐陽偉柯"),("雅筑","乃珂"),("振宏","護禮"),("王宛如","王季真"),("李國棟","李爾柯"),("蔡文淵","蔡富燦"),("施雨萱","施樂年"),("鄭宇安","鄭耀詩")]
+for a,b in KT_NAMES:
+    d = d.replace(a,b); e = e.replace(a,b)
+k3 = '以下三家醫院與廣告均為虛構，只借用說明會的格式。'
+assert e.count(k3)==1; e = e.replace(k3, '以下以光田綜合醫院為藍圖，改成諧音的虛構「光甜綜合醫院」三個院區；廣告內容均為虛構，只借用說明會的格式。')
+e = e.replace('<h2>選擇你的訓練醫院</h2>','<h2>選擇你的訓練院區</h2>')
+MCREDIT = '<p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目，每個科別一首。Slice of Life、Gotta Keep On Movin（Bryan Teoh）；Study and Relax、Kalimba Relaxation Music、Night Vigil（Kevin MacLeod）；Happy Whistling Ukulele、Barnville、Hopeful（Rafael Krux）；Journey of Hope（Alexander Nakarada）；Rush、Nostalgic Piano、Travelers Notebook、Think About It。</p>'
+_k = '臨床處置請以最新指引與院內規範為準。</p>'
+assert h.count(_k)==1; h = h.replace(_k, _k + '\n  ' + MCREDIT)
+assert h.count('醫院與人物皆為虛構')==1; h = h.replace('醫院與人物皆為虛構','醫院與人物皆為虛構（以光田綜合醫院為藍圖，院名與各科人物名字採諧音）')
+for a,_ in KT_NAMES: assert a not in d+e, a
 out=h+'\n<script>\n"use strict";\n'+d+'\n'+e+'</script>\n'
 open('/mnt/project-files/pgy-rpg/index.html','w',encoding='utf-8').write(out)
 open('test.html','w',encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+out+'</body></html>')

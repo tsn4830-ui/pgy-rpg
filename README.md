@@ -9,3 +9,7 @@
 ## 修改內容
 
 `src/` 是原始零件，`src/build.py` 會組成遊戲頁面。改完後執行 `python3 build.py`，再把產生的頁面包成完整 HTML 放到根目錄的 `index.html`。
+
+## 背景音樂
+
+`music/` 裡的 13 首曲子都來自 FreePD.com 的公眾領域（CC0）曲庫，取自 [SoundSafari/CC0-1.0-Music](https://github.com/SoundSafari/CC0-1.0-Music)，轉成 96 kbps、最長 3 分鐘並統一音量。每個科別一首，作曲者列在頁尾。

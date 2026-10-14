@@ -180,7 +180,8 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
     </div>
     <aside class="side" id="side"></aside>
   </div>
-  <p class="foot">醫院與人物皆為虛構。醫學內容依所附參考文獻撰寫，僅供學習；臨床處置請以最新指引與院內規範為準。</p>
+  <p class="foot">醫院與人物皆為虛構（以光田綜合醫院為藍圖，院名與各科人物名字採諧音）。醫學內容依所附參考文獻撰寫，僅供學習；臨床處置請以最新指引與院內規範為準。</p>
+  <p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目，每個科別一首。Slice of Life、Gotta Keep On Movin（Bryan Teoh）；Study and Relax、Kalimba Relaxation Music、Night Vigil（Kevin MacLeod）；Happy Whistling Ukulele、Barnville、Hopeful（Rafael Krux）；Journey of Hope（Alexander Nakarada）；Rush、Nostalgic Piano、Travelers Notebook、Think About It。</p>
 </div>
 
 <script>
@@ -192,24 +193,24 @@ const CH = {
           desc:"交班永遠一句「應該沒事吧」，搶功倒是很快。", twist:"其實很怕被人發現自己不會。學會 ISBAR 後交班變得最清楚的就是他。"},
   bai:   {n:"白芷晴", role:"PGY 同梯", tag:"惹人厭的同事", col:"#9a5a2a",
           desc:"群組已讀不回，雜事總能「剛好」落到別人頭上。", twist:"她同時在照顧生病的父親。說開之後，兩人一起排出公平的分工表。"},
-  zhang: {n:"張雅筑", role:"內科 R3，後來升總醫師", tag:"可怕的學姊", col:"#a3342e",
-          desc:"早上六點查房，一路問到你答不出來為止。", twist:"嚴格只針對病人安全。你被家屬罵時，第一個站出來的是她。"},
-  ouyang:{n:"歐陽晉", role:"外科總醫師", tag:"可怕的學長", col:"#30506e",
-          desc:"嗓門大、節奏快，交班漏一項就當場開罵。", twist:"PGY2 那年他請了三個月育嬰假，回來後說：「以前那樣罵人，是我錯了。」"},
-  lin:   {n:"林振宏", role:"內科病房護理長", tag:"指手畫腳的護理長", col:"#4b6b2e",
-          desc:"醫囑格式、手部衛生、給藥前確認……每一樣都要管。", twist:"他管的每一件事，背後都有一次差點出事的病人。"},
+  zhang: {n:"張乃珂", role:"內科 R3，後來升總醫師", tag:"可怕的學姊", col:"#a3342e",
+          desc:"名字諧音「內科」。早上六點查房，一路問到你答不出來為止。", twist:"嚴格只針對病人安全。你被家屬罵時，第一個站出來的是她。"},
+  ouyang:{n:"歐陽偉柯", role:"外科總醫師", tag:"可怕的學長", col:"#30506e",
+          desc:"名字諧音「外科」。嗓門大、節奏快，交班漏一項就當場開罵。", twist:"PGY2 那年他請了三個月育嬰假，回來後說：「以前那樣罵人，是我錯了。」"},
+  lin:   {n:"林護禮", role:"內科病房護理長", tag:"指手畫腳的護理長", col:"#4b6b2e",
+          desc:"名字諧音「護理」。醫囑格式、手部衛生、給藥前確認……每一樣都要管。", twist:"他管的每一件事，背後都有一次差點出事的病人。"},
   kui:   {n:"陳葵（小葵）", role:"新手護理師", tag:"可愛的新人", col:"#c2557a",
           desc:"笑起來很甜，大家都叫她小葵。", twist:"可愛不等於好欺負：她給藥前一定雙重核對，擋下過你的錯誤醫囑。"},
   rui:   {n:"陳品睿", role:"急診資深護理師", tag:"男護理師", col:"#2a6f86",
           desc:"ACLS 指導員，急救室裡最冷靜的人。", twist:"被病人叫「男護士」時，他只淡淡回一句：「叫我護理師就好。」"},
-  wang:  {n:"王宛如", role:"急診主治醫師", tag:"急診主治", col:"#7a3f8f", desc:"同時看十床也不提高音量。"},
-  lee:   {n:"李國棟", role:"兒科主治醫師", tag:"兒科主治", col:"#c07a12", desc:"口袋裡永遠有貼紙，跟家長解釋可以講三十分鐘。"},
-  tsai:  {n:"蔡文淵", role:"婦產科主治醫師", tag:"婦產科主治", col:"#8a3b5c", desc:"資深婦產科醫師，對病人隱私的要求一絲不苟。"},
+  wang:  {n:"王季真", role:"急診主治醫師", tag:"急診主治", col:"#7a3f8f", desc:"名字諧音「急診」。同時看十床也不提高音量。"},
+  lee:   {n:"李爾柯", role:"兒科主治醫師", tag:"兒科主治", col:"#c07a12", desc:"名字諧音「兒科」。口袋裡永遠有貼紙，跟家長解釋可以講三十分鐘。"},
+  tsai:  {n:"蔡富燦", role:"婦產科主治醫師", tag:"婦產科主治", col:"#8a3b5c", desc:"名字諧音「婦產」。資深婦產科醫師，對病人隱私的要求一絲不苟。"},
   kolas: {n:"Kolas 主任", role:"東部衛生所主任", tag:"社區醫學導師", col:"#1f7a6a", desc:"阿美族，回到家鄉服務十五年，騎機車做居家訪視。"},
-  shih:  {n:"施雨萱", role:"老年醫學科主治醫師", tag:"老年醫學主治", col:"#5b5ea6", desc:"會蹲下來跟坐輪椅的阿公平視說話。"},
+  shih:  {n:"施樂年", role:"老年醫學科主治醫師", tag:"老年醫學主治", col:"#5b5ea6", desc:"名字諧音「老年」。會蹲下來跟坐輪椅的阿公平視說話。"},
   xiaoc: {n:"跑跑小Ｃ", role:"醫院老闆", tag:"精神領袖", col:"#e0662b", desc:"齊肩黑髮，深藍西裝外套配橘色跑鞋（她是管理者，不穿白袍），永遠在走廊上小跑步。擅長運動和溝通，還會讀心術：一眼就看出誰累了、誰不敢開口。答題卡關時點地圖上的她，會幫你刪掉一個錯的選項。", twist:"原來小Ｃ每天跑遍全院，是為了在每一科都停一下，用她的讀心術看看大家今天好不好。"},
   gy:    {n:"葛宜長官", role:"健保署審查委員", tag:"超級龜毛的長官", col:"#3b3f58", desc:"西裝筆挺，拿紅筆逐行看病歷，口頭禪是「依據在哪裡？」", twist:"後來你發現，葛長官退件的病歷，幾乎都是真的沒寫清楚。被退過三次之後，你的病歷是全科寫得最好的。"},
-  cheng: {n:"鄭宇安", role:"臨床藥師", tag:"臨床藥師", col:"#3f7f3a", desc:"在電話那頭幫你把劑量算第二遍。"},
+  cheng: {n:"鄭耀詩", role:"臨床藥師", tag:"臨床藥師", col:"#3f7f3a", desc:"名字諧音「藥師」。在電話那頭幫你把劑量算第二遍。"},
   sys:   {n:"旁白", role:"", col:"#5a6b6f"},
   pager: {n:"呼叫器", role:"值班", col:"#b42318"}
 };
@@ -585,7 +586,7 @@ const NIGHT = [
 
 /* 選修科 */
 const ELECTIVES = {
- derm:{n:"皮膚科",steps:[say("cheng","鄭宇安：「神經科要開 carbamazepine 給一位新診斷的病人。開之前呢？」"),quiz("hla","cheng")]},
+ derm:{n:"皮膚科",steps:[say("cheng","鄭耀詩：「神經科要開 carbamazepine 給一位新診斷的病人。開之前呢？」"),quiz("hla","cheng")]},
  psy:{n:"精神科",steps:[say("sys","門診一位大學生說最近什麼都不想做。你猶豫要不要直接問自殺的想法。"),quiz("suicide","sys")]},
  anes:{n:"麻醉科",steps:[say("sys","術前訪視：病人說他凌晨餓到偷喝了一杯運動飲料。"),quiz("npo","sys")]},
  rad:{n:"放射科",steps:[say("sys","CT 預約單上寫著：metformin 1000 mg BID，eGFR 25。"),quiz("contrast","sys")]},
@@ -595,13 +596,13 @@ const ELECTIVES = {
 
 /* ======================= 醫院（虛構招募廣告） ======================= */
 const HOSP = [
- {id:"mc",n:"呆丸大學附設醫院",kind:"醫學中心｜北部",tag:"RECRUIT 116",
+ {id:"mc",n:"光甜綜合醫院・香尚總院",kind:"總院｜臺中海線",tag:"RECRUIT 116",
   pts:["PGY 容額多，全院導師制，每 2 位學員 1 位導師","國際交換見習（選修月）","社區醫學合作點：東部衛生所","病例數多、學習曲線陡"],
   fx:{know:6,maxhp:-10,mood:-4},note:"知識成長快，但比較累。"},
- {id:"rg",n:"港灣區域教學醫院",kind:"區域醫院｜南部",tag:"RECRUIT 116",
+ {id:"rg",n:"光甜綜合醫院・大佳院區",kind:"院區｜海線北端",tag:"RECRUIT 116",
   pts:["小班制，主治直接帶 bedside teaching","PGY 有固定的 debrief 時間","手術、操作機會多","離海邊 10 分鐘"],
   fx:{know:3,mood:4},note:"均衡型，操作機會多。"},
- {id:"rr",n:"山海地區教學醫院",kind:"地區醫院｜東部",tag:"RECRUIT 116",
+ {id:"rr",n:"光甜綜合醫院・通笑院區",kind:"院區｜山海之間",tag:"RECRUIT 116",
   pts:["提供員工宿舍","與原鄉衛生所長期合作","跨專業團隊（藥師、社工、個管師）緊密","夜班呼叫較少"],
   fx:{maxhp:10,mood:8,rel:{kolas:3}},note:"體力與心情好，人情味重。"}
 ];
@@ -614,7 +615,7 @@ const STAGES = [
   choose("me","跑跑小Ｃ舉起手要跟你擊掌：",[
    {l:"用力擊掌：「老闆好！」",fx:{mood:4},rel:{xiaoc:3},r:"跑跑小Ｃ笑著說：「叫我小Ｃ就好。」說完又跑去下一站了。"},
    {l:"有點緊張，輕輕碰一下",fx:{mood:3},rel:{xiaoc:2},r:"「放輕鬆，大家都是這樣開始的。答題卡住的時候，在地圖上點我，我幫你讀心。」小Ｃ塞給你一顆巧克力，又跑走了。"}]),
-  say("lin","林振宏護理長看了你寫的第一張醫囑，用紅筆圈起來：「劑量單位寫『u』？會被看成 0。Units 要寫完整。」"),
+  say("lin","林護禮護理長看了你寫的第一張醫囑，用紅筆圈起來：「劑量單位寫『u』？會被看成 0。Units 要寫完整。」"),
   choose("me","被當眾糾正，你的反應是？",[
    {l:"謝謝護理長，馬上改",fx:{know:1},rel:{lin:3},r:"林護理長點點頭：「縮寫 U、IU、QD 都是 ISMP 列的易錯縮寫。你改得很快，不錯。」[[ismp_abbr]]"},
    {l:"小聲抱怨「護理師管這麼多」",fx:{mood:-2},rel:{lin:-3},r:"他聽到了，沒說話，只是把 ISMP 易錯縮寫表貼在你的電腦旁邊。你後來發現，那張表救過你兩次。"}]),
@@ -624,7 +625,7 @@ const STAGES = [
    {l:"私下問她最近是不是遇到什麼事",fx:{mood:2,hours:1},rel:{bai:4},r:"她沉默一下才說，父親剛中風住在別家醫院，她每天下班要趕去顧。你們一起去找導師調整分工，把「家庭照顧需求」正式提出來，而不是私下硬撐。"},
    {l:"直接拒絕，說這是她的工作",fx:{mood:1},rel:{bai:-1},r:"界線清楚是對的。她愣了一下說「好啦」，自己寫完了。"},
    {l:"默默幫她寫，加班到九點",fx:{hp:-8,hours:3},rel:{bai:1},r:"病摘寫完了，你的晚餐沒了。一直吸收別人的工作，不會讓問題消失。"}]),
-  quiz("sepsis","zhang","凌晨，急診上來一位病人。張雅筑學姊站在你後面：「你打算怎麼做？」"),
+  quiz("sepsis","zhang","凌晨，急診上來一位病人。張乃珂學姊站在你後面：「你打算怎麼做？」"),
   quiz("kcl","kui","小葵拿著你開的醫囑跑來："),
   say("kui","小葵：「學長姐，你剛剛開的 KCl 寫 IV push，我不敢給，所以先打給你確認。」\n你背後一陣冷汗。"),
   choose("me","",[
@@ -635,49 +636,49 @@ const STAGES = [
   quiz("hypogly","rui","陳品睿從急診打來支援評估："),
   shift(1),
   quiz("ugib","zhang"),
-  quiz("txunit","zhang","另一床 Hb 6.4，沒有出血。張雅筑：「要輸多少？用台灣的單位講。」"),
+  quiz("txunit","zhang","另一床 Hb 6.4，沒有出血。張乃珂：「要輸多少？用台灣的單位講。」"),
   quiz("txstop","kui","半夜，小葵打電話來："),
-  boss("zhang","早上六點查房。張雅筑學姊：「三題，答對兩題就讓你去吃早餐。」",["dka","curb","hypona"],2,
-   "張雅筑：「不錯。你知道為什麼我問這麼兇嗎？因為病人不會等你準備好。」她遞給你一杯咖啡。",
-   "張雅筑：「沒關係，今天下班前把 DKA 共識讀一遍，明天我再問你。」語氣很硬，但她真的隔天又問了，還幫你畫重點。",{zhang:4}),
+  boss("zhang","早上六點查房。張乃珂學姊：「三題，答對兩題就讓你去吃早餐。」",["dka","curb","hypona"],2,
+   "張乃珂：「不錯。你知道為什麼我問這麼兇嗎？因為病人不會等你準備好。」她遞給你一杯咖啡。",
+   "張乃珂：「沒關係，今天下班前把 DKA 共識讀一遍，明天我再問你。」語氣很硬，但她真的隔天又問了，還幫你畫重點。",{zhang:4}),
   quiz("isbar","hsu","交班時許哲維又只說了「應該沒事」。你決定教他："),
   say("hsu","許哲維：「……喔，原來要這樣講。我一直以為交班就是講診斷。」")
  ]},
  {y:1,m:2,dept:"一般醫學外科",place:"開刀房與外科病房",steps:[
-  say("ouyang","歐陽晉總醫師在開刀房外大吼：「誰交班沒寫 NPO？病人早上吃了一碗粥，刀開不了！」"),
+  say("ouyang","歐陽偉柯總醫師在開刀房外大吼：「誰交班沒寫 NPO？病人早上吃了一碗粥，刀開不了！」"),
   choose("me","那床是你交班的。你要？",[
    {l:"冷靜承認，說明當時狀況，提出改善做法",fx:{know:1},rel:{ouyang:3},r:"他愣了一下，音量降下來：「……好。之後交班單加一欄 NPO。」"},
    {l:"沉默挨罵，事後一個人在樓梯間哭",fx:{mood:-8},r:"你哭完後，陳品睿剛好經過，遞給你一包面紙：「被罵不代表你不適合當醫師。」",rel:{rui:2}},
    {l:"當場頂回去「你自己也沒看！」",fx:{mood:-2},rel:{ouyang:-4},r:"開刀房外一片寂靜。對錯先不論，這不是解決問題的地方。"}]),
   quiz("checklist","ouyang"),
   quiz("abx","ouyang","刀前十五分鐘，麻醉科問："),
-  say("ouyang","歐陽晉這週第三次當著病人面罵你「笨」。旁邊的小葵也嚇到了。"),
+  say("ouyang","歐陽偉柯這週第三次當著病人面罵你「笨」。旁邊的小葵也嚇到了。"),
   choose("me","嚴格教學和言語霸凌之間，是有界線的。",[
-   {l:"整理事件時間與內容，找導師或教學部的申訴管道",fx:{mood:3},rel:{ouyang:1},r:"教學部依程序處理並安排溝通。依《職業安全衛生法》，雇主應預防員工執行職務時遭受不法侵害，並建立申訴、調查及處理程序[[law_osh]]。歐陽晉後來在 M&M 會議公開道歉。"},
+   {l:"整理事件時間與內容，找導師或教學部的申訴管道",fx:{mood:3},rel:{ouyang:1},r:"教學部依程序處理並安排溝通。依《職業安全衛生法》，雇主應預防員工執行職務時遭受不法侵害，並建立申訴、調查及處理程序[[law_osh]]。歐陽偉柯後來在 M&M 會議公開道歉。"},
    {l:"忍下來，反正外科只有兩個月",fx:{mood:-6},r:"你撐過去了，但下一屆 PGY 也會遇到一樣的事。"}]),
   quiz("tension","rui","急診紅區叫外科："),
   quiz("needle","sys","縫合時一個不小心——"),
   quiz("alvarado","ouyang"),
-  boss("ouyang","燒燙傷病人送進來。歐陽晉：「我問，你答。答錯病人等你。」",["burn","trauma","compart"],2,
-   "歐陽晉：「……可以。下週那台闌尾切除，你當第一助手。」",
-   "歐陽晉沒罵你，只說：「回去讀 ATLS 第 10 版，下次再來。」這大概是他最溫柔的版本。",{ouyang:4})
+  boss("ouyang","燒燙傷病人送進來。歐陽偉柯：「我問，你答。答錯病人等你。」",["burn","trauma","compart"],2,
+   "歐陽偉柯：「……可以。下週那台闌尾切除，你當第一助手。」",
+   "歐陽偉柯沒罵你，只說：「回去讀 ATLS 第 10 版，下次再來。」這大概是他最溫柔的版本。",{ouyang:4})
  ]},
  {y:1,m:1,dept:"一般醫學兒科",place:"兒科病房與急診",steps:[
-  say("lee","李國棟主治從口袋拿出恐龍貼紙：「兒科第一課：先跟小孩打招呼，再跟家長打招呼。」"),
+  say("lee","李爾柯主治從口袋拿出恐龍貼紙：「兒科第一課：先跟小孩打招呼，再跟家長打招呼。」"),
   quiz("infant","lee","半夜兒科急診："),
   quiz("ors","lee"),
   quiz("pedcpr","rui","兒科急救訓練，陳品睿來當教練："),
   say("sys","一位母親抱著孩子：「我在網路上看到 MMR 會造成自閉症，所以不想打。」"),
-  quiz("mmr","lee","李國棟看著你，示意由你來回答："),
+  quiz("mmr","lee","李爾柯看著你，示意由你來回答："),
   choose("me","你要怎麼開口？",[
    {l:"先問她最擔心什麼，再說明證據",fx:{know:1,mood:2},rel:{lee:3},r:"她說哥哥家的孩子有自閉症，所以很怕。你先同理，再講研究。最後她說：「我回去跟先生討論，下週來打。」"},
    {l:"直接說「網路都是假的」",fx:{mood:-2},rel:{lee:-1},r:"她抱著孩子轉身走了。正確的資訊，也需要正確的說法。"}]),
-  boss("lee","李國棟：「最後一題。這個 5 歲的孩子燒了 6 天。」",["kawasaki"],1,
-   "李國棟：「很好。記得也要排心臟超音波。」他給了你一張暴龍貼紙。",
-   "李國棟：「沒關係，川崎病很容易被當成病毒感染。重點是燒超過五天要想到它。」",{lee:4})
+  boss("lee","李爾柯：「最後一題。這個 5 歲的孩子燒了 6 天。」",["kawasaki"],1,
+   "李爾柯：「很好。記得也要排心臟超音波。」他給了你一張暴龍貼紙。",
+   "李爾柯：「沒關係，川崎病很容易被當成病毒感染。重點是燒超過五天要想到它。」",{lee:4})
  ]},
  {y:1,m:1,dept:"一般醫學婦產科",place:"產房與婦科門診",steps:[
-  say("tsai","蔡文淵主治：「不管醫師是什麼性別，做乳房或骨盆檢查前都要先說明、取得同意，並請第三人陪同。這是保護病人，也保護你。」[[gmc]]"),
+  say("tsai","蔡富燦主治：「不管醫師是什麼性別，做乳房或骨盆檢查前都要先說明、取得同意，並請第三人陪同。這是保護病人，也保護你。」[[gmc]]"),
   choose("me","一位病人說「我想換女醫師檢查」，而你剛好是男性；或是她說「我想要男醫師」，而你剛好是女性。",[
    {l:"尊重她的選擇，協助安排",fx:{mood:1},rel:{tsai:3},r:"蔡醫師點頭：「病人的自主與舒適優先，這不是在否定你的能力。」"},
    {l:"堅持「醫師都一樣」",fx:{mood:-2},rel:{tsai:-2},r:"病人越來越緊張，最後拒絕檢查。專業和尊重並不衝突。"}]),
@@ -688,7 +689,7 @@ const STAGES = [
    "蔡醫師：「是深部肌腱反射。記住，鎂中毒會先讓反射消失，再來是呼吸。」",{tsai:4})
  ]},
  {y:1,m:1,dept:"急診醫學",place:"急診",steps:[
-  say("wang","王宛如主治：「急診每月班表約 168–192 小時，夜班不超過 8 班、每班不超過 13 小時，這是訓練計畫寫的。睡眠是你的責任，也是病人安全。」[[mohw]]"),
+  say("wang","王季真主治：「急診每月班表約 168–192 小時，夜班不超過 8 班、每班不超過 13 小時，這是訓練計畫寫的。睡眠是你的責任，也是病人安全。」[[mohw]]"),
   say("sys","一位阿伯大聲說：「男護士喔？叫女的來打針啦！」陳品睿正要幫他打針。"),
   choose("me","你在旁邊，要怎麼反應？",[
    {l:"平靜地說：「陳護理師是我們急診最資深的，交給他很放心。」",fx:{mood:2},rel:{rui:4},r:"阿伯哼了一聲，伸出手臂。陳品睿一針就上：「叫我護理師就好。」"},
@@ -699,7 +700,7 @@ const STAGES = [
   quiz("snake","rui","花蓮來的登山客，被蛇咬了。陳品睿：「有拍到蛇的照片，是龜殼花。」"),
   quiz("op","wang"),
   boss("rui","急救室裡，監視器變成一團亂波。陳品睿：「醫師，你帶 code。」",["vf"],1,
-   "ROSC。陳品睿和你擊了一下拳：「帶得很好。」王宛如在旁邊默默把你的名字寫進教學評核。",
+   "ROSC。陳品睿和你擊了一下拳：「帶得很好。」王季真在旁邊默默把你的名字寫進教學評核。",
    "陳品睿冷靜接手：「先電擊，充電 200 焦耳。」病人最後恢復心跳。你在學習單上寫下：可電擊心律，先電擊。",{rui:4,wang:2})
  ]},
 {y:1,m:0,dept:"技能關卡：急救與呼吸道",place:"臨床技能中心 · DOPS 考核",steps:[
@@ -708,13 +709,13 @@ const STAGES = [
   quiz("ratio","rui"),
   quiz("hts","rui","假人第二輪心律是 PEA。陳品睿：「找原因。」"),
   quiz("fbao","rui","下一站：餐廳情境。「有人噎到了！」"),
-  boss("wang","王宛如：「換呼吸道。擬真病人：肺炎合併呼吸衰竭，要插管。三題答對兩題才能拿喉頭鏡。」",["lemon","preox","etco2"],2,
-   "王宛如把喉頭鏡交給你：「評估、給氧、確認，你都想到了。」",
-   "王宛如：「插管最危險的不是插不進去，是忘了病人需要氧氣。回去讀 DAS 指引，下次再來。」",{wang:3}),
+  boss("wang","王季真：「換呼吸道。擬真病人：肺炎合併呼吸衰竭，要插管。三題答對兩題才能拿喉頭鏡。」",["lemon","preox","etco2"],2,
+   "王季真把喉頭鏡交給你：「評估、給氧、確認，你都想到了。」",
+   "王季真：「插管最危險的不是插不進去，是忘了病人需要氧氣。回去讀 DAS 指引，下次再來。」",{wang:3}),
   quiz("intorder","wang","正式上場前，把 RSI 步驟排好："),
-  boss("wang","王宛如：「最後兩題，是你一個人值夜班時會遇到的。」",["succ","failed"],1,
-   "王宛如：「很好。記住，插不進去不丟臉，讓病人缺氧才是。」陳品睿在評核表上簽了名。",
-   "王宛如：「重點是氧合，不是插管成功。喉罩先放上去，然後大聲求援。」",{wang:2,rui:2})
+  boss("wang","王季真：「最後兩題，是你一個人值夜班時會遇到的。」",["succ","failed"],1,
+   "王季真：「很好。記住，插不進去不丟臉，讓病人缺氧才是。」陳品睿在評核表上簽了名。",
+   "王季真：「重點是氧合，不是插管成功。喉罩先放上去，然後大聲求援。」",{wang:2,rui:2})
  ]},
  {y:1,m:2,dept:"社區醫學",place:"東部衛生所（社區合作）",steps:[
   say("kolas","Kolas 主任把安全帽丟給你：「社區醫學兩個月，不用回原醫院值班。今天去部落做居家訪視。」[[mohw]]"),
@@ -734,7 +735,7 @@ const STAGES = [
  {y:1,m:2,dept:"選修",place:"選修兩個月（每月一科）",elective:2,steps:[]},
  {y:1,m:0,dept:"PGY1 年度評核",place:"教學部",steps:[
   say("sys","PGY1 結束前，教學部安排工作場所評量與學習歷程檢討。"),
-  quiz("minicex","zhang","張雅筑學姊擔任你的評核教師："),
+  quiz("minicex","zhang","張乃珂學姊擔任你的評核教師："),
   say("xiaoc","跑跑小Ｃ跑進教學部，手上拿著一疊回饋單：「每個人的評語我都看過了。一年前你們連醫囑都不太敢開，現在會攔下錯誤、會開口求救。這就是成長。」"),
   choose("me","你想跟小Ｃ說：",[
    {l:"「謝謝小Ｃ這一年一直都在」",fx:{mood:5},rel:{xiaoc:3},r:"小Ｃ揮揮手：「我只是跑得比較勤。PGY2 見！」"},
@@ -742,13 +743,13 @@ const STAGES = [
   {t:"yearEnd"}
  ]},
  {y:2,m:3,dept:"內科（進階）",place:"內科病房，你帶 PGY1",steps:[
-  say("zhang","張雅筑升總醫師了：「今年你帶 PGY1。記得你去年怎麼被教的嗎？選你想要的方式。」"),
+  say("zhang","張乃珂升總醫師了：「今年你帶 PGY1。記得你去年怎麼被教的嗎？選你想要的方式。」"),
   say("hsu","許哲維也升 PGY2，交班單寫得比你還整齊。他尷尬地說：「去年……謝謝你。」"),
   quiz("af","zhang"),
   quiz("stemi","rui","急診胸痛病人，ECG 是 inferior STEMI："),
   shift(2),
-  quiz("inr","cheng","鄭宇安藥師打電話來："),
-  quiz("ffp","zhang","外科會診單寫著「INR 1.6，術前是否需輸 FFP？」張雅筑把單子交給你："),
+  quiz("inr","cheng","鄭耀詩藥師打電話來："),
+  quiz("ffp","zhang","外科會診單寫著「INR 1.6，術前是否需輸 FFP？」張乃珂把單子交給你："),
   quiz("taco","kui","小葵：「12 床輸完血兩個小時開始喘，血氧 88。」"),
   say("gy","健保署的葛宜長官來院抽審，西裝筆挺，手上一支紅筆。葛長官把你的病歷攤在桌上，逐行唸：「Hb 7.8，輸 PRBC 2U……理由呢？」"),
   quiz("nhidoc","gy"),
@@ -757,26 +758,26 @@ const STAGES = [
   quiz("nhidm","gy"),
   choose("me","葛長官把病歷推回來：「下次寫清楚。」你的反應是？",[
    {l:"「謝謝長官，我會補上症狀和輸後追蹤。」",fx:{know:2,mood:1},rel:{gy:3},r:"葛長官抬了抬眼鏡：「嗯。寫清楚，病人安全，你也安全。」紅筆終於放下了。"},
-   {l:"小聲抱怨「也太龜毛了吧」",fx:{mood:-2},rel:{gy:-1},r:"葛長官聽到了，又在下一頁畫了一個紅圈。張雅筑在旁邊忍住沒笑：「龜毛，但說的對。」"}]),  quiz("apap","cheng"),
+   {l:"小聲抱怨「也太龜毛了吧」",fx:{mood:-2},rel:{gy:-1},r:"葛長官聽到了，又在下一頁畫了一個紅圈。張乃珂在旁邊忍住沒笑：「龜毛，但說的對。」"}]),  quiz("apap","cheng"),
   quiz("hypercal","zhang"),
   quiz("adrenal","zhang","骨科會診：術後第一天血壓一直上不來。"),
   say("bai","白芷晴：「我爸出院了，這一年謝謝你幫我爭取彈性排班。這週你的夜班我來換。」"),
-  boss("zhang","家庭會議前，張雅筑：「你來主持。先確認法律你懂。」",["acp","dnr"],2,
+  boss("zhang","家庭會議前，張乃珂：「你來主持。先確認法律你懂。」",["acp","dnr"],2,
    "家屬會議結束，病人女兒握著你的手說：「謝謝你讓我們知道媽媽想要什麼。」",
-   "張雅筑接手補充說明，會後陪你把病主法和安寧條例條文讀一遍。",{zhang:4,shih:2})
+   "張乃珂接手補充說明，會後陪你把病主法和安寧條例條文讀一遍。",{zhang:4,shih:2})
  ]},
  {y:2,m:2,dept:"外科（進階）",place:"外科與創傷",steps:[
-  say("ouyang","歐陽晉剛從三個月育嬰假回來：「以前那樣罵人，是我錯了。這次我們好好來。」"),
+  say("ouyang","歐陽偉柯剛從三個月育嬰假回來：「以前那樣罵人，是我錯了。這次我們好好來。」"),
   choose("me","你要怎麼回？",[
    {l:"「謝謝學長。我們一起把交班表改好吧。」",fx:{mood:4},rel:{ouyang:4},r:"你們一起設計了新的外科交班表，NPO、抗凝血劑、過敏都有勾選欄。"},
    {l:"保持距離，只談公事",fx:{},rel:{ouyang:1},r:"沒關係，修復關係本來就需要時間。"}]),
   quiz("mtp","ouyang","大量輸血啟動："),
   quiz("compart","ouyang"),
-  quiz("periop","cheng","明天要開刀的糖尿病病人，藥師鄭宇安問你："),
+  quiz("periop","cheng","明天要開刀的糖尿病病人，藥師鄭耀詩問你："),
   quiz("needle","sys","這次是你帶的 PGY1 被針扎，他慌了。你先告訴他："),
-  boss("ouyang","創傷小組會議，歐陽晉：「考你兩題，答對一題就好。」",["trauma","burn"],1,
-   "歐陽晉：「很穩。考慮來外科嗎？我們缺人，而且現在工時有守法。」",
-   "歐陽晉：「沒關係，我們一起再看一次 ATLS。」這次他真的沒有罵人。",{ouyang:3})
+  boss("ouyang","創傷小組會議，歐陽偉柯：「考你兩題，答對一題就好。」",["trauma","burn"],1,
+   "歐陽偉柯：「很穩。考慮來外科嗎？我們缺人，而且現在工時有守法。」",
+   "歐陽偉柯：「沒關係，我們一起再看一次 ATLS。」這次他真的沒有罵人。",{ouyang:3})
  ]},
  {y:2,m:1,dept:"急診醫學（夜班）",place:"急診",steps:[
   quiz("ecg10","wang"),
@@ -785,16 +786,16 @@ const STAGES = [
   shift(3),
   quiz("brady","rui","監視器警報：心跳 34，血壓 78/40，病人說頭暈。"),
   quiz("svt","wang"),
-  boss("wang","凌晨四點，院內 CPR 廣播。王宛如：「你今晚當資深，你帶 code。」",["pea","etco2cpr","rosc"],2,
-   "王宛如：「你已經可以照顧整個急診的夜晚了。」",
-   "王宛如：「不急，下一次你會更快。」",{wang:4})
+  boss("wang","凌晨四點，院內 CPR 廣播。王季真：「你今晚當資深，你帶 code。」",["pea","etco2cpr","rosc"],2,
+   "王季真：「你已經可以照顧整個急診的夜晚了。」",
+   "王季真：「不急，下一次你會更快。」",{wang:4})
  ]},
  {y:2,m:1,dept:"老年醫學",place:"老年醫學病房",steps:[
-  say("shih","施雨萱主治蹲下來跟輪椅上的阿公平視：「阿公，今天是幾月幾號？」"),
+  say("shih","施樂年主治蹲下來跟輪椅上的阿公平視：「阿公，今天是幾月幾號？」"),
   quiz("cam","shih"),
   quiz("delir","shih","半夜，阿公要拔鼻胃管。值班的小葵打給你："),
   quiz("tug","shih"),
-  quiz("beers","cheng","鄭宇安做用藥整合時問你："),
+  quiz("beers","cheng","鄭耀詩做用藥整合時問你："),
   boss("shih","施醫師：「最後，安寧照護。」",["dyspnea"],1,
    "施醫師：「好的醫師不只會救命，也會陪病人好好走完。」",
    "施醫師：「鴉片類在末期呼吸困難是對的藥。我們一起跟家屬說明。」",{shih:4})
@@ -1064,8 +1065,8 @@ function titleScreen(){
 
 function chooseHospital(){
   S.stage = -1;
-  show(`<div class="banner"><span class="eyebrow">畢業前一年 · PGY 招募季</span><h2>選擇你的訓練醫院</h2>
-   <span class="meta">各醫院會在前一年辦招募說明會，公告容額、課程特色、社區合作點與面試日期${rich("[[ntuh2]][[cch]]")}。以下三家醫院與廣告均為虛構，只借用說明會的格式。</span></div>
+  show(`<div class="banner"><span class="eyebrow">畢業前一年 · PGY 招募季</span><h2>選擇你的訓練院區</h2>
+   <span class="meta">各醫院會在前一年辦招募說明會，公告容額、課程特色、社區合作點與面試日期${rich("[[ntuh2]][[cch]]")}。以下以光田綜合醫院為藍圖，改成諧音的虛構「光甜綜合醫院」三個院區；廣告內容均為虛構，只借用說明會的格式。</span></div>
    <div class="ads">${HOSP.map((h,i)=>`<button class="ad" data-i="${i}"><span class="tag">${h.tag}</span><h3>${esc(h.n)}</h3><span class="meta">${esc(h.kind)}</span><ul>${h.pts.map(p=>`<li>${esc(p)}</li>`).join("")}</ul><span class="meta">${esc(h.note)}</span></button>`).join("")}</div>`);
   V().querySelectorAll(".ad").forEach(b => b.onclick = () => {
     const h = HOSP[+b.dataset.i]; S.hosp = h.id;
@@ -1104,7 +1105,7 @@ function checkLimits(){
   if(S.hours > 320){
     addLog(`四週工時 ${S.hours}h，超過上限被叫回家`);
     S.hours = 300;
-    show(`${speaker("lin","林振宏護理長擋在你面前：「你這四週已經超過 320 小時了。住院醫師納入勞基法後總工時有上限，值班日單次勤務含延長最多 28 小時，兩次勤務之間至少休 10 小時。回去睡覺。」[[cgmh]]")}
+    show(`${speaker("lin","林護禮護理長擋在你面前：「你這四週已經超過 320 小時了。住院醫師納入勞基法後總工時有上限，值班日單次勤務含延長最多 28 小時，兩次勤務之間至少休 10 小時。回去睡覺。」[[cgmh]]")}
      <div class="feedback"><strong>真實制度</strong><span>住院醫師自 2019 年 9 月 1 日起適用勞動基準法；《住院醫師勞動權益保障及工作時間指引》以四週為單位，總工時上限 320 小時${rich("[[cgmh]][[pts]]")}。</span></div>
      <p class="fx">${applyFx({hp:15,mood:-3},{lin:2})}</p>${nxBtn("去休息")}`);
     document.getElementById("nx").onclick = run; return true;
@@ -1281,7 +1282,7 @@ function yearEnd(){
 }
 
 const SPECIALTIES = ["內科","外科","兒科","婦產科","急診醫學科","家庭醫學科","精神科","麻醉科","放射診斷科","皮膚科","眼科","老年醫學（經內科／家醫科）"];
-function ending(){
+function ending(){ BGM.end = true; musicTo("ending");
   const pct = S.total ? S.right/S.total : 0;
   show(`<div class="banner"><span class="eyebrow">PGY 結訓 · 住院醫師招募</span><h2>兩年過去了，你想走哪一科？</h2>
    <span class="meta">完成 PGY 訓練後，才能申請進入各專科住院醫師訓練${rich("[[mohw]]")}。</span></div>
@@ -1292,7 +1293,7 @@ function ending(){
     let verdict;
     if(pct >= 0.75 && S.know >= 120) verdict = `面試時，主任翻著你的學習歷程說：「Mini-CEX 評語寫你『臨床推理清楚、尊重團隊』。歡迎加入${sp}。」你錄取了第一志願。`;
     else if(pct >= 0.55) verdict = `面試有點緊張，但你把 PGY 兩年的病人故事講得很真誠。你錄取了${sp}。`;
-    else verdict = `第一志願醫院的${sp}名額很少，你沒有錄取。張雅筑學姊陪你整理面試回饋，你去參加其他醫院的第二波招募，最後錄取另一家醫院的${sp}。她說：「第一家沒上很常見，訓練是在哪裡都能好好學的。」`;
+    else verdict = `第一志願醫院的${sp}名額很少，你沒有錄取。張乃珂學姊陪你整理面試回饋，你去參加其他醫院的第二波招募，最後錄取另一家醫院的${sp}。她說：「第一家沒上很常見，訓練是在哪裡都能好好學的。」`;
     addLog(`申請 ${sp}`);
     S.stage = STAGES.length; S.spec = sp; S.verdict = verdict; save();
     finalScreen();
@@ -1381,36 +1382,91 @@ document.getElementById("theme").onclick = () => {
   const dark = root.dataset.theme ? root.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   root.dataset.theme = dark ? "light" : "dark";
 };
-/* 安靜的背景音：柔和的和弦循環 */
-let audio = null;
-document.getElementById("music").onclick = e => {
-  const btn = e.currentTarget;
-  if(audio){ audio.ctx.close(); audio = null; btn.setAttribute("aria-pressed", false); return; }
+/* 背景音樂：每個科別一首公眾領域（CC0）曲子，來源 FreePD.com。按「♪ 音樂」才開始播放。 */
+const MUSIC = {
+  lobby:{f:"lobby", t:"Slice of Life", a:"Bryan Teoh"},
+  med:{f:"med", t:"Study and Relax", a:"Kevin MacLeod"},
+  surg:{f:"surg", t:"Gotta Keep On Movin", a:"Bryan Teoh"},
+  peds:{f:"peds", t:"Happy Whistling Ukulele", a:"Rafael Krux"},
+  ob:{f:"ob", t:"Kalimba Relaxation Music", a:"Kevin MacLeod"},
+  er:{f:"er", t:"Rush", a:""},
+  night:{f:"night", t:"Night Vigil", a:"Kevin MacLeod"},
+  comm:{f:"comm", t:"Barnville", a:"Rafael Krux"},
+  geri:{f:"geri", t:"Nostalgic Piano", a:""},
+  elect:{f:"elect", t:"Travelers Notebook", a:""},
+  eval:{f:"eval", t:"Think About It", a:""},
+  match:{f:"match", t:"Hopeful", a:"Rafael Krux"},
+  ending:{f:"ending", t:"Journey of Hope", a:"Alexander Nakarada"}
+};
+function musicKey(){
+  if(!S || S.stage < 0){ BGM.end = false; return "lobby"; }
+  if(BGM.end) return "ending";
+  const st = STAGES[S.stage]; if(!st) return "ending";
+  const d = st.dept || "";
+  if(/夜班/.test(d)) return "night";
+  if(/急診|技能/.test(d)) return "er";
+  if(/外科/.test(d)) return "surg";
+  if(/兒科/.test(d)) return "peds";
+  if(/婦產/.test(d)) return "ob";
+  if(/社區/.test(d)) return "comm";
+  if(/老年/.test(d)) return "geri";
+  if(/選修/.test(d)) return "elect";
+  if(/評核/.test(d)) return "eval";
+  if(/招募/.test(d)) return "match";
+  return "med";
+}
+const BGM = {on:false, el:null, key:null, synth:null};
+function musicLabel(){ const m = MUSIC[BGM.key]; const btn = document.getElementById("music");
+  if(btn){ btn.textContent = BGM.on ? "♪ 音樂開" : "♪ 音樂"; btn.title = BGM.on && m ? `正在播放：${m.t}${m.a ? "（"+m.a+"）" : ""}・FreePD 公眾領域` : "播放各科別的背景音樂"; } }
+function synthStart(){
   try{
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
     const master = ctx.createGain(); master.gain.value = 0.035; master.connect(ctx.destination);
     const chords = [[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66]];
     let i = 0;
-    const play = () => {
-      const t = ctx.currentTime;
-      chords[i++ % chords.length].forEach(f => {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = "sine"; o.frequency.value = f/2;
-        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t+1.2); g.gain.linearRampToValueAtTime(0, t+4.2);
-        o.connect(g); g.connect(master); o.start(t); o.stop(t+4.3);
-      });
-    };
-    play(); const timer = setInterval(play, 4000);
-    audio = {ctx, timer}; ctx.addEventListener("statechange", () => { if(ctx.state==="closed") clearInterval(timer); });
-    btn.setAttribute("aria-pressed", true);
-  }catch(err){ btn.textContent = "♪ 無法播放"; }
+    const play = () => { const t = ctx.currentTime;
+      chords[i++ % chords.length].forEach(f => { const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = f/2; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t+1.2); g.gain.linearRampToValueAtTime(0, t+4.2);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t+4.3); }); };
+    play(); const timer = setInterval(play, 4000); BGM.synth = {ctx, timer};
+  }catch(err){}
+}
+function synthStop(){ if(BGM.synth){ clearInterval(BGM.synth.timer); BGM.synth.ctx.close(); BGM.synth = null; } }
+function fadeTo(el, v, ms, then){
+  const from = el.volume, t0 = performance.now();
+  const stepF = now => { const k = Math.min(1, (now - t0) / ms); el.volume = Math.max(0, Math.min(1, from + (v - from) * k)); if(k < 1) requestAnimationFrame(stepF); else if(then) then(); };
+  requestAnimationFrame(stepF);
+}
+function musicTo(key){
+  if(!MUSIC[key]) key = "med";
+  if(!BGM.on){ BGM.key = key; return; }
+  if(BGM.key === key && BGM.el && !BGM.el.paused) return;
+  BGM.key = key; musicLabel();
+  const start = () => {
+    const el = new Audio(`music/${MUSIC[key].f}.mp3`); el.loop = true; el.volume = 0; el.preload = "auto";
+    el.onerror = () => { if(BGM.el === el && BGM.on && !BGM.synth) synthStart(); };
+    BGM.el = el;
+    el.play().then(() => { synthStop(); fadeTo(el, .32, 900); }).catch(() => { if(BGM.on && !BGM.synth) synthStart(); });
+  };
+  const old = BGM.el;
+  if(old && !old.paused){ fadeTo(old, 0, 500, () => { old.pause(); old.src = ""; if(BGM.key === key) start(); }); }
+  else start();
+}
+function musicSync(){ musicTo(musicKey()); }
+document.getElementById("music").onclick = e => {
+  const btn = e.currentTarget;
+  BGM.on = !BGM.on; btn.setAttribute("aria-pressed", BGM.on);
+  if(BGM.on){ BGM.key = null; musicTo(musicKey()); }
+  else { synthStop(); if(BGM.el){ const el = BGM.el; fadeTo(el, 0, 300, () => { el.pause(); }); } BGM.el = null; }
+  musicLabel();
 };
 if(GAS_URL){ const g = document.getElementById("gas"); g.href = GAS_URL; g.hidden = false; }
 
 
 /* ======================= 角色扮演地圖 ======================= */
 /* 15×9 格的病房地圖。角色、家具都用程式畫，不載入圖檔。 */
-const TW = 32, COLS = 15, ROWS = 9;
+const TW = 32, COLS = 15, ROWS = 9, SC = 2; /* SC：高解析度倍率 */
+const HASH = id => [...String(id)].reduce((h,ch) => (h*31 + ch.charCodeAt(0)) % 997, 7);
 const LOOK = {
   me:    {coat:"#f4f6f5", shirt:"#2c6e5c", hair:"#2a211c", style:"short", skin:"#f1c8a5"},
   hsu:   {coat:"#f4f6f5", shirt:"#6d4bb3", hair:"#5a3a22", style:"spiky", skin:"#e9bf98", glasses:1},
@@ -1435,14 +1491,19 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   const L = LOOK[id] || LOOK.pt;
   const r = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(x + a*s, y + b*s, w*s, h*s); };
   c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x+8*s, y+19.5*s, 6*s, 1.6*s, 0, 0, 7); c.fill();
-  const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0;
-  r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40");
+  const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0, OL = "rgba(28,32,44,.55)";
+  /* 外框，讓角色在任何地板上都清楚 */
+  r(3.4, 14.6, 4.2, 4.8 - step, OL); r(8.4, 14.6, 4.2, 3.8 + step, OL);
+  r(2.4, 7.4+bob, 11.2, 8.8, OL); r(1, 8.6+bob, 2.8, 6.6, OL); r(12.2, 8.6+bob, 2.8, 6.6, OL);
+  r(3.2, -0.4+bob, 9.6, 8.8, OL);
+  r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40"); r(4, 15, 1, 3, "rgba(255,255,255,.12)");
   if(L.shoes){ r(3.5, 18 - step, 4, 1.4, L.shoes); r(8.5, 17 + step, 4, 1.4, L.shoes); }
   r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
-  if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); }
+  r(3, 8+bob, 1.2, 8, "rgba(255,255,255,.22)"); r(11.4, 8+bob, 1.6, 8, "rgba(0,0,0,.13)"); r(3, 15.2+bob, 10, .8, "rgba(0,0,0,.12)");
+  if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); r(6, 8.4+bob, .6, 3.2, "#56606a"); r(9.4, 8.4+bob, .6, 3.2, "#56606a"); r(5.6, 11.4+bob, 1.4, 1.4, "#8a949c"); }
   r(1.6, 9+bob + (dir==="left"||dir==="right" ? 0 : step), 1.6, 5, L.coat); r(12.8, 9+bob + (dir==="left"||dir==="right" ? 0 : 1-step), 1.6, 5, L.coat);
   r(1.6, 13.6+bob, 1.6, 1.2, L.skin); r(12.8, 13.6+bob, 1.6, 1.2, L.skin);
-  r(4, 1+bob, 8, 7, L.skin);
+  r(4, 1+bob, 8, 7, L.skin); r(4, 6.6+bob, 8, .9, "rgba(0,0,0,.07)");
   const h = L.hair;
   if(L.style==="cap"){ r(3.4, 0+bob, 9.2, 3, h); r(3.4, 3+bob, 1, 1.4, h); r(11.6, 3+bob, 1, 1.4, h); }
   else {
@@ -1456,10 +1517,14 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(L.style==="pony"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); if(dir!=="down") r(dir==="left"?11.8:2.2, 3+bob, 1.8, 5, h); else r(12, 2.4+bob, 1.4, 4, h); }
     if(L.style==="short"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
     if(L.band) r(3.6, 1.6+bob, 8.8, 1.1, L.band);
+    r(5, 0.5+bob, 3.4, .6, "rgba(255,255,255,.28)");
   }
   if(dir!=="up"){
     const dx = dir==="left" ? -1 : dir==="right" ? 1 : 0;
-    r(5.8+dx, 4.4+bob, 1.2, 1.4, "#222"); r(9+dx, 4.4+bob, 1.2, 1.4, "#222");
+    const tt = typeof W === "object" ? W.t : 0, blink = ((tt + HASH(id)*.37) % 4.2) < .13;
+    if(blink){ r(5.6+dx, 5+bob, 1.8, .45, "#222"); r(8.8+dx, 5+bob, 1.8, .45, "#222"); }
+    else { r(5.5+dx, 4.2+bob, 1.8, 1.8, "#fff"); r(8.7+dx, 4.2+bob, 1.8, 1.8, "#fff"); r(5.9+dx+dx*.3, 4.4+bob, 1.2, 1.5, "#222"); r(9.1+dx+dx*.3, 4.4+bob, 1.2, 1.5, "#222"); r(6+dx, 4.5+bob, .45, .45, "#fff"); r(9.2+dx, 4.5+bob, .45, .45, "#fff"); }
+    r(4.6+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)"); r(10.2+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)");
     if(L.glasses){ r(5+dx, 4+bob, 2.8, .5, "#555"); r(8.2+dx, 4+bob, 2.8, .5, "#555"); }
     r(7+dx, 6.6+bob, 2, .6, "#b4685a");
   }
@@ -1468,8 +1533,10 @@ const PORTRAIT = {};
 function portrait(id){
   if(PORTRAIT[id]) return PORTRAIT[id];
   try{
-    const cv = document.createElement("canvas"); cv.width = 48; cv.height = 48;
-    const c = cv.getContext("2d"); c.fillStyle = (CH[id]||CH.sys).col; c.fillRect(0,0,48,48);
+    const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
+    const c = cv.getContext("2d"); c.scale(2,2);
+    const g = c.createLinearGradient(0,0,0,48), col = (CH[id]||CH.sys).col; g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,.25)");
+    c.fillStyle = col; c.fillRect(0,0,48,48); c.fillStyle = g; c.fillRect(0,0,48,48);
     drawChar(c, 8, 6, LOOK[id] ? id : "pt", "down", 0, 2);
     PORTRAIT[id] = cv.toDataURL();
   }catch(e){ PORTRAIT[id] = ""; }
@@ -1492,14 +1559,14 @@ const FLOOR = {lobby:["#e8e2d4","#e1dacb"], ward:["#dfe9e5","#d6e2dd"], er:["#dc
 function furniture(theme){
   const bedsTop = [2,5,8,11].map(x => ({k:"bed", x, y:1}));
   switch(theme){
-    case "lobby": return [{k:"desk",x:5,y:1,w:5},{k:"sign",x:5,y:0,w:5,t:"呆丸醫院 · 教學部"},{k:"chair",x:1,y:6},{k:"chair",x:2,y:6},{k:"chair",x:12,y:6},{k:"chair",x:13,y:6},{k:"plant",x:1,y:1},{k:"plant",x:13,y:1},{k:"door",x:7,y:8}];
-    case "er": return [{k:"resus",x:2,y:1},{k:"resus",x:5,y:1},{k:"resus",x:8,y:1},{k:"desk",x:1,y:6,w:3},{k:"cart",x:11,y:1},{k:"door",x:14,y:4,t:"救護車"},{k:"plant",x:13,y:7}];
-    case "or": return [{k:"ortable",x:6,y:3},{k:"lamp",x:6,y:2},{k:"sink",x:1,y:1},{k:"sink",x:2,y:1},{k:"cart",x:10,y:2},{k:"monitor",x:9,y:3}];
-    case "peds": return [...bedsTop.map(b => ({...b,k:"cot"})),{k:"desk",x:10,y:6,w:3},{k:"toy",x:2,y:6},{k:"toy",x:3,y:7},{k:"plant",x:13,y:7}];
-    case "ob": return [{k:"bed",x:2,y:1},{k:"bed",x:5,y:1},{k:"crib",x:8,y:1},{k:"crib",x:10,y:1},{k:"desk",x:10,y:6,w:3},{k:"plant",x:1,y:7}];
+    case "lobby": return [{k:"desk",x:5,y:1,w:5},{k:"sign",x:4,y:0,w:7,t:"光甜綜合醫院 · 教學部"},{k:"chair",x:1,y:6},{k:"chair",x:2,y:6},{k:"chair",x:12,y:6},{k:"chair",x:13,y:6},{k:"plant",x:1,y:1},{k:"plant",x:13,y:1},{k:"door",x:7,y:8}];
+    case "er": return [{k:"sign",x:10,y:0,w:4,t:"急診 ER",red:1},{k:"resus",x:2,y:1},{k:"resus",x:5,y:1},{k:"resus",x:8,y:1},{k:"desk",x:1,y:6,w:3},{k:"cart",x:11,y:1},{k:"door",x:14,y:4,t:"救護車"},{k:"plant",x:13,y:7}];
+    case "or": return [{k:"sign",x:9,y:0,w:5,t:"5F 外科 · 手術室"},{k:"ortable",x:6,y:3},{k:"lamp",x:6,y:2},{k:"sink",x:1,y:1},{k:"sink",x:2,y:1},{k:"cart",x:10,y:2},{k:"monitor",x:9,y:3}];
+    case "peds": return [{k:"sign",x:4,y:0,w:6,t:"7F 內兒科病房"},...bedsTop.map(b => ({...b,k:"cot"})),{k:"desk",x:10,y:6,w:3},{k:"toy",x:2,y:6},{k:"toy",x:3,y:7},{k:"plant",x:13,y:7}];
+    case "ob": return [{k:"sign",x:9,y:0,w:5,t:"2F 產房 · 嬰兒室"},{k:"bed",x:2,y:1},{k:"bed",x:5,y:1},{k:"crib",x:8,y:1},{k:"crib",x:10,y:1},{k:"desk",x:10,y:6,w:3},{k:"plant",x:1,y:7}];
     case "village": return [{k:"house",x:1,y:1,w:4,t:"衛生所"},{k:"tree",x:9,y:1},{k:"tree",x:12,y:2},{k:"tree",x:13,y:6},{k:"tree",x:2,y:7},{k:"path"}];
-    case "office": return [{k:"desk",x:2,y:2,w:3},{k:"desk",x:9,y:2,w:3},{k:"shelf",x:6,y:0,w:3},{k:"plant",x:1,y:7},{k:"plant",x:13,y:7}];
-    default: return [...bedsTop,{k:"desk",x:1,y:6,w:3,t:"護理站"},{k:"cart",x:13,y:1},{k:"plant",x:13,y:7},{k:"sink",x:7,y:7}];
+    case "office": return [{k:"sign",x:10,y:0,w:4,t:"教學研究部"},{k:"desk",x:2,y:2,w:3},{k:"desk",x:9,y:2,w:3},{k:"shelf",x:6,y:0,w:3},{k:"plant",x:1,y:7},{k:"plant",x:13,y:7}];
+    default: return [{k:"sign",x:5,y:0,w:5,t:"8F 內科病房"},...bedsTop,{k:"curtain",x:4,y:1},{k:"curtain",x:7,y:1},{k:"curtain",x:10,y:1},{k:"desk",x:1,y:6,w:3,t:"護理站"},{k:"cart",x:13,y:1},{k:"plant",x:13,y:7},{k:"sink",x:7,y:7}];
   }
 }
 const SPOTS = [[4,4],[9,5],[12,4],[6,6],[2,4],[11,6],[7,4],[13,5],[5,5],[10,3],[3,6],[8,6]];
@@ -1510,7 +1577,7 @@ function buildBlock(){
   W.block = new Set();
   for(let x=0;x<COLS;x++){ W.block.add(x+",0"); }
   W.items.forEach(f => {
-    if(f.k==="path"||f.k==="sign"||f.k==="lamp") return;
+    if(f.k==="path"||f.k==="sign"||f.k==="lamp"||f.k==="curtain") return;
     const w = f.w || (f.k==="bed"||f.k==="resus"||f.k==="cot"?2:f.k==="ortable"?3:f.k==="house"?4:1);
     const h = f.k==="bed"||f.k==="resus"||f.k==="cot"||f.k==="house"?2:1;
     if(f.k==="door") return;
@@ -1542,6 +1609,7 @@ function worldSync(){
   /* 跑跑小Ｃ：每張地圖都在跑 */
   if(!W.npcs.some(n => n.id==="xiaoc")) W.walkers.push({id:"xiaoc", fx:1, fy:blocked(1,7)?8:7, dir:"right", path:[], wait:.5, sp:3.6, run:1});
   W.fade = 1;
+  if(typeof musicSync === "function") musicSync();
 }
 function npcOf(id){
   let n = W.npcs.find(n => n.id===id);
@@ -1609,16 +1677,25 @@ function drawItem(c, f){
   switch(f.k){
     case "bed": case "cot": case "resus":
       r(2,4,TW*2-4,TW*2-10, f.k==="resus" ? "#c8d2da" : "#fafafa"); r(2,4,TW*2-4,6,"#9fb4c2");
-      r(10,12,14,10,"#fff"); r(8,26,TW*2-16,24, f.k==="cot" ? "#f2c463" : f.k==="resus" ? "#7fa7c9" : "#8fb9a8");
+      r(2,TW*2-8,TW*2-4,3,"rgba(0,0,0,.12)"); r(1,4,2,TW*2-10,"#aab7bf"); r(TW*2-3,4,2,TW*2-10,"#aab7bf");
+      r(10,12,14,10,"#fff"); r(10,20,14,2,"#e3e7ea"); r(8,26,TW*2-16,24, f.k==="cot" ? "#f2c463" : f.k==="resus" ? "#7fa7c9" : "#8fb9a8");
+      r(8,26,TW*2-16,4,"rgba(255,255,255,.35)"); r(8,36,TW*2-16,1,"rgba(0,0,0,.08)"); r(8,44,TW*2-16,1,"rgba(0,0,0,.08)");
+      if(f.k==="bed"){ r(TW*2-6,-14,2,40,"#9aa6ad"); r(TW*2-11,-16,12,3,"#9aa6ad"); r(TW*2-11,-13,7,11,"rgba(190,225,245,.85)"); r(TW*2-10,-6,5,4,"rgba(140,190,225,.9)");
+        const dp = (W.t*1.3 + f.x) % 1; c.fillStyle="rgba(120,170,210,.9)"; c.fillRect(X+TW*2-8, Y-2+dp*8, 1.5, 2); }
       drawHead(c, X+17, Y+13); if(f.k!=="resus"){ c.fillStyle="#6b7c86"; c.font="bold 11px sans-serif"; c.fillText("z", X+34, Y+8+z); }
       if(f.k==="resus"){ r(TW*2-12,0,10,10,"#222"); c.strokeStyle="#4ef08a"; c.beginPath(); for(let i=0;i<9;i++){ const yy = (i===4? -3 : i===5 ? 3 : 0); c.lineTo(X+TW*2-12+i, Y+5+yy); } c.stroke(); }
       break;
     case "crib": r(4,8,24,18,"#f6efe4"); r(4,8,24,3,"#c79a6a"); drawHead(c, X+12, Y+12, 0.7); break;
-    case "desk": r(0,8,(f.w||1)*TW,TW-8,"#b98b5e"); r(0,8,(f.w||1)*TW,5,"#d3a679"); r(8,0,14,10,"#33424c"); r(10,2,10,6,"#7fd0e0");
+    case "desk": r(0,TW-2,(f.w||1)*TW,3,"rgba(0,0,0,.15)"); r(0,8,(f.w||1)*TW,TW-8,"#b98b5e"); r(0,8,(f.w||1)*TW,5,"#d3a679"); r(0,13,(f.w||1)*TW,1,"rgba(0,0,0,.15)");
+      r(8,0,14,10,"#33424c"); r(10,2,10,6, (Math.floor(W.t*1.5+f.x)%5) ? "#7fd0e0" : "#a8e6f0"); r(11,3,6,1,"rgba(255,255,255,.6)"); r(13,10,4,2,"#33424c");
+      if((f.w||1) > 2){ r(TW+8,2,10,8,"#f4f1e8"); r(TW+9,4,8,1,"#bbb"); r(TW+9,6,6,1,"#bbb"); r(TW*2+4,4,6,6,"#e05a47"); r(TW*2+5,2,4,2,"#fff"); }
       if(f.t){ c.fillStyle="#fff"; c.font="bold 11px sans-serif"; c.fillText(f.t, X+30, Y+26); } break;
-    case "sign": r(0,2,(f.w||1)*TW,22,"#2c6e5c"); c.fillStyle="#fff"; c.font="bold 13px sans-serif"; c.textAlign="center"; c.fillText(f.t, X+(f.w||1)*TW/2, Y+18); c.textAlign="left"; break;
-    case "chair": r(6,10,20,14,"#4a7c9a"); r(6,6,20,6,"#3b6680"); break;
-    case "plant": r(10,18,12,12,"#b06a3b"); c.fillStyle="#3f8f4a"; c.beginPath(); c.arc(X+16,Y+14+z*.3,10,0,7); c.fill(); break;
+    case "sign": r(1,4,(f.w||1)*TW,22,"rgba(0,0,0,.18)"); r(0,2,(f.w||1)*TW,22, f.red ? "#a3342e" : "#2c6e5c"); r(0,2,(f.w||1)*TW,3,"rgba(255,255,255,.18)");
+      if(f.red && Math.floor(W.t*2)%2){ r(-8,6,6,6,"#ff5a4f"); r((f.w||1)*TW+2,6,6,6,"#ff5a4f"); }
+      c.fillStyle="#fff"; c.font="bold 13px sans-serif"; c.textAlign="center"; c.fillText(f.t, X+(f.w||1)*TW/2, Y+18); c.textAlign="left"; break;
+    case "chair": r(7,24,18,3,"rgba(0,0,0,.15)"); r(6,10,20,14,"#4a7c9a"); r(6,6,20,6,"#3b6680"); r(6,10,20,2,"rgba(255,255,255,.2)"); r(8,24,2,4,"#333"); r(22,24,2,4,"#333"); break;
+    case "plant": c.fillStyle="rgba(0,0,0,.15)"; c.beginPath(); c.ellipse(X+16,Y+30,10,3,0,0,7); c.fill(); r(10,18,12,12,"#b06a3b"); r(10,18,12,3,"#c98250");
+      [["#2f7a3c",16,12,10],["#3f8f4a",11,15,7],["#4ea85a",21,14,7],["#62bd6b",16,8,5]].forEach(([col,cx,cy,rr]) => { c.fillStyle=col; c.beginPath(); c.arc(X+cx+z*.2,Y+cy+z*.3,rr,0,7); c.fill(); }); break;
     case "door": r(0,TW-6,TW,6,"#7a8a94"); if(f.t){ c.fillStyle="#a3342e"; c.font="bold 10px sans-serif"; c.fillText(f.t, X-14, Y+12); } break;
     case "cart": r(4,6,24,20,"#c8483f"); r(4,6,24,4,"#e0675e"); r(6,26,4,4,"#333"); r(22,26,4,4,"#333"); break;
     case "sink": r(4,6,24,16,"#cfd8dc"); r(10,10,12,8,"#9ec5d6"); break;
@@ -1627,20 +1704,66 @@ function drawItem(c, f){
     case "monitor": r(4,2,24,18,"#222"); r(6,4,20,14,"#103"); c.strokeStyle="#4ef08a"; c.beginPath(); for(let i=0;i<20;i++){ c.lineTo(X+6+i, Y+11 + ((i+Math.floor(W.t*12))%10===0 ? -5 : 0)); } c.stroke(); break;
     case "toy": r(6,14,10,10,"#e05a47"); r(16,18,10,8,"#3b8bd0"); r(10,8,8,8,"#f2c230"); break;
     case "house": r(0,10,TW*4,TW*2-10,"#efe6d2"); c.fillStyle="#b2513b"; c.beginPath(); c.moveTo(X-4,Y+12); c.lineTo(X+TW*2,Y-6); c.lineTo(X+TW*4+4,Y+12); c.fill();
-      r(TW*2-8,TW*2-22,16,22,"#7a5a3a"); c.fillStyle="#2c6e5c"; c.font="bold 12px sans-serif"; c.fillText(f.t, X+18, Y+30); break;
-    case "tree": r(12,18,8,14,"#7a5432"); c.fillStyle="#3d7f3a"; c.beginPath(); c.arc(X+16,Y+12,14,0,7); c.fill(); break;
+      r(TW*2-8,TW*2-22,16,22,"#7a5a3a"); r(10,TW+4,18,12,"#9fd3ea"); r(TW*3-4,TW+4,18,12,"#9fd3ea"); r(10,TW+9,18,1,"#7a5a3a"); r(TW*3-4,TW+9,18,1,"#7a5a3a");
+      c.fillStyle="#2c6e5c"; c.font="bold 12px sans-serif"; c.fillText(f.t, X+18, Y+30); break;
+    case "curtain": { const sway = Math.sin(W.t*1.2+f.x)*1.2; r(0,-2,4,2,"#9aa6ad"); c.fillStyle="rgba(150,200,215,.75)"; c.beginPath(); c.moveTo(X,Y); c.lineTo(X+4,Y); c.lineTo(X+4+sway,Y+TW*1.6); c.lineTo(X+sway,Y+TW*1.6); c.fill();
+      c.fillStyle="rgba(255,255,255,.35)"; c.fillRect(X+1, Y, 1, TW*1.5); break; }
+    case "tree": c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(X+18,Y+31,14,4,0,0,7); c.fill(); r(12,18,8,14,"#7a5432"); r(12,18,3,14,"#8f6a45");
+      [["#2e6b2c",16,13,14],["#3d7f3a",12,10,10],["#4f9447",20,8,9],["#68ad5c",15,5,6]].forEach(([col,cx,cy,rr]) => { c.fillStyle=col; c.beginPath(); c.arc(X+cx+z*.3,Y+cy,rr,0,7); c.fill(); }); break;
     case "shelf": r(0,0,(f.w||1)*TW,TW,"#8a6542"); for(let i=0;i<9;i++) r(4+i*10,6,7,20,["#c8483f","#3b8bd0","#f2c230","#2c6e5c"][i%4]); break;
   }
 }
 function drawHead(c, x, y, s=1){ c.fillStyle="#eac29c"; c.fillRect(x, y, 12*s, 10*s); c.fillStyle="#5b4a3f"; c.fillRect(x, y, 12*s, 3*s); }
+const WALL = {lobby:"#cdbfa6", ward:"#b9cdc8", er:"#bcc3cc", or:"#a9cbc6", peds:"#e9d39a", ob:"#e4c3cd", office:"#cbb79a"};
+function isNight(){ return /夜班/.test(W.title); }
+function drawFloor(c){
+  const [a,b] = FLOOR[W.theme], V2 = W.theme==="village";
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    const X = x*TW, Y = y*TW;
+    c.fillStyle = (x+y)%2 ? a : b; c.fillRect(X, Y, TW, TW);
+    if(V2){ const h = (x*7+y*13)%5; c.fillStyle="rgba(40,100,30,.35)"; if(h<3){ c.fillRect(X+6+h*5, Y+10+h*3, 2, 4); c.fillRect(X+8+h*5, Y+9+h*3, 2, 5); } if(h===4){ c.fillStyle="#f6e27a"; c.fillRect(X+20,Y+20,3,3); } continue; }
+    c.fillStyle = "rgba(255,255,255,.28)"; c.fillRect(X, Y, TW, 1); c.fillRect(X, Y, 1, TW);
+    c.fillStyle = "rgba(0,0,0,.05)"; c.fillRect(X, Y+TW-1, TW, 1); c.fillRect(X+TW-1, Y, 1, TW);
+    if((x*5+y*3)%7===0){ c.fillStyle="rgba(0,0,0,.035)"; c.fillRect(X+9, Y+14, 3, 2); c.fillRect(X+21, Y+6, 2, 2); }
+  }
+  if(V2){ c.fillStyle="#d8c39a"; c.fillRect(0, 5*TW, COLS*TW, TW); c.fillRect(6*TW, 3*TW, TW, 6*TW);
+    c.fillStyle="rgba(120,90,50,.18)"; for(let i=0;i<COLS*4;i++){ c.fillRect((i*37)%(COLS*TW), 5*TW + (i*11)%TW, 3, 2); } return; }
+  /* 牆面：踢腳板、窗戶（白天看得到雲，夜班是星空）、時鐘 */
+  const wall = WALL[W.theme] || WALL.ward, g = c.createLinearGradient(0,0,0,TW);
+  g.addColorStop(0, wall); g.addColorStop(1, "rgba(0,0,0,.08)");
+  c.fillStyle = wall; c.fillRect(0,0,COLS*TW,TW); c.fillStyle = g; c.fillRect(0,0,COLS*TW,TW);
+  c.fillStyle = "rgba(0,0,0,.18)"; c.fillRect(0,TW-5,COLS*TW,5); c.fillStyle = "rgba(255,255,255,.25)"; c.fillRect(0,TW-6,COLS*TW,1);
+  const used = new Set(); W.items.forEach(f => { if(f.y===0) for(let i=0;i<(f.w||1);i++) used.add(f.x+i); });
+  const night = isNight();
+  [1,13].forEach(wx => { if(used.has(wx)) return;
+    const X = wx*TW+3, sky = c.createLinearGradient(0,3,0,24);
+    sky.addColorStop(0, night ? "#0d1a3a" : "#7cc3f0"); sky.addColorStop(1, night ? "#25335e" : "#cfeaf9");
+    c.fillStyle = "#8a969c"; c.fillRect(X-2,1,TW-2,25); c.fillStyle = sky; c.fillRect(X,3,TW-6,21);
+    if(night){ c.fillStyle="#fff"; [[5,7],[16,12],[21,5],[10,17]].forEach(([sx,sy],i) => { if((Math.floor(W.t*2)+i)%5) c.fillRect(X+sx,sy,1.5,1.5); }); c.fillStyle="#f6e9b0"; c.beginPath(); c.arc(X+20,9,3.5,0,7); c.fill(); }
+    else { const cx = (W.t*4 + wx*9) % (TW+10) - 8; c.fillStyle="rgba(255,255,255,.9)"; c.beginPath(); c.arc(X+cx,11,3.5,0,7); c.arc(X+cx+4,9,4.5,0,7); c.arc(X+cx+9,11,3.5,0,7); c.fill(); }
+    c.fillStyle = "#8a969c"; c.fillRect(X+(TW-6)/2-1,3,2,21); c.fillRect(X,13,TW-6,2);
+    c.fillStyle = "rgba(255,255,255,.18)"; c.fillRect(X+2,4,3,18);
+  });
+  if(!used.has(3)){ const X = 3*TW+16, Y = 13; c.fillStyle="#fff"; c.beginPath(); c.arc(X,Y,8,0,7); c.fill(); c.strokeStyle="#334"; c.lineWidth=1.5; c.stroke();
+    const tm = W.t*0.4; c.beginPath(); c.moveTo(X,Y); c.lineTo(X+Math.sin(tm)*5, Y-Math.cos(tm)*5); c.moveTo(X,Y); c.lineTo(X+Math.sin(tm*12)*6.5, Y-Math.cos(tm*12)*6.5); c.stroke(); c.lineWidth=1; }
+  /* 天花板燈在地板上的光暈 */
+  [[3,4],[7.5,4],[12,4]].forEach(([lx,ly]) => { const rg = c.createRadialGradient(lx*TW, ly*TW, 4, lx*TW, ly*TW, TW*3);
+    rg.addColorStop(0, night ? "rgba(255,230,170,.16)" : "rgba(255,255,240,.22)"); rg.addColorStop(1, "rgba(255,255,240,0)"); c.fillStyle = rg; c.fillRect(lx*TW-TW*3, ly*TW-TW*3, TW*6, TW*6); });
+}
+function drawLight(c){
+  const w = COLS*TW, h = ROWS*TW, night = isNight();
+  if(night){ c.fillStyle = "rgba(16,24,60,.28)"; c.fillRect(0,0,w,h); }
+  const v = c.createRadialGradient(w/2, h/2, h*.45, w/2, h/2, w*.62);
+  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, night ? "rgba(5,8,25,.42)" : "rgba(20,24,30,.2)");
+  c.fillStyle = v; c.fillRect(0,0,w,h);
+  if(!REDUCED && W.theme!=="village"){ c.fillStyle = "rgba(255,255,255,.35)"; for(let i=0;i<10;i++){ const t = W.t*.15 + i*.61; c.fillRect((i*97 + Math.sin(t*3)*20) % w, (h - (t*40 % h)), 1.5, 1.5); } }
+}
 function drawWorld(){
   const cv = W.cv, c = cv.getContext("2d");
+  c.setTransform(SC,0,0,SC,0,0);
   c.save();
   if(W.shake > 0) c.translate((Math.random()-.5)*8, 0);
-  const [a,b] = FLOOR[W.theme];
-  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){ c.fillStyle = (x+y)%2 ? a : b; c.fillRect(x*TW, y*TW, TW, TW); }
-  if(W.theme==="village"){ c.fillStyle="#d8c39a"; c.fillRect(0, 5*TW, COLS*TW, TW); c.fillRect(6*TW, 3*TW, TW, 6*TW); }
-  else { c.fillStyle = "#b9c4c2"; c.fillRect(0,0,COLS*TW,TW); c.fillStyle="#a7b3b1"; c.fillRect(0,TW-4,COLS*TW,4); }
+  drawFloor(c);
   W.items.forEach(f => drawItem(c, f));
   const actors = [...W.npcs.map(n => ({id:n.id, x:n.x, y:n.y, dir:n.dir, frame:Math.floor((W.t+n.ph)*1.5)%2 && 0, npc:n})),
     ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*(w.run?14:8)) : 0})),
@@ -1667,8 +1790,9 @@ function drawWorld(){
     c.fillStyle = "#223"; c.fillText(b.text.length > 18 ? b.text.slice(0,17)+"…" : b.text, x0+7, by-4);
   });
   W.parts.forEach(p => { c.globalAlpha = Math.max(0,p.t); c.fillStyle = p.col; c.fillRect(p.x, p.y, 5, 5); }); c.globalAlpha = 1;
+  drawLight(c);
   c.fillStyle = "rgba(20,30,34,.72)"; c.font = "bold 12px sans-serif"; const tw = c.measureText(W.title).width + 16; c.fillRect(6, 6, tw, 20); c.fillStyle="#fff"; c.fillText(W.title, 14, 20);
-  if(W.fade > 0){ c.fillStyle = `rgba(10,16,18,${W.fade})`; c.fillRect(0,0,cv.width,cv.height); c.fillStyle = `rgba(255,255,255,${W.fade})`; c.font = "bold 20px sans-serif"; c.textAlign="center"; c.fillText(W.title, cv.width/2, cv.height/2); c.textAlign="left"; }
+  if(W.fade > 0){ c.fillStyle = `rgba(10,16,18,${W.fade})`; c.fillRect(0,0,COLS*TW,ROWS*TW); c.fillStyle = `rgba(255,255,255,${W.fade})`; c.font = "bold 20px sans-serif"; c.textAlign="center"; c.fillText(W.title, COLS*TW/2, ROWS*TW/2); c.textAlign="left"; }
   c.restore();
 }
 function tick(dt){
@@ -1699,7 +1823,7 @@ function tick(dt){
 function worldInit(){
   const wrap = document.getElementById("world"), cv = document.getElementById("map");
   if(!cv || !cv.getContext) return;
-  W.cv = cv; cv.width = COLS*TW; cv.height = ROWS*TW;
+  W.cv = cv; cv.width = COLS*TW*SC; cv.height = ROWS*TW*SC;
   worldSync();
   let last = performance.now();
   const loop = now => {
@@ -1711,7 +1835,7 @@ function worldInit(){
   W.raf = requestAnimationFrame(loop);
   const tapTile = e => {
     const r = cv.getBoundingClientRect();
-    return [Math.floor((e.clientX - r.left) / r.width * COLS), Math.floor((e.clientY - r.top + 10*r.height/cv.height) / r.height * ROWS)];
+    return [Math.floor((e.clientX - r.left) / r.width * COLS), Math.floor((e.clientY - r.top + 10*r.height/(ROWS*TW)) / r.height * ROWS)];
   };
   cv.addEventListener("click", e => {
     const [x,y] = tapTile(e);
