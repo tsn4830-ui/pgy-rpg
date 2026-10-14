@@ -155,7 +155,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
       <a href="https://imreview.drtsengshihting.com/" target="_blank" rel="noopener">內科 Review Hub ↗</a>
       <a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>
-      <a id="gas" hidden target="_blank" rel="noopener">PGY 職前加油站 ↗</a>
+      <a id="gas" hidden target="_blank" rel="noopener">PGY學院 ↗</a>
     </nav>
   </header>
   <div class="ctrl" id="ctrl">
@@ -809,15 +809,15 @@ const STAGES = [
 
 
 /* ======================= 讀書網站與參考文獻 ======================= */
-const GAS_URL = ""; // PGY 職前加油站網址（待補）
+const GAS_URL = "https://pgy.drtsengshihting.com/"; // PGY學院
 const SITES = {
   pocket:{n:"2026 內科小手冊", u:"https://pocket.drtsengshihting.com/"},
   guide:{n:"內科指引索引", u:"https://guideline.drtsengshihting.com/"},
   review:{n:"內科 Review Hub", u:"https://imreview.drtsengshihting.com/"},
-  gas:{n:"PGY 職前加油站", u:GAS_URL},
-  gas_acls:{n:"PGY職前加油站", u:"https://drive.google.com/file/d/17JVBn0DX4lUnHOVogluVhGuwibQtRf7N/view?usp=drivesdk", hide:true},
-  gas_glu:{n:"PGY職前加油站", u:"https://drive.google.com/file/d/1M8rVEmyVDHBEvMnPl_vlCQkMlxa71S7x/view?usp=drivesdk", hide:true},
-  gas_tx:{n:"PGY職前加油站", u:"https://drive.google.com/file/d/1JWHO6oeknX-4uJTcC_0u-CxbFPXaAoUn/view?usp=drivesdk", hide:true},
+  gas:{n:"PGY學院", u:GAS_URL},
+  gas_acls:{n:"PGY學院", u:GAS_URL, hide:true},
+  gas_glu:{n:"PGY學院", u:GAS_URL, hide:true},
+  gas_tx:{n:"PGY學院", u:GAS_URL, hide:true},
   endo:{n:"內分泌代謝實證教室（需密碼）", u:"https://endoclass.drtsengshihting.com/"}
 };
 const GAS_ACLS = ["cpr","ratio","etco2cpr","pea","hts","rosc","brady","svt","vf","cprorder","lemon","preox","failed","intorder","etco2","succ","pedcpr","fbao","stemi","stroke","ecg10"];
@@ -846,13 +846,13 @@ const SYS_REFS = [
   {k:"ltc1966", t:"衛生福利部。長照服務專線 1966。", u:"https://1966.gov.tw/"},
   {k:"mol1955", t:"勞動部。1955 勞工諮詢申訴專線（提供多語服務）。"},
   {k:"mohw1925", t:"衛生福利部。1925 安心專線（24 小時免付費心理諮詢）。"},
-  {k:"gas_acls", t:"黃品叡。PGY 職前加油站：ACLS 破題解析（2026 版；依 2025 AHA ECC、2025 ACC/AHA ACS、2026 AHA/ASA Stroke 指引整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/17JVBn0DX4lUnHOVogluVhGuwibQtRf7N/view?usp=drivesdk"},
-  {k:"gas_glu", t:"黃品叡。PGY 職前加油站：住院血糖值班生存講義（依 ADA Standards of Care 2026 整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1M8rVEmyVDHBEvMnPl_vlCQkMlxa71S7x/view?usp=drivesdk"},
-  {k:"gas_tx", t:"黃品叡。PGY 職前加油站：輸血醫囑值班講義（依 AABB 2023 紅血球、AABB/ICTMG 2025 血小板指引與 ISBT 定義整理）。Google Drive 講義，需有檢視權限。", u:"https://drive.google.com/file/d/1JWHO6oeknX-4uJTcC_0u-CxbFPXaAoUn/view?usp=drivesdk"}
+  {k:"gas_acls", t:"黃品叡。PGY 職前加油站：ACLS 破題解析（2026 版；依 2025 AHA ECC、2025 ACC/AHA ACS、2026 AHA/ASA Stroke 指引整理）。延伸閱讀請至 PGY學院。"},
+  {k:"gas_glu", t:"黃品叡。PGY 職前加油站：住院血糖值班生存講義（依 ADA Standards of Care 2026 整理）。延伸閱讀請至 PGY學院。"},
+  {k:"gas_tx", t:"黃品叡。PGY 職前加油站：輸血醫囑值班講義（依 AABB 2023 紅血球、AABB/ICTMG 2025 血小板指引與 ISBT 定義整理）。延伸閱讀請至 PGY學院。"}
 ];
-GAS_ACLS.forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_acls","ACLS 破題解析 2026"]));
-["hypogly","dka","periop"].forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_glu","住院血糖值班生存講義"]));
-["txunit","txstop","taco","ffp","dengueplt","ugib","mtp","inr"].forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_tx","輸血醫囑值班講義"]));
+GAS_ACLS.forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_acls","ACLS 破題解析 2026（出處：黃品叡《PGY職前加油站》）"]));
+["hypogly","dka","periop"].forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_glu","住院血糖值班生存講義（出處：黃品叡《PGY職前加油站》）"]));
+["txunit","txstop","taco","ffp","dengueplt","ugib","mtp","inr"].forEach(id => (STUDY[id] = STUDY[id] || []).push(["gas_tx","輸血醫囑值班講義（出處：黃品叡《PGY職前加油站》）"]));
 Object.entries({hypogly:"低血糖",dka:"DKA 與 HHS",periop:"住院與圍術期血糖",hypercal:"高血鈣",hypona:"低血鈉",adrenal:"腎上腺功能不全"}).forEach(([id,ch]) => (STUDY[id] = STUDY[id] || []).push(["endo",ch]));
 const REFS = []; const REF_NO = {};
 SYS_REFS.forEach(r => { REFS.push(r); REF_NO[r.k] = REFS.length; });
@@ -1174,8 +1174,8 @@ function runSeq(head, list, done, i=0){
 
 function shuffled(n){ const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 function studyLinks(id){
-  const list = (STUDY[id]||[]).filter(([k]) => SITES[k].u);
-  if(SITES.gas.u) list.push(["gas","PGY 職前準備"]);
+  const list = (STUDY[id]||[]).filter(([k]) => SITES[k].u).filter(([k], i, a) => a.findIndex(([x]) => SITES[x].u === SITES[k].u) === i);
+  if(SITES.gas.u && !list.some(([x]) => SITES[x].u === SITES.gas.u)) list.push(["gas","PGY 職前準備"]);
   if(!list.length) return "";
   return `<div class="study"><span>延伸閱讀：</span>${list.map(([k,ch]) => `<a href="${SITES[k].u}" target="_blank" rel="noopener">${esc(SITES[k].n)}｜${esc(ch)} ↗</a>`).join("")}</div>`;
 }

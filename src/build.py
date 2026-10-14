@@ -52,11 +52,29 @@ assert e.count('S.total++; if(ok) S.right++;')==2
 e=e.replace('S.total++; if(ok) S.right++;','S.total++; if(ok) S.right++; worldReact(ok);')
 assert e.count('Object.values(SITES).filter(s=>s.u)')==2
 e=e.replace('Object.values(SITES).filter(s=>s.u)','Object.values(SITES).filter(s=>s.u&&!s.hide)')
+# PGY職前加油站講義：只寫出處，不連 Google Drive；延伸閱讀一律導向 PGY學院
+import re
+PGY_URL = "https://pgy.drtsengshihting.com/"
+e = e.replace('const GAS_URL = ""; // PGY 職前加油站網址（待補）', 'const GAS_URL = "'+PGY_URL+'"; // PGY學院')
+e = e.replace('gas:{n:"PGY 職前加油站", u:GAS_URL}', 'gas:{n:"PGY學院", u:GAS_URL}')
+e, n1 = re.subn(r'n:"PGY職前加油站", u:"https://drive\.google\.com/[^"]*", hide:true', 'n:"PGY學院", u:GAS_URL, hide:true', e)
+e, n2 = re.subn(r'Google Drive 講義，需有檢視權限。", u:"https://drive\.google\.com/[^"]*"\}', '延伸閱讀請至 PGY學院。"}', e)
+for a in ['ACLS 破題解析 2026','住院血糖值班生存講義','輸血醫囑值班講義']:
+    assert e.count('"'+a+'"]')==1, a
+    e = e.replace('"'+a+'"]', '"'+a+'（出處：黃品叡《PGY職前加油站》）"]')
+k = 'const list = (STUDY[id]||[]).filter(([k]) => SITES[k].u);'
+assert e.count(k)==1
+e = e.replace(k, 'const list = (STUDY[id]||[]).filter(([k]) => SITES[k].u).filter(([k], i, a) => a.findIndex(([x]) => SITES[x].u === SITES[k].u) === i);')
+k2 = '  if(SITES.gas.u) list.push(["gas","PGY 職前準備"]);'
+assert e.count(k2)==1
+e = e.replace(k2, '  if(SITES.gas.u && !list.some(([x]) => SITES[x].u === SITES.gas.u)) list.push(["gas","PGY 職前準備"]);')
+assert n1==3 and n2==3 and 'drive.google' not in e, (n1,n2)
 CSS='.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}\n'
-h=open('head.html',encoding='utf-8').read().replace('◐ v3.0','◐ v5.0').replace('<main class="card enter" id="view"></main>','<div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>\n      <main class="card enter" id="view"></main>').replace('</style>',CSS+'</style>',1).replace('<button id="theme">◐ 畫面明暗</button>','<button id="theme">◐ 畫面明暗</button>\n    <button id="login" hidden>☁ 用 Google 登入</button>').replace('<a id="gas" hidden','<a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>\n      <a id="gas" hidden')
+h=open('head.html',encoding='utf-8').read().replace('◐ v3.0','◐ v5.0').replace('<main class="card enter" id="view"></main>','<div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>\n      <main class="card enter" id="view"></main>').replace('</style>',CSS+'</style>',1).replace('<button id="theme">◐ 畫面明暗</button>','<button id="theme">◐ 畫面明暗</button>\n    <button id="login" hidden>☁ 用 Google 登入</button>').replace('PGY 職前加油站 ↗','PGY學院 ↗').replace('<a id="gas" hidden','<a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>\n      <a id="gas" hidden')
 out=h+'\n<script>\n"use strict";\n'+d+'\n'+e+'</script>\n'
 open('/mnt/project-files/pgy-rpg/index.html','w',encoding='utf-8').write(out)
 open('test.html','w',encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+out+'</body></html>')
+assert 'drive.google' not in out
 print('built',len(out))
 
 # 公開網站版（GitHub Pages）：完整 HTML，並填入 Firebase 設定
