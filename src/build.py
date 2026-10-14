@@ -57,7 +57,7 @@ assert e.count('Object.values(SITES).filter(s=>s.u)')==2
 e=e.replace('Object.values(SITES).filter(s=>s.u)','Object.values(SITES).filter(s=>s.u&&!s.hide)')
 # PGY職前加油站講義：只寫出處，不連 Google Drive；延伸閱讀一律導向 PGY學院
 import re
-PGY_URL = "https://pgy.drtsengshihting.com/"
+PGY_URL = "https://www.facebook.com/rayhuangrapidsequence"  # PGY學院（阿婷提供，黃品叡的粉絲專頁）
 e = e.replace('const GAS_URL = ""; // PGY 職前加油站網址（待補）', 'const GAS_URL = "'+PGY_URL+'"; // PGY學院')
 e = e.replace('gas:{n:"PGY 職前加油站", u:GAS_URL}', 'gas:{n:"PGY學院", u:GAS_URL}')
 e, n1 = re.subn(r'n:"PGY職前加油站", u:"https://drive\.google\.com/[^"]*", hide:true', 'n:"PGY學院", u:GAS_URL, hide:true', e)
