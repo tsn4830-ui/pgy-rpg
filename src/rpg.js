@@ -16,7 +16,7 @@ const LOOK = {
   tsai:  {coat:"#f4f6f5", shirt:"#8a3b5c", hair:"#6b6b6b", style:"bob", skin:"#e9bb94"},
   kolas: {coat:"#4c7a3a", shirt:"#e9e1c9", hair:"#111", style:"short", skin:"#b9835c"},
   shih:  {coat:"#f4f6f5", shirt:"#5b5ea6", hair:"#2c2320", style:"long", skin:"#f0c9a6"},
-  xiaoc: {coat:"#f4f6f5", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
+  xiaoc: {coat:"#2f3b52", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
   gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
