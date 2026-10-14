@@ -3,12 +3,13 @@ function load(){ try{ const v = localStorage.getItem(KEY); return v ? JSON.parse
 const FB_CONFIG = null; /* 公開網站版在建置時填入 Firebase 網頁設定 */
 const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0, kind:"", who:"", fb:null};
 function save(){
-  if(S) S.savedAt = Date.now();
+  if(!S) return; /* 標題畫面沒有進度，不要用空白蓋掉舊存檔 */
+  S.savedAt = Date.now();
   if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudWrite, 1200); return; }
   try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
 }
 async function cloudWrite(){
-  if(!CLOUD.ref) return;
+  if(!CLOUD.ref || !S) return;
   if(CLOUD.busy){ CLOUD.again = true; return; }
   CLOUD.busy = true;
   try{ const s = JSON.stringify(S); CLOUD.data = S ? JSON.parse(s) : null; await CLOUD.ref.set({s, at:Date.now()}); }

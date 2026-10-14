@@ -39,6 +39,10 @@ for x in open('cloud.txt',encoding='utf-8').read().strip().split('\n@@@\n'):
 _e = e.index('/* 安靜的背景音：柔和的和弦循環 */'); _f = e.index('if(GAS_URL){ const g = document.getElementById("gas")')
 e = e[:_e] + open('music.js',encoding='utf-8').read() + e[_f:]
 assert e.count('function ending(){')==1; e = e.replace('function ending(){', 'function ending(){ BGM.end = true; musicTo("ending");')
+# 版本更新後保留舊存檔：關卡步驟數變了也不會跳錯或卡住
+_r = 'function resume(d){\n  S = d;'
+assert e.count(_r)==1
+e = e.replace(_r, _r + '\n  const _st = STAGES[S.stage]; if(_st && _st.steps && S.step >= _st.steps.length) S.step = Math.max(0, _st.steps.length - 1);')
 RPG=[
 ('/* ======================= 啟動 ======================= */', open('rpg.js',encoding='utf-8').read()+'\n/* ======================= 啟動 ======================= */'),
 ('function start(){ S = null; titleScreen(); }','function start(){ S = null; titleScreen(); }\nworldInit();'),

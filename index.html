@@ -871,12 +871,13 @@ function fresh(name){
 const FB_CONFIG = {"apiKey": "AIzaSyAyNAAuRAhsaUS4EVEiGB7d-C1d9mwgSCs", "authDomain": "pgy-rpg.firebaseapp.com", "projectId": "pgy-rpg", "storageBucket": "pgy-rpg.firebasestorage.app", "messagingSenderId": "384106007683", "appId": "1:384106007683:web:987ba4bc705380b36f9fb6"}; /* 公開網站版在建置時填入 Firebase 網頁設定 */
 const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0, kind:"", who:"", fb:null};
 function save(){
-  if(S) S.savedAt = Date.now();
+  if(!S) return; /* 標題畫面沒有進度，不要用空白蓋掉舊存檔 */
+  S.savedAt = Date.now();
   if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudWrite, 1200); return; }
   try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
 }
 async function cloudWrite(){
-  if(!CLOUD.ref) return;
+  if(!CLOUD.ref || !S) return;
   if(CLOUD.busy){ CLOUD.again = true; return; }
   CLOUD.busy = true;
   try{ const s = JSON.stringify(S); CLOUD.data = S ? JSON.parse(s) : null; await CLOUD.ref.set({s, at:Date.now()}); }
@@ -1888,6 +1889,7 @@ function idleLine(id){
 /* ======================= 啟動 ======================= */
 function resume(d){
   S = d;
+  const _st = STAGES[S.stage]; if(_st && _st.steps && S.step >= _st.steps.length) S.step = Math.max(0, _st.steps.length - 1);
   if(S.stage >= STAGES.length && S.spec) return finalScreen();
   run();
 }
