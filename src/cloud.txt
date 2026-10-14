@@ -1,12 +1,14 @@
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
-function load(){ try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } }|||/* 每個人用自己的 Claude 帳號存檔；沒有登入時退回這台裝置的瀏覽器存檔 */
-const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0};
+function load(){ try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } }|||/* 每個人用自己的帳號存檔：在 claude.ai 用 Claude 帳號；在公開網站用 Google 帳號（Firebase）；都沒有就存在這台裝置的瀏覽器 */
+const FB_CONFIG = null; /* 公開網站版在建置時填入 Firebase 網頁設定 */
+const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0, kind:"", who:"", fb:null};
 function save(){
   if(S) S.savedAt = Date.now();
   if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudWrite, 1200); return; }
   try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
 }
 async function cloudWrite(){
+  if(!CLOUD.ref) return;
   if(CLOUD.busy){ CLOUD.again = true; return; }
   CLOUD.busy = true;
   try{ const s = JSON.stringify(S); CLOUD.data = S ? JSON.parse(s) : null; await CLOUD.ref.set({s, at:Date.now()}); }
@@ -14,37 +16,67 @@ async function cloudWrite(){
   CLOUD.busy = false;
   if(CLOUD.again){ CLOUD.again = false; cloudWrite(); }
 }
-function load(){
-  if(CLOUD.ref) return CLOUD.data;
-  try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; }
-}
+function localSave(){ try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } }
+function load(){ return CLOUD.ref ? CLOUD.data : localSave(); }
 function clearSave(){
   if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.data = null; CLOUD.ref.delete().catch(()=>{}); }
   try{ localStorage.removeItem(KEY); }catch(e){}
 }
 function setCloudNote(t){ const n = document.getElementById("acct"); if(n) n.textContent = t; }
 function cloudNote(){
-  if(CLOUD.ref) return "☁ 已登入：進度存在你自己的帳號，換電腦或手機也能接著玩；別人看不到你的存檔。";
+  if(CLOUD.ref) return CLOUD.kind==="google" ? `☁ 已用 ${CLOUD.who} 登入：進度存在你的帳號，換電腦、換瀏覽器都能接著玩。` : "☁ 已登入：進度存在你自己的帳號，換電腦或手機也能接著玩；別人看不到你的存檔。";
+  if(FB_CONFIG && !window.claude) return !CLOUD.ready ? "正在確認帳號…" : CLOUD.fb ? "還沒登入：按上方「☁ 用 Google 登入」，進度就會跟著你的帳號走。" : "登入服務暫時連不上，進度先存在這台裝置的瀏覽器。";
   if(!window.claude) return "進度存在這台裝置的瀏覽器，換裝置不會跟著走。";
   if(CLOUD.ready) return "目前沒有登入，進度只存在這台裝置的瀏覽器。";
   return "正在確認帳號…";
 }
-(async () => {
-  try{
-    const db = await window.claude?.use?.("db"); const user = await window.claude?.use?.("user");
-    const id = db && user ? await user.id() : null;
-    if(id){
-      const ref = db.collection("data/users/"+id).doc("pgy");
-      const snap = await ref.get();
-      let data = null;
-      if(snap.exists){ try{ data = JSON.parse(snap.data().s); }catch(e){} }
-      else { const local = (() => { try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } })();
-        if(local){ data = local; try{ await ref.set({s:JSON.stringify(local), at:Date.now()}); }catch(e){} } }
-      CLOUD.ref = ref; CLOUD.data = data;
-    }
-  }catch(e){}
+/* 登入後：雲端與本機各有存檔時，保留比較新的那一份 */
+async function attachCloud(ref){
+  let data = null;
+  try{ const snap = await ref.get(); if(snap.exists){ data = JSON.parse(snap.data().s); } }catch(e){}
+  const local = S && S.stage !== undefined ? S : localSave();
+  if(local && (!data || (local.savedAt||0) > (data.savedAt||0))){ data = local; try{ await ref.set({s:JSON.stringify(local), at:Date.now()}); }catch(e){} }
+  CLOUD.ref = ref; CLOUD.data = data;
+}
+function cloudDone(){
   CLOUD.ready = true;
+  const b = document.getElementById("login");
+  if(b && CLOUD.fb){ b.hidden = false; b.textContent = CLOUD.ref ? "☁ 登出" : "☁ 用 Google 登入"; }
   if(!S) titleScreen(); else setCloudNote(cloudNote());
+}
+async function fbInit(){
+  const base = "https://www.gstatic.com/firebasejs/10.12.2/";
+  const [app, au, fs] = await Promise.all([import(base+"firebase-app.js"), import(base+"firebase-auth.js"), import(base+"firebase-firestore.js")]);
+  const a = app.initializeApp(FB_CONFIG), auth = au.getAuth(a), db = fs.getFirestore(a);
+  CLOUD.fb = {auth, au};
+  document.getElementById("login").onclick = async () => {
+    if(auth.currentUser){ await au.signOut(auth); return; }
+    const pv = new au.GoogleAuthProvider();
+    try{ await au.signInWithPopup(auth, pv); }
+    catch(e){ if(/popup-blocked|operation-not-supported/.test(e.code||"")) au.signInWithRedirect(auth, pv); else if(!/popup-closed|cancelled-popup/.test(e.code||"")) setCloudNote("登入沒有成功，請再試一次。"); }
+  };
+  au.onAuthStateChanged(auth, async u => {
+    if(u){
+      const d = fs.doc(db, "saves", u.uid);
+      CLOUD.kind = "google"; CLOUD.who = u.email || u.displayName || "Google 帳號";
+      await attachCloud({get: async () => { const s = await fs.getDoc(d); return {exists: s.exists(), data: () => s.data()}; },
+        set: o => fs.setDoc(d, o), delete: () => fs.deleteDoc(d)});
+    } else {
+      CLOUD.ref = null; CLOUD.data = null; CLOUD.kind = ""; CLOUD.who = "";
+    }
+    cloudDone();
+  });
+}
+(async () => {
+  await null; /* 等整份程式載入完再開始 */
+  try{
+    if(window.claude?.use){
+      const db = await window.claude.use("db"); const user = await window.claude.use("user");
+      const id = db && user ? await user.id() : null;
+      if(id) await attachCloud(db.collection("data/users/"+id).doc("pgy"));
+    } else if(FB_CONFIG){ await fbInit(); return; }
+  }catch(e){}
+  cloudDone();
 })();
 @@@
    <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>`);|||   <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>

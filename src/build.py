@@ -51,8 +51,18 @@ e=e.replace('S.total++; if(ok) S.right++;','S.total++; if(ok) S.right++; worldRe
 assert e.count('Object.values(SITES).filter(s=>s.u)')==2
 e=e.replace('Object.values(SITES).filter(s=>s.u)','Object.values(SITES).filter(s=>s.u&&!s.hide)')
 CSS='.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}\n'
-h=open('head.html',encoding='utf-8').read().replace('◐ v3.0','◐ v5.0').replace('<main class="card enter" id="view"></main>','<div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>\n      <main class="card enter" id="view"></main>').replace('</style>',CSS+'</style>',1).replace('<a id="gas" hidden','<a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>\n      <a id="gas" hidden')
+h=open('head.html',encoding='utf-8').read().replace('◐ v3.0','◐ v5.0').replace('<main class="card enter" id="view"></main>','<div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>\n      <main class="card enter" id="view"></main>').replace('</style>',CSS+'</style>',1).replace('<button id="theme">◐ 畫面明暗</button>','<button id="theme">◐ 畫面明暗</button>\n    <button id="login" hidden>☁ 用 Google 登入</button>').replace('<a id="gas" hidden','<a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>\n      <a id="gas" hidden')
 out=h+'\n<script>\n"use strict";\n'+d+'\n'+e+'</script>\n'
 open('/mnt/project-files/pgy-rpg/index.html','w',encoding='utf-8').write(out)
 open('test.html','w',encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+out+'</body></html>')
 print('built',len(out))
+
+# 公開網站版（GitHub Pages）：完整 HTML，並填入 Firebase 設定
+import json, os
+fb = json.load(open('fbconfig.json')) if os.path.exists('fbconfig.json') else None
+pub = out.replace('const FB_CONFIG = null;', 'const FB_CONFIG = '+json.dumps(fb)+';') if fb else out
+html = '<!doctype html>\n<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="臺灣 PGY 兩年訓練的角色扮演遊戲，每題附參考文獻。"></head><body>\n'+pub+'\n</body></html>\n'
+os.makedirs('/mnt/project-files/pgy-rpg/deploy/pgy', exist_ok=True)
+open('/mnt/project-files/pgy-rpg/deploy/pgy/index.html','w',encoding='utf-8').write(html)
+open('standalone.html','w',encoding='utf-8').write(html)
+print('standalone', len(html), 'firebase' if fb else 'no-firebase')

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="臺灣 PGY 兩年訓練的角色扮演遊戲，每題附參考文獻。"></head><body>
-
+<title>呆丸 PGY 物語</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,6 +163,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
     <button id="auto" aria-pressed="false">⋯ 自動播放</button>
     <button id="music" aria-pressed="false">♪ 音樂</button>
     <button id="theme">◐ 畫面明暗</button>
+    <button id="login" hidden>☁ 用 Google 登入</button>
     <span class="sep" aria-hidden="true"></span>
     <button data-tab="game" aria-pressed="true">劇情</button>
     <button data-tab="people" aria-pressed="false">同事與團隊</button>
@@ -826,14 +827,16 @@ function fresh(name){
     stage:-1, step:0, rel:{}, met:{}, cards:{}, right:0, total:0, burnout:0, electDone:[], electQueue:null,
     log:[], hourLog:[], note:""};
 }
-/* 每個人用自己的 Claude 帳號存檔；沒有登入時退回這台裝置的瀏覽器存檔 */
-const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0};
+/* 每個人用自己的帳號存檔：在 claude.ai 用 Claude 帳號；在公開網站用 Google 帳號（Firebase）；都沒有就存在這台裝置的瀏覽器 */
+const FB_CONFIG = {"apiKey": "AIzaSyAyNAAuRAhsaUS4EVEiGB7d-C1d9mwgSCs", "authDomain": "pgy-rpg.firebaseapp.com", "projectId": "pgy-rpg", "storageBucket": "pgy-rpg.firebasestorage.app", "messagingSenderId": "384106007683", "appId": "1:384106007683:web:987ba4bc705380b36f9fb6"}; /* 公開網站版在建置時填入 Firebase 網頁設定 */
+const CLOUD = {ref:null, data:null, ready:false, busy:false, again:false, timer:0, kind:"", who:"", fb:null};
 function save(){
   if(S) S.savedAt = Date.now();
   if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudWrite, 1200); return; }
   try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
 }
 async function cloudWrite(){
+  if(!CLOUD.ref) return;
   if(CLOUD.busy){ CLOUD.again = true; return; }
   CLOUD.busy = true;
   try{ const s = JSON.stringify(S); CLOUD.data = S ? JSON.parse(s) : null; await CLOUD.ref.set({s, at:Date.now()}); }
@@ -841,37 +844,67 @@ async function cloudWrite(){
   CLOUD.busy = false;
   if(CLOUD.again){ CLOUD.again = false; cloudWrite(); }
 }
-function load(){
-  if(CLOUD.ref) return CLOUD.data;
-  try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; }
-}
+function localSave(){ try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } }
+function load(){ return CLOUD.ref ? CLOUD.data : localSave(); }
 function clearSave(){
   if(CLOUD.ref){ clearTimeout(CLOUD.timer); CLOUD.data = null; CLOUD.ref.delete().catch(()=>{}); }
   try{ localStorage.removeItem(KEY); }catch(e){}
 }
 function setCloudNote(t){ const n = document.getElementById("acct"); if(n) n.textContent = t; }
 function cloudNote(){
-  if(CLOUD.ref) return "☁ 已登入：進度存在你自己的帳號，換電腦或手機也能接著玩；別人看不到你的存檔。";
+  if(CLOUD.ref) return CLOUD.kind==="google" ? `☁ 已用 ${CLOUD.who} 登入：進度存在你的帳號，換電腦、換瀏覽器都能接著玩。` : "☁ 已登入：進度存在你自己的帳號，換電腦或手機也能接著玩；別人看不到你的存檔。";
+  if(FB_CONFIG && !window.claude) return !CLOUD.ready ? "正在確認帳號…" : CLOUD.fb ? "還沒登入：按上方「☁ 用 Google 登入」，進度就會跟著你的帳號走。" : "登入服務暫時連不上，進度先存在這台裝置的瀏覽器。";
   if(!window.claude) return "進度存在這台裝置的瀏覽器，換裝置不會跟著走。";
   if(CLOUD.ready) return "目前沒有登入，進度只存在這台裝置的瀏覽器。";
   return "正在確認帳號…";
 }
-(async () => {
-  try{
-    const db = await window.claude?.use?.("db"); const user = await window.claude?.use?.("user");
-    const id = db && user ? await user.id() : null;
-    if(id){
-      const ref = db.collection("data/users/"+id).doc("pgy");
-      const snap = await ref.get();
-      let data = null;
-      if(snap.exists){ try{ data = JSON.parse(snap.data().s); }catch(e){} }
-      else { const local = (() => { try{ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }catch(e){ return null; } })();
-        if(local){ data = local; try{ await ref.set({s:JSON.stringify(local), at:Date.now()}); }catch(e){} } }
-      CLOUD.ref = ref; CLOUD.data = data;
-    }
-  }catch(e){}
+/* 登入後：雲端與本機各有存檔時，保留比較新的那一份 */
+async function attachCloud(ref){
+  let data = null;
+  try{ const snap = await ref.get(); if(snap.exists){ data = JSON.parse(snap.data().s); } }catch(e){}
+  const local = S && S.stage !== undefined ? S : localSave();
+  if(local && (!data || (local.savedAt||0) > (data.savedAt||0))){ data = local; try{ await ref.set({s:JSON.stringify(local), at:Date.now()}); }catch(e){} }
+  CLOUD.ref = ref; CLOUD.data = data;
+}
+function cloudDone(){
   CLOUD.ready = true;
+  const b = document.getElementById("login");
+  if(b && CLOUD.fb){ b.hidden = false; b.textContent = CLOUD.ref ? "☁ 登出" : "☁ 用 Google 登入"; }
   if(!S) titleScreen(); else setCloudNote(cloudNote());
+}
+async function fbInit(){
+  const base = "https://www.gstatic.com/firebasejs/10.12.2/";
+  const [app, au, fs] = await Promise.all([import(base+"firebase-app.js"), import(base+"firebase-auth.js"), import(base+"firebase-firestore.js")]);
+  const a = app.initializeApp(FB_CONFIG), auth = au.getAuth(a), db = fs.getFirestore(a);
+  CLOUD.fb = {auth, au};
+  document.getElementById("login").onclick = async () => {
+    if(auth.currentUser){ await au.signOut(auth); return; }
+    const pv = new au.GoogleAuthProvider();
+    try{ await au.signInWithPopup(auth, pv); }
+    catch(e){ if(/popup-blocked|operation-not-supported/.test(e.code||"")) au.signInWithRedirect(auth, pv); else if(!/popup-closed|cancelled-popup/.test(e.code||"")) setCloudNote("登入沒有成功，請再試一次。"); }
+  };
+  au.onAuthStateChanged(auth, async u => {
+    if(u){
+      const d = fs.doc(db, "saves", u.uid);
+      CLOUD.kind = "google"; CLOUD.who = u.email || u.displayName || "Google 帳號";
+      await attachCloud({get: async () => { const s = await fs.getDoc(d); return {exists: s.exists(), data: () => s.data()}; },
+        set: o => fs.setDoc(d, o), delete: () => fs.deleteDoc(d)});
+    } else {
+      CLOUD.ref = null; CLOUD.data = null; CLOUD.kind = ""; CLOUD.who = "";
+    }
+    cloudDone();
+  });
+}
+(async () => {
+  await null; /* 等整份程式載入完再開始 */
+  try{
+    if(window.claude?.use){
+      const db = await window.claude.use("db"); const user = await window.claude.use("user");
+      const id = db && user ? await user.id() : null;
+      if(id) await attachCloud(db.collection("data/users/"+id).doc("pgy"));
+    } else if(FB_CONFIG){ await fbInit(); return; }
+  }catch(e){}
+  cloudDone();
 })();
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
