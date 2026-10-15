@@ -29,3 +29,16 @@ return `<div class="kcard"><h3>${esc(q.t)}</h3><p><strong>答案：</strong>${es
    <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。</p>|||   <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
 @@@
     else verdict = `今年${sp}名額很少，你沒有錄取。Kolas 主任打電話來：「要不要先來衛生所一年？很多好醫師都繞過路。」一年後你再申請，順利錄取。`;|||    else verdict = `第一志願醫院的${sp}名額很少，你沒有錄取。張雅筑學姊陪你整理面試回饋，你去參加其他醫院的第二波招募，最後錄取另一家醫院的${sp}。她說：「第一家沒上很常見，訓練是在哪裡都能好好學的。」`;
+@@@
+    show(`${speaker("sys",`你錄取了「${h.n}」！`)}<p class="fx">${fx}</p>${nxBtn("七月一日，報到")}`);
+    document.getElementById("nx").onclick = run;|||    show(`${speaker("sys",`你錄取了「${h.n}」！`)}<p class="fx">${fx}</p>${nxBtn("七月一日，報到（從頭開始）")}
+      <details class="jump"><summary>自選科別開始</summary><p class="meta">想先練某一科，可以直接跳過去。之前的月份會算成已經完成，跳過的關卡不會有題目和劇情。</p>
+      <div class="jumps">${STAGES.map((s,i)=>`<button class="ghost" data-j="${i}">${s.y===1?"PGY1":"PGY2"}・${esc(s.dept.replace(/^PGY\d\s*/,""))}</button>`).join("")}</div></details>`);
+    document.getElementById("nx").onclick = run;
+    V().querySelectorAll("[data-j]").forEach(b => b.onclick = () => {
+      const j = +b.dataset.j;
+      S.stage = j; S.step = 0; S.electQueue = null;
+      S.month = STAGES.slice(0, j).reduce((a, s) => a + (s.m||0), 0);
+      if(j > 0) addLog(`自選從「${STAGES[j].dept}」開始`);
+      save(); run();
+    });

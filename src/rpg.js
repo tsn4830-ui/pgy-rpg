@@ -137,7 +137,7 @@ function worldSync(){
   const elect = st && st.elective && S.electQueue && S.electQueue.length ? ELECTIVES[S.electQueue[0]] : null;
   W.theme = themeOf(elect ? elect.n : st && st.dept);
   W.title = !S ? "畢業典禮後 · 醫院大廳" : S.stage<0 ? "招募季 · 醫院大廳" : st ? `${st.y===1?"PGY1":"PGY2"} · ${elect ? elect.n : st.dept}` : "";
-  W.items = furniture(W.theme); W.npcs = []; buildBlock();
+  W.items = furniture(W.theme); W.npcs = []; buildBlock(); W.patient = null;
   stageWhos().forEach((id,i) => { const [x,y] = SPOTS[i]; if(!blocked(x,y)) W.npcs.push({id, x, y, dir:"down", ph:Math.random()*6}); });
   W.p = {x:7, y:7, fx:7, fy:7, dir:"up", path:[], moving:0};
   if(blocked(7,7)) W.p.y = W.p.fy = 8;
@@ -202,10 +202,81 @@ function worldReact(ok){
   const px = W.p.fx*TW + TW/2, py = W.p.fy*TW;
   if(ok){ for(let i=0;i<18;i++) W.parts.push({x:px, y:py, vx:(Math.random()-.5)*160, vy:-60-Math.random()*120, t:1, col:["#2c6e5c","#f2b630","#e78fae","#4aa3c7"][i%4]}); }
   else { W.shake = .35; }
+  patientReact(ok);
   const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, ok ? "很好！" : "再想想。", 1.6);
 }
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+
+/* 病人場景：臨床題出現時，地圖上真的有一位病人出狀況；答對會好轉，答錯會惡化 */
+const PT_RE = /病人|歲|男性|女性|嬰|孩|新生兒|產婦|孕婦|阿公|阿嬤|爺爺|奶奶|床|傷患|BP|血壓|血氧|心跳|發燒|意識|昏迷|休克|胸痛|喘|抽搐|出血/;
+function vitalsOf(t){
+  const v = [], m = (re) => { const x = t.match(re); return x && x[1]; };
+  const bp = m(/(?:BP|血壓)[^\d]{0,3}(\d{2,3}\/\d{2,3})/); if(bp) v.push(["BP", bp]);
+  const hr = m(/(?:HR|心跳|脈搏|心率)[^\d]{0,3}(\d{2,3})/); if(hr) v.push(["HR", hr]);
+  const sp = m(/(?:SpO2|SpO₂|血氧)[^\d]{0,4}(\d{2,3})/); if(sp) v.push(["SpO₂", sp+"%"]);
+  const tp = m(/(?:體溫|發燒|BT)[^\d]{0,3}(\d{2}(?:\.\d)?)/); if(tp && +tp > 34 && +tp < 43) v.push(["BT", tp+"°C"]);
+  const gl = m(/(?:血糖|glucose)[^\d]{0,4}(\d{2,4})/i); if(gl) v.push(["血糖", gl]);
+  const k = m(/\bK\s*(\d(?:\.\d)?)/); if(k) v.push(["K", k]);
+  const hb = m(/\bHb\s*(\d{1,2}(?:\.\d)?)/); if(hb) v.push(["Hb", hb]);
+  return v.slice(0, 4);
+}
+function worldPatient(qid){
+  const q = QB[qid]; W.patient = null;
+  if(!q || !PT_RE.test(q.q || "")) return;
+  const beds = W.items.filter(f => /bed|cot|resus|ortable|crib/.test(f.k));
+  const who = W.npcs.find(n => n.id === W.lastWho);
+  let spot;
+  if(beds.length){
+    const b = beds.slice().sort((a,c) => (who ? Math.abs(a.x-who.x)+Math.abs(a.y-who.y) - Math.abs(c.x-who.x)-Math.abs(c.y-who.y) : 0))[0];
+    spot = b.k==="ortable" ? {x:b.x*TW+48, y:b.y*TW+14, lie:1} : b.k==="crib" ? {x:b.x*TW+16, y:b.y*TW+16, baby:1} : {x:b.x*TW+27, y:b.y*TW+21};
+  } else spot = {x:7*TW+16, y:3*TW+12, gurney:1};
+  const text = (q.q || "").replace(/[「」]/g, "");
+  const cut = text.split(/[。？?]/)[0];
+  W.patient = {...spot, st:"crit", t:0, vit:vitalsOf(text), say: cut.length > 16 ? cut.slice(0,15)+"…" : cut};
+  W.parts.push(...Array.from({length:6}, (_, i) => ({x:spot.x, y:spot.y, vx:Math.cos(i)*40, vy:-40, t:.8, col:"#e5484d"})));
+}
+function patientReact(ok){
+  const P = W.patient; if(!P || P.st !== "crit") return;
+  P.st = ok ? "ok" : "worse"; P.t = 0;
+  if(ok){ for(let i=0;i<14;i++) W.parts.push({x:P.x, y:P.y-6, vx:(Math.random()-.5)*90, vy:-50-Math.random()*70, t:1.2, col:["#3fbf7f","#f2b630","#e78fae"][i%3]}); }
+  else W.shake = .5;
+}
+function drawPatient(c){
+  const P = W.patient; if(!P) return;
+  P.t += 1/60;
+  if(P.st !== "crit" && P.t > 6){ W.patient = null; return; }
+  const pulse = (Math.sin(W.t*6)+1)/2, col = P.st==="ok" ? "63,191,127" : "229,72,77";
+  if(P.gurney){ c.fillStyle="rgba(0,0,0,.15)"; c.fillRect(P.x-26, P.y+14, 56, 4); c.fillStyle="#c9d3da"; c.fillRect(P.x-28, P.y-2, 56, 16); c.fillStyle="#fafafa"; c.fillRect(P.x-26, P.y, 52, 12); c.fillStyle="#555"; c.fillRect(P.x-24, P.y+14, 3, 6); c.fillRect(P.x+20, P.y+14, 3, 6); }
+  /* 躺著的病人：臉、蓋被 */
+  const s = P.baby ? .7 : 1, X = P.x - 10*s, Y = P.y - 8*s;
+  c.fillStyle = P.st==="crit" ? "#e2c2a6" : P.st==="worse" ? "#c9b2a0" : "#f1c8a5"; c.fillRect(X, Y, 12*s, 10*s);
+  c.fillStyle = "#4a3a30"; c.fillRect(X, Y, 12*s, 3*s);
+  c.fillStyle = "#222";
+  if(P.st==="ok"){ c.fillRect(X+3*s, Y+5*s, 2*s, 1*s); c.fillRect(X+7*s, Y+5*s, 2*s, 1*s); c.fillStyle="#b4685a"; c.fillRect(X+4*s, Y+8*s, 4*s, 1*s); }
+  else { c.fillRect(X+3*s, Y+5*s, 2*s, .6*s); c.fillRect(X+7*s, Y+5*s, 2*s, .6*s); c.fillStyle="#7a4a40"; c.fillRect(X+5*s, Y+8*s, 2*s, 1.2*s); }
+  if(P.st!=="ok"){ c.fillStyle = "rgba(120,170,230,.8)"; c.fillRect(X+12*s, Y+2*s + (W.t*8 % 4), 1.5, 2.5); }
+  /* 警示光圈 */
+  c.strokeStyle = `rgba(${col},${P.st==="ok" ? .7 : .35 + pulse*.5})`; c.lineWidth = 2;
+  c.beginPath(); c.ellipse(P.x, P.y, 26 + (P.st==="crit" ? pulse*4 : 0), 16 + (P.st==="crit" ? pulse*3 : 0), 0, 0, 7); c.stroke(); c.lineWidth = 1;
+  if(P.st!=="ok"){ c.fillStyle = `rgba(229,72,77,${.6+pulse*.4})`; c.beginPath(); c.arc(P.x+20, P.y-18, 7, 0, 7); c.fill(); c.fillStyle="#fff"; c.font="bold 10px sans-serif"; c.textAlign="center"; c.fillText("!", P.x+20, P.y-14.5); c.textAlign="left"; }
+  else { c.fillStyle="#3fbf7f"; c.font="bold 12px sans-serif"; c.fillText("♥", P.x+15, P.y-14 - Math.sin(W.t*3)*2); }
+}
+function drawVitals(c){
+  const P = W.patient; if(!P) return;
+  const crit = P.st!=="ok", rows = P.vit.length ? P.vit : [["狀態", crit ? "不穩定" : "穩定"]];
+  const w = 150, h = 24 + rows.length*15, x0 = COLS*TW - w - 6, y0 = 30;
+  c.fillStyle = "rgba(10,18,22,.86)"; c.fillRect(x0, y0, w, h);
+  c.strokeStyle = P.st==="ok" ? "#3fbf7f" : `rgba(229,72,77,${.5+((Math.sin(W.t*6)+1)/4)})`; c.lineWidth = 2; c.strokeRect(x0, y0, w, h); c.lineWidth = 1;
+  c.font = "bold 11px sans-serif"; c.fillStyle = P.st==="ok" ? "#7fe0a8" : "#ff8a8a";
+  c.fillText(P.st==="ok" ? "生命徵象：改善中" : P.st==="worse" ? "生命徵象：惡化！" : "病人狀況：警示", x0+8, y0+15);
+  c.font = "11px ui-monospace, monospace";
+  rows.forEach(([k,v], i) => { c.fillStyle = "#9fb3bb"; c.fillText(k, x0+8, y0+31+i*15); c.fillStyle = P.st==="ok" ? "#c9f2da" : "#fff"; c.fillText(P.st==="ok" && k!=="狀態" ? v+" → 好轉" : v, x0+50, y0+31+i*15); });
+  /* 心電圖線 */
+  c.strokeStyle = P.st==="ok" ? "#3fbf7f" : "#e5484d"; c.beginPath();
+  for(let i=0;i<w-16;i++){ const ph = (i + W.t*60) % (P.st==="worse" ? 22 : 34); const yy = ph<2 ? -7 : ph<4 ? 5 : 0; c.lineTo(x0+8+i, y0+h-5+yy*.5); }
+  c.stroke();
+}
 /* 繪製 */
 function drawItem(c, f){
   const X = f.x*TW, Y = f.y*TW, r = (x,y,w,h,col) => { c.fillStyle = col; c.fillRect(X+x, Y+y, w, h); };
@@ -301,6 +372,7 @@ function drawWorld(){
   if(W.shake > 0) c.translate((Math.random()-.5)*8, 0);
   drawFloor(c);
   W.items.forEach(f => drawItem(c, f));
+  drawPatient(c);
   const actors = [...W.npcs.map(n => ({id:n.id, x:n.x, y:n.y, dir:n.dir, frame:Math.floor((W.t+n.ph)*1.5)%2 && 0, npc:n})),
     ...W.walkers.map(w => ({id:w.id, x:w.fx, y:w.fy, dir:w.dir, frame:w.path.length ? Math.floor(W.t*(w.run?14:8)) : 0})),
     {id:"me", x:W.p.fx, y:W.p.fy, dir:W.p.dir, frame:W.p.path.length ? Math.floor(W.t*8) : 0, me:1}].sort((p,q) => p.y-q.y);
@@ -327,6 +399,7 @@ function drawWorld(){
   });
   W.parts.forEach(p => { c.globalAlpha = Math.max(0,p.t); c.fillStyle = p.col; c.fillRect(p.x, p.y, 5, 5); }); c.globalAlpha = 1;
   drawLight(c);
+  drawVitals(c);
   c.fillStyle = "rgba(20,30,34,.72)"; c.font = "bold 12px sans-serif"; const tw = c.measureText(W.title).width + 16; c.fillRect(6, 6, tw, 20); c.fillStyle="#fff"; c.fillText(W.title, 14, 20);
   if(W.fade > 0){ c.fillStyle = `rgba(10,16,18,${W.fade})`; c.fillRect(0,0,COLS*TW,ROWS*TW); c.fillStyle = `rgba(255,255,255,${W.fade})`; c.font = "bold 20px sans-serif"; c.textAlign="center"; c.fillText(W.title, COLS*TW/2, ROWS*TW/2); c.textAlign="left"; }
   c.restore();

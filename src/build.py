@@ -50,7 +50,7 @@ RPG=[
 ('function run(){\n  if(S.stage<0) return chooseHospital();','function run(){\n  worldSync();\n  if(S.stage<0) return chooseHospital();'),
 ('function av(id){ const c','function av(id){ if(id!=="sys" && LOOK[id]) return `<img class="av pav" src="${portrait(id)}" alt="">`; const c'),
 ]
-RPG.append(('  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {\n    const k = +b.dataset.k, ok = k===q.a;','  V().dataset.qid = id; delete V().dataset.read;\n  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {\n    const k = +b.dataset.k, ok = k===q.a;'))
+RPG.append(('  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {\n    const k = +b.dataset.k, ok = k===q.a;','  V().dataset.qid = id; delete V().dataset.read; worldPatient(id);\n  V().querySelectorAll(".opt").forEach(b => b.onclick = () => {\n    const k = +b.dataset.k, ok = k===q.a;'))
 RPG.append(('  const v=V(); v.classList.remove("enter");','  const v=V(); delete v.dataset.qid; v.classList.remove("enter");'))
 GAS += RPG
 for a,c in GAS:
@@ -76,7 +76,7 @@ k2 = '  if(SITES.gas.u) list.push(["gas","PGY 職前準備"]);'
 assert e.count(k2)==1
 e = e.replace(k2, '  if(SITES.gas.u && !list.some(([x]) => SITES[x].u === SITES.gas.u)) list.push(["gas","PGY 職前準備"]);')
 assert n1==3 and n2==3 and 'drive.google' not in e, (n1,n2)
-CSS='.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}\n'
+CSS='.jump{margin-top:12px}.jump summary{cursor:pointer;color:var(--accent,#2c6e5c);font-weight:600}.jumps{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.jumps button{font-size:13px}.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}\n'
 h=open('head.html',encoding='utf-8').read().replace('◐ v3.0','◐ v5.0').replace('<main class="card enter" id="view"></main>','<div class="card world" id="world"><canvas id="map" role="img" aria-label="病房地圖：可以走動的角色扮演場景"></canvas></div>\n      <main class="card enter" id="view"></main>').replace('</style>',CSS+'</style>',1).replace('<button id="theme">◐ 畫面明暗</button>','<button id="theme">◐ 畫面明暗</button>\n    <button id="login" hidden>☁ 用 Google 登入</button>').replace('PGY 職前加油站 ↗','PGY學院 ↗').replace('<a id="gas" hidden','<a href="https://endoclass.drtsengshihting.com/" target="_blank" rel="noopener">內分泌代謝實證教室 ↗</a>\n      <a id="gas" hidden')
 
 # 以光田綜合醫院為藍圖：虛構的「光甜綜合醫院」，各科人物名字用科別諧音
