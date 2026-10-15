@@ -25,6 +25,7 @@ const LOOK = {
   wan:   {coat:"#f4f6f5", shirt:"#1f3a68", hair:"#c8c8c8", style:"short", skin:"#e9bf98", glasses:1, tie:"#c9a227", chief:1},
   luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
   chunpu:{coat:"#f2f5f7", shirt:"#f2f5f7", hair:"#5e5a58", style:"bun", skin:"#e6b994", glasses:1, cap:1},
+  zhen:  {coat:"#f4f6f5", shirt:"#2d5d7b", hair:"#4a4440", style:"bob", skin:"#ecc3a0", glasses:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -227,7 +228,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu") ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。", zhen:"先講你的 PICO。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu"||who==="zhen") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -569,6 +570,6 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。", zhen:"這個數字，換成病人聽得懂的話是什麼？"};
   return lines[id] || "你好。";
 }

@@ -222,10 +222,12 @@ const CH = {
           desc:"名字諧音「錄音」。雙手抱胸、眉頭深鎖，胸前口袋的手機紅點一直亮著：「你剛剛講的我都錄起來了喔。」", twist:"陸茵上一次家人住院，被醫院前後不一的說法搞到崩潰，從此什麼都錄。你每次都講得一樣清楚，後來陸茵把手機收進口袋：「你講的，我放心。」"},
   chunpu:{n:"陶淳璞", role:"資深護理長", tag:"病房資深護理長", col:"#7a6a52",
           desc:"名字諧音「淳樸」。在病房待了三十年，護理站的規矩比病歷還清楚，最看不慣「穿得太漂亮」的新人。", twist:"陶護理長年輕時看過一位醫師的手鍊勾到病人的點滴管，從此對服裝特別嚴格。後來陶護理長把「純樸」改成了三條看得懂的規則：手腕以下不戴飾品、長髮綁好、穿包鞋。"},
+  zhen:  {n:"甄菊", role:"實證醫學中心主任", tag:"期刊閱讀導師", col:"#2d5d7b",
+          desc:"名字諧音「證據」。期刊閱讀報告時永遠坐第一排，手上一支紅筆，最常說的一句話是：「這個數字，換成病人聽得懂的話是什麼？」", twist:"甄主任每篇文章都會先自己算一次 NNT。你後來才知道，甄主任當住院醫師時，曾因為只看「降低 50%」就開了一個藥，結果病人得到的好處很小、副作用卻很多。"},
   sys:   {n:"旁白", role:"", col:"#5a6b6f"},
   pager: {n:"呼叫器", role:"值班", col:"#b42318"}
 };
-const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz","yan","wan","luyin","chunpu"];
+const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz","yan","wan","luyin","chunpu","zhen"];
 
 /* ======================= 題庫（每題附出處） ======================= */
 const QB = {
@@ -592,7 +594,31 @@ lemon:{t:"LEMON 困難呼吸道評估",q:"LEMON 評估中的「3-3-2 法則」�
  attire:{t:"白袍下的穿著",q:"護理長說你「穿得不夠純樸」。從感染管制與病人安全的角度，照顧病人時下列哪一項最該先調整？",
   o:["拿掉手鍊、手錶等手腕飾品，長髮綁好，穿包鞋，讓雙手能確實執行手部衛生","把米白色外套換成深色衣服，比較耐髒","不要化妝，看起來比較樸素","洋裝一律改成長褲，才像醫師"],a:0,
   e:"SHEA 的醫療人員服裝專家建議指出，照顧病人時可考慮「手肘以下淨空」（短袖或捲起袖子、不戴手錶與手腕飾品），以利確實洗手；鞋子要包住腳趾。多數醫院另規定長髮要綁起、避免垂墜飾品勾到管路。顏色、款式、化妝不是感染管制的重點，服裝規定該講的是理由，而不是「純樸」。",
-  s:"Bearman G, et al. Healthcare personnel attire in non-operating-room settings. Infect Control Hosp Epidemiol 2014;35(2):107-121（SHEA Expert Guidance）"}
+  s:"Bearman G, et al. Healthcare personnel attire in non-operating-room settings. Infect Control Hosp Epidemiol 2014;35(2):107-121（SHEA Expert Guidance）"},
+ pico:{t:"PICO：把問題問清楚",q:"病房有位 70 歲心衰竭的阿伯，你想知道新藥 X 能不能減少再住院。把這個問題寫成 PICO，下列何者正確？",
+  o:["P：70 歲心衰竭病人；I：新藥 X；C：標準治療；O：一年內因心衰竭再住院","P：新藥 X；I：心衰竭；C：阿伯；O：藥價","P：醫院；I：醫師；C：護理師；O：病人滿意度","不用寫問題，直接上 PubMed 搜尋「心衰竭」"],a:0,
+  e:"PICO 把臨床問題拆成 Patient/Population、Intervention、Comparison、Outcome。問題清楚了，搜尋的關鍵字和要找的研究設計也就跟著清楚。",
+  s:"Richardson WS, Wilson MC, Nishikawa J, Hayward RS. The well-built clinical question: a key to evidence-based decisions. ACP J Club 1995;123(3):A12-13"},
+ evlevel:{t:"治療問題的證據等級",q:"要回答「新藥 X 有沒有效」這類治療問題，下列哪一種證據等級最高？",
+  o:["多個隨機對照試驗（RCT）的系統性回顧","一位資深主治的個人經驗","單一病例報告","藥廠的宣傳單張"],a:0,
+  e:"依牛津實證醫學中心 2011 證據等級，治療效益的問題以隨機試驗的系統性回顧最高，其次是單一 RCT。等級只是起點，還要看研究品質：設計嚴謹的觀察性研究，可能比偏誤很多的 RCT 更可信（GRADE 會依此升降級）。",
+  s:"OCEBM Levels of Evidence Working Group. The Oxford 2011 Levels of Evidence. Oxford Centre for Evidence-Based Medicine"},
+ nnt:{t:"ARR、RRR 與 NNT",q:"這篇 RCT 的主要結果：一年再住院率，對照組 10%，新藥組 8%。下列何者正確？",
+  o:["絕對風險下降 2%，需治療人數（NNT）50；相對風險下降 20%","相對風險下降 2%，NNT 20","絕對風險下降 20%，NNT 5","差距只有 2%，表示藥物無效"],a:0,
+  e:"ARR = 10% − 8% = 2%；NNT = 1 ÷ ARR = 50，代表治療 50 人一年，可以多避免 1 次再住院。RRR = 2% ÷ 10% = 20%。廣告常只寫「降低 20%」，看起來比較厲害；報告時要把絕對數字一起講。",
+  s:"Laupacis A, Sackett DL, Roberts RS. An assessment of clinically useful measures of the consequences of treatment. N Engl J Med 1988;318(26):1728-1733"},
+ itt:{t:"意向治療分析（ITT）",q:"這篇研究有 15% 的受試者中途停藥，作者採用「意向治療分析（intention-to-treat）」。意思是？",
+  o:["依照當初隨機分配的組別分析所有受試者，不管後來有沒有持續吃藥","只分析有乖乖吃完藥的人","把停藥的人移到對照組","停藥的人直接從資料中刪除"],a:0,
+  e:"ITT 依隨機分配的組別分析，保留隨機化帶來的組間可比性，也比較接近真實世界「開了這個藥」的效果；只分析有遵從的人（per-protocol）容易高估療效。",
+  s:"Hollis S, Campbell F. What is meant by intention to treat analysis? Survey of published randomised controlled trials. BMJ 1999;319(7211):670-674"},
+ ci95:{t:"看懂 95% 信賴區間",q:"次要指標「全死因死亡」的相對風險 RR 0.90，95% 信賴區間 0.78–1.04。怎麼解讀？",
+  o:["信賴區間包含 1，統計上沒有顯著差異，不能說新藥降低死亡","RR 小於 1，所以新藥一定降低 10% 死亡","信賴區間很窄，所以一定有顯著差異","次要指標都不用看"],a:0,
+  e:"相對風險、勝算比、危險比的 95% 信賴區間如果包含 1，就代表在 0.05 的顯著水準下沒有統計差異。信賴區間同時告訴你效果可能的範圍，比單看 p 值更有資訊；次要指標多半用來產生假說，不宜直接下結論。",
+  s:"Gardner MJ, Altman DG. Confidence intervals rather than P values: estimation rather than hypothesis testing. BMJ 1986;292(6522):746-750"},
+ ebm3:{t:"實證醫學是什麼",q:"報告最後，甄主任問：「什麼是實證醫學？」下列何者最完整？",
+  o:["整合目前最佳的研究證據、醫師的臨床專業，以及病人的價值與偏好，做出照顧個別病人的決定","只要照最新的 RCT 結果做就對了","依照資深醫師的經驗","依照健保有沒有給付"],a:0,
+  e:"Sackett 等人把實證醫學定義為：審慎、明確且明智地運用目前最佳的證據，來決定個別病人的照顧。它整合臨床專業與病人的選擇，不是照食譜做菜。",
+  s:"Sackett DL, Rosenberg WMC, Gray JAM, Haynes RB, Richardson WS. Evidence based medicine: what it is and what it isn't. BMJ 1996;312(7023):71-72"}
 };
 
 /* ======================= 劇本工具 ======================= */
@@ -815,6 +841,19 @@ const STAGES = [
   choose("me","你想跟小Ｃ說：",[
    {l:"「謝謝小Ｃ這一年一直都在」",fx:{mood:5},rel:{xiaoc:3},r:"小Ｃ揮揮手：「我只是跑得比較勤。PGY2 見！」"},
    {l:"「第二年可以少值一點班嗎？」",fx:{mood:3},rel:{xiaoc:2},r:"小Ｃ大笑：「工時上限我們一定守。排班有問題直接來找我。」"}]),
+  say("sys","評核前還有一關：期刊閱讀報告（Journal Club）。你抽到一篇新藥 X 治療心衰竭的隨機對照試驗，要在全科面前報告。"),
+  say("zhen","實證醫學中心的甄菊主任坐在第一排，面前放著你的投影片，紅筆圈了好幾個地方：「我們從頭來。先講你的臨床問題。」"),
+  boss("zhen","甄主任：「好，我一題一題問。」",["pico","evlevel","nnt","itt","ci95"],3,
+   "甄主任放下紅筆：「問題問得清楚，研究設計看得懂，還會把相對數字換成病人聽得懂的絕對數字。這份報告可以放進你的學習歷程檔案。」",
+   "甄主任：「沒關係，第一次報告的人都會卡在這裡。記住三步：先寫 PICO，再看研究設計，最後把相對數字換成絕對數字。下個月再報一次，我陪你看。」",{zhen:4}),
+  quiz("ebm3","zhen","報告最後，甄主任問全場："),
+  choose("me","最後一張投影片，你要怎麼下結論？",[
+   {l:"整理證據等級、NNT 50、適用的病人族群和副作用，最後提醒要和病人討論價值與費用",fx:{know:3},rel:{zhen:3,zhang:1},
+    r:"甄主任帶頭鼓掌：「這才是把文獻帶回病床邊。」\n（好的期刊報告不是複述摘要，而是回答三件事：這篇研究可信嗎？效果有多大？適用於我的病人嗎？）"},
+   {l:"「結論：新藥 X 降低再住院 20%，所有心衰竭病人都應該用。」",fx:{mood:-2},rel:{zhen:-1},
+    r:"甄主任：「20% 是相對風險下降，絕對只差 2%，NNT 50。而且這篇排除了洗腎病人，你病房裡一半的人都不適用。」台下一陣笑聲，你的臉有點燙。"},
+   {l:"直接念完作者摘要的結論",fx:{know:1},
+    r:"報告很順，但台下有人在滑手機。甄主任說：「摘要是作者希望你相信的。你自己的判斷呢？」"}]),
   {t:"yearEnd"}
  ]},
  {y:2,m:3,dept:"內科（進階）",place:"內科病房，你帶 PGY1",steps:[
@@ -1599,6 +1638,7 @@ const LOOK = {
   wan:   {coat:"#f4f6f5", shirt:"#1f3a68", hair:"#c8c8c8", style:"short", skin:"#e9bf98", glasses:1, tie:"#c9a227", chief:1},
   luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
   chunpu:{coat:"#f2f5f7", shirt:"#f2f5f7", hair:"#5e5a58", style:"bun", skin:"#e6b994", glasses:1, cap:1},
+  zhen:  {coat:"#f4f6f5", shirt:"#2d5d7b", hair:"#4a4440", style:"bob", skin:"#ecc3a0", glasses:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -1801,7 +1841,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu") ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。", zhen:"先講你的 PICO。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu"||who==="zhen") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -2143,7 +2183,7 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。", zhen:"這個數字，換成病人聽得懂的話是什麼？"};
   return lines[id] || "你好。";
 }
 
