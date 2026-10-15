@@ -155,4 +155,8 @@
  ebm3:{t:"實證醫學是什麼",q:"報告最後，甄主任問：「什麼是實證醫學？」下列何者最完整？",
   o:["整合目前最佳的研究證據、醫師的臨床專業，以及病人的價值與偏好，做出照顧個別病人的決定","只要照最新的 RCT 結果做就對了","依照資深醫師的經驗","依照健保有沒有給付"],a:0,
   e:"Sackett 等人把實證醫學定義為：審慎、明確且明智地運用目前最佳的證據，來決定個別病人的照顧。它整合臨床專業與病人的選擇，不是照食譜做菜。",
-  s:"Sackett DL, Rosenberg WMC, Gray JAM, Haynes RB, Richardson WS. Evidence based medicine: what it is and what it isn't. BMJ 1996;312(7023):71-72"}
+  s:"Sackett DL, Rosenberg WMC, Gray JAM, Haynes RB, Richardson WS. Evidence based medicine: what it is and what it isn't. BMJ 1996;312(7023):71-72"},
+ wbafb:{t:"工作場所評量要什麼時候填",q:"崔秘書來催 Mini-CEX 和 DOPS 表單。這類工作場所評量，什麼時候完成、請老師給回饋最有學習效果？",
+  o:["在老師觀察完的當下或當天就完成，回饋具體指出哪些行為做得好、哪裡要改","每個月底一次補齊，比較有效率","等年度評核前再一起請老師簽","只要分數夠高，有沒有寫回饋都沒關係"],a:0,
+  e:"Mini-CEX、DOPS 這類工作場所評量的主要價值在回饋，不在分數。回饋要及時、具體、針對觀察到的行為；隔了幾週才補，老師和學員都記不清細節，回饋就只剩「表現良好」。所以最好是觀察完當下就填，並和老師當面討論下一步怎麼改進。",
+  s:"Norcini J, Burch V. Workplace-based assessment as an educational tool: AMEE Guide No. 31. Med Teach 2007;29(9):855-871；Ende J. Feedback in clinical medical education. JAMA 1983;250(6):777-781"}
