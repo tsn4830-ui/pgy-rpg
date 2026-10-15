@@ -100,6 +100,11 @@ MCREDIT = '<p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目
 _k = '臨床處置請以最新指引與院內規範為準。</p>'
 assert h.count(_k)==1; h = h.replace(_k, _k + '\n  ' + MCREDIT)
 assert h.count('醫院與人物皆為虛構')==1; h = h.replace('醫院與人物皆為虛構','醫院與人物皆為虛構（以光田綜合醫院為藍圖，院名與各科人物名字採諧音）')
+for a,b2 in [x.split('|||') for x in open('gender.txt',encoding='utf-8').read().strip().split('\n@@@\n')]:
+    n=[d.count(a),e.count(a),h.count(a)]; assert sum(n)==1,(a[:60],n)
+    if n[0]: d=d.replace(a,b2)
+    elif n[1]: e=e.replace(a,b2)
+    else: h=h.replace(a,b2)
 for a,_ in KT_NAMES: assert a not in d+e, a
 out=h+'\n<script>\n"use strict";\n'+d+'\n'+e+'</script>\n'
 open('/mnt/project-files/pgy-rpg/index.html','w',encoding='utf-8').write(out)

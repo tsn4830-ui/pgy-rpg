@@ -27,8 +27,11 @@ const LOOK = {
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
+/* 玩家自選外觀：男生、女生、無性別（舊存檔沒有這個欄位，就是無性別） */
+function playerGender(){ return (typeof S === "object" && S && S.gender) || "x"; }
+function meLook(){ const g = playerGender(); return g==="m" ? LOOK.me : g==="f" ? {...LOOK.me, style:"shoulder", hair:"#2a1d18"} : {...LOOK.me, style:"bob", hair:"#3b2a22"}; }
 function drawChar(c, x, y, id, dir="down", frame=0, s=2){
-  const L = LOOK[id] || LOOK.pt;
+  const L = id==="me" ? meLook() : (LOOK[id] || LOOK.pt);
   const r = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(x + a*s, y + b*s, w*s, h*s); };
   c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x+8*s, y+19.5*s, 6*s, 1.6*s, 0, 0, 7); c.fill();
   const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0, OL = "rgba(28,32,44,.55)";
@@ -89,16 +92,17 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
 }
 const PORTRAIT = {};
 function portrait(id){
-  if(PORTRAIT[id]) return PORTRAIT[id];
+  const pk = id==="me" ? "me" + playerGender() : id;
+  if(PORTRAIT[pk]) return PORTRAIT[pk];
   try{
     const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
     const c = cv.getContext("2d"); c.scale(2,2); cv.noBag = 1;
     const g = c.createLinearGradient(0,0,0,48), col = (CH[id]||CH.sys).col; g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,.25)");
     c.fillStyle = col; c.fillRect(0,0,48,48); c.fillStyle = g; c.fillRect(0,0,48,48);
     drawChar(c, 8, 6, LOOK[id] ? id : "pt", "down", 0, 2);
-    PORTRAIT[id] = cv.toDataURL();
-  }catch(e){ PORTRAIT[id] = ""; }
-  return PORTRAIT[id];
+    PORTRAIT[pk] = cv.toDataURL();
+  }catch(e){ PORTRAIT[pk] = ""; }
+  return PORTRAIT[pk];
 }
 
 /* 場景：依科別換地板與家具 */

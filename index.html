@@ -120,6 +120,7 @@ a{color:var(--drape)}
 .hero h1 span{color:var(--drape)}
 .hero p{margin:0;max-width:62ch}
 .field{display:grid;gap:4px}
+.gsel{display:flex;gap:18px;flex-wrap:wrap}.gsel label{display:flex;gap:6px;align-items:center;cursor:pointer;white-space:nowrap}.field .gsel input{width:auto;padding:0;margin:0;accent-color:var(--drape,#2c6e5c)}
 .field input,.field textarea{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);max-width:420px;width:100%}
 .ads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .ad{border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:8px;align-content:start;background:var(--surface-2);text-align:left}
@@ -1014,7 +1015,7 @@ async function fbInit(){
 })();
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const rich = s => esc(s).replace(/\[\[(\w+)\]\]/g, (m,k) => REF_NO[k] ? `<a class="ref" href="#ref-${REF_NO[k]}" data-ref="${REF_NO[k]}">[${REF_NO[k]}]</a>` : "");
+const rich = s => esc(String(s).replace(/學長姐(?=，[你他])/g, honor())).replace(/\[\[(\w+)\]\]/g, (m,k) => REF_NO[k] ? `<a class="ref" href="#ref-${REF_NO[k]}" data-ref="${REF_NO[k]}">[${REF_NO[k]}]</a>` : "");
 const plain = s => String(s).replace(/\[\[(\w+)\]\]/g, "");
 
 function monthLabel(){ const y = S.month < 12 ? 1 : 2; const m = S.month < 12 ? S.month+1 : S.month-11; return `Y${y}·${String(Math.min(m,12)).padStart(2,"0")}月`; }
@@ -1115,6 +1116,9 @@ document.addEventListener("click", e => {
   const li = document.getElementById("ref-"+a.dataset.ref); if(li){ li.scrollIntoView({block:"center"}); li.style.background="var(--surface-2)"; }
 });
 
+/* 性別只影響外觀和別人怎麼稱呼你 */
+const gsel = () => (document.querySelector('input[name="gd"]:checked') || {}).value || "x";
+const honor = () => ({m:"學長", f:"學姊"})[S && S.gender] || "學長姐";
 function titleScreen(){
   const saved = load();
   show(`<div class="hero"><span class="eyebrow">Taiwan Post-Graduate Year · 人生模擬</span>
@@ -1122,11 +1126,12 @@ function titleScreen(){
    <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
    <p>路上有搶功的同梯、凶巴巴的學長姐、管東管西的護理長，也有擋下你錯誤醫囑的護理師。每一道臨床題都附參考文獻，並連到內科小手冊與指引索引的對應章節。</p></div>
    <div class="field"><label for="nm">你的名字</label><input id="nm" maxlength="8" placeholder="例如：林小安" value="${esc(saved?.name||"")}"></div>
+   <div class="field"><span>你的性別<small class="meta">（只影響外觀和別人怎麼稱呼你，舊存檔也可以改）</small></span><div class="gsel" role="radiogroup" aria-label="性別">${[["m","男生"],["f","女生"],["x","無性別"]].map(([v,l]) => `<label><input type="radio" name="gd" value="${v}" ${(saved?.gender||"x")===v?"checked":""}> ${l}</label>`).join("")}</div></div>
    <div class="row"><button class="primary" id="go">開始報到</button>${saved && saved.stage>=0 ? `<button class="ghost" id="cont">繼續上次進度（${saved.month<12?"PGY1":"PGY2"}，第 ${saved.month} 個月）</button>`:""}</div>
    <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
    <p class="meta" id="acct">${cloudNote()}</p>`);
-  document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); chooseHospital(); };
-  const c = document.getElementById("cont"); if(c) c.onclick = () => resume(saved);
+  document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); S.gender = gsel(); chooseHospital(); };
+  const c = document.getElementById("cont"); if(c) c.onclick = () => { saved.gender = gsel(); resume(saved); };
 }
 
 function chooseHospital(){
@@ -1566,8 +1571,11 @@ const LOOK = {
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
+/* 玩家自選外觀：男生、女生、無性別（舊存檔沒有這個欄位，就是無性別） */
+function playerGender(){ return (typeof S === "object" && S && S.gender) || "x"; }
+function meLook(){ const g = playerGender(); return g==="m" ? LOOK.me : g==="f" ? {...LOOK.me, style:"shoulder", hair:"#2a1d18"} : {...LOOK.me, style:"bob", hair:"#3b2a22"}; }
 function drawChar(c, x, y, id, dir="down", frame=0, s=2){
-  const L = LOOK[id] || LOOK.pt;
+  const L = id==="me" ? meLook() : (LOOK[id] || LOOK.pt);
   const r = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(x + a*s, y + b*s, w*s, h*s); };
   c.fillStyle = "rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x+8*s, y+19.5*s, 6*s, 1.6*s, 0, 0, 7); c.fill();
   const step = frame%2 ? 1 : 0, bob = frame%2 ? -0.5 : 0, OL = "rgba(28,32,44,.55)";
@@ -1628,16 +1636,17 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
 }
 const PORTRAIT = {};
 function portrait(id){
-  if(PORTRAIT[id]) return PORTRAIT[id];
+  const pk = id==="me" ? "me" + playerGender() : id;
+  if(PORTRAIT[pk]) return PORTRAIT[pk];
   try{
     const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
     const c = cv.getContext("2d"); c.scale(2,2); cv.noBag = 1;
     const g = c.createLinearGradient(0,0,0,48), col = (CH[id]||CH.sys).col; g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,.25)");
     c.fillStyle = col; c.fillRect(0,0,48,48); c.fillStyle = g; c.fillRect(0,0,48,48);
     drawChar(c, 8, 6, LOOK[id] ? id : "pt", "down", 0, 2);
-    PORTRAIT[id] = cv.toDataURL();
-  }catch(e){ PORTRAIT[id] = ""; }
-  return PORTRAIT[id];
+    PORTRAIT[pk] = cv.toDataURL();
+  }catch(e){ PORTRAIT[pk] = ""; }
+  return PORTRAIT[pk];
 }
 
 /* 場景：依科別換地板與家具 */

@@ -1,0 +1,16 @@
+const rich = s => esc(s).replace(|||const rich = s => esc(String(s).replace(/學長姐(?=，[你他])/g, honor())).replace(
+@@@
+function titleScreen(){|||/* 性別只影響外觀和別人怎麼稱呼你 */
+const gsel = () => (document.querySelector('input[name="gd"]:checked') || {}).value || "x";
+const honor = () => ({m:"學長", f:"學姊"})[S && S.gender] || "學長姐";
+function titleScreen(){
+@@@
+<div class="field"><label for="nm">你的名字</label><input id="nm" maxlength="8" placeholder="例如：林小安" value="${esc(saved?.name||"")}"></div>|||<div class="field"><label for="nm">你的名字</label><input id="nm" maxlength="8" placeholder="例如：林小安" value="${esc(saved?.name||"")}"></div>
+   <div class="field"><span>你的性別<small class="meta">（只影響外觀和別人怎麼稱呼你，舊存檔也可以改）</small></span><div class="gsel" role="radiogroup" aria-label="性別">${[["m","男生"],["f","女生"],["x","無性別"]].map(([v,l]) => `<label><input type="radio" name="gd" value="${v}" ${(saved?.gender||"x")===v?"checked":""}> ${l}</label>`).join("")}</div></div>
+@@@
+S = fresh(n); chooseHospital();|||S = fresh(n); S.gender = gsel(); chooseHospital();
+@@@
+if(c) c.onclick = () => resume(saved);|||if(c) c.onclick = () => { saved.gender = gsel(); resume(saved); };
+@@@
+.field{display:grid;gap:4px}|||.field{display:grid;gap:4px}
+.gsel{display:flex;gap:18px;flex-wrap:wrap}.gsel label{display:flex;gap:6px;align-items:center;cursor:pointer;white-space:nowrap}.field .gsel input{width:auto;padding:0;margin:0;accent-color:var(--drape,#2c6e5c)}
