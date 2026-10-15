@@ -26,6 +26,7 @@ const LOOK = {
   luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
   chunpu:{coat:"#f2f5f7", shirt:"#f2f5f7", hair:"#5e5a58", style:"bun", skin:"#e6b994", glasses:1, cap:1},
   zhen:  {coat:"#f4f6f5", shirt:"#2d5d7b", hair:"#4a4440", style:"bob", skin:"#ecc3a0", glasses:1},
+  fenhong:{coat:"#4f6378", shirt:"#e9edf2", hair:"#1d1a19", style:"short", skin:"#ecc4a2", glasses:1, badge:"#2f6db5"},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -52,6 +53,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); r(6, 8.4+bob, .6, 3.2, "#56606a"); r(9.4, 8.4+bob, .6, 3.2, "#56606a"); r(5.6, 11.4+bob, 1.4, 1.4, "#8a949c"); }
   if(L.skirt){ r(3.2, 14.6+bob, 9.6, 2, L.skirt); r(3.2, 16.2+bob, 3, .6, L.skirt); }
   if(L.tweed){ [[3.6,9],[5,11.5],[4,13.6],[11,9.4],[10.6,12],[11.8,14],[3.4,11],[12,11]].forEach(([a,b]) => r(a, b+bob, .6, .6, "#bfb39a")); r(6.2, 8+bob, .5, 7, "#d7cfb8"); r(9.3, 8+bob, .5, 7, "#d7cfb8"); }
+  if(L.badge){ r(5.4, 8+bob, .5, 4.4, L.badge); r(10.1, 8+bob, .5, 4.4, L.badge); r(5.2, 12.2+bob, 2.4, 2.6, "#f7f7f5"); r(5.5, 12.6+bob, 1.8, .7, L.badge); }
   if(L.bangle){ r(12.6, 13.2+bob, 2, .5, L.bangle); }
   if(L.tie){ r(5.6, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)"); r(9, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)");
     r(7.3, 8.2+bob, 1.4, 1, L.tie); r(7.1, 9.2+bob, 1.8, 4.2, L.tie); r(7.5, 13.4+bob, 1, .7, L.tie); r(7.3, 9.4+bob, .5, 3.6, "rgba(255,255,255,.2)");
@@ -125,10 +127,12 @@ function themeOf(dept){
   if(/婦產/.test(dept)) return "ob";
   if(/社區/.test(dept)) return "village";
   if(/評核|招募/.test(dept)) return "office";
+  if(dept==="party") return "party";
   return "ward";
 }
 const FLOOR = {lobby:["#e8e2d4","#e1dacb"], ward:["#dfe9e5","#d6e2dd"], er:["#dcdfe3","#d2d6db"], or:["#cfe3e0","#c4dbd7"],
-  peds:["#f3ead0","#ece1c3"], ob:["#f2e1e6","#ead6dc"], village:["#9cc77f","#93bf76"], office:["#e6dccb","#ddd2be"]};
+  peds:["#f3ead0","#ece1c3"], ob:["#f2e1e6","#ead6dc"], village:["#9cc77f","#93bf76"], office:["#e6dccb","#ddd2be"], party:["#d9c3a0","#cfb894"]};
+function curScene(){ try{ const st = STAGES[S.stage].steps[S.step]; return st && st.scene || ""; }catch(e){ return ""; } }
 function furniture(theme){
   const bedsTop = [2,5,8,11].map(x => ({k:"bed", x, y:1}));
   switch(theme){
@@ -139,6 +143,7 @@ function furniture(theme){
     case "ob": return [{k:"sign",x:9,y:0,w:5,t:"2F 產房 · 嬰兒室"},{k:"bed",x:2,y:1},{k:"bed",x:5,y:1},{k:"crib",x:8,y:1},{k:"crib",x:10,y:1},{k:"desk",x:10,y:6,w:3},{k:"plant",x:1,y:7}];
     case "village": return [{k:"house",x:1,y:1,w:4,t:"衛生所"},{k:"tree",x:9,y:1},{k:"tree",x:12,y:2},{k:"tree",x:13,y:6},{k:"tree",x:2,y:7},{k:"path"}];
     case "office": return [{k:"sign",x:10,y:0,w:4,t:"教學研究部"},{k:"desk",x:2,y:2,w:3},{k:"desk",x:9,y:2,w:3},{k:"shelf",x:6,y:0,w:3},{k:"plant",x:1,y:7},{k:"plant",x:13,y:7}];
+    case "party": return [{k:"sign",x:4,y:0,w:7,t:"高中同學會 · 熱炒店",red:1},{k:"table",x:2,y:2,w:3},{k:"table",x:10,y:2,w:3},{k:"table",x:2,y:6,w:3},{k:"chair",x:1,y:2},{k:"chair",x:13,y:2},{k:"chair",x:5,y:6},{k:"plant",x:13,y:7},{k:"door",x:7,y:8}];
     default: return [{k:"sign",x:5,y:0,w:5,t:"8F 內科病房"},...bedsTop,{k:"curtain",x:4,y:1},{k:"curtain",x:7,y:1},{k:"curtain",x:10,y:1},{k:"desk",x:1,y:6,w:3,t:"護理站"},{k:"cart",x:13,y:1},{k:"plant",x:13,y:7},{k:"sink",x:7,y:7}];
   }
 }
@@ -160,25 +165,28 @@ function buildBlock(){
 function stageWhos(){
   if(!S || S.stage<0) return ["zhang","rui","kui","ouyang","bai","hsu","lin"];
   const st = STAGES[S.stage]; if(!st) return [];
-  let list = st.steps.slice();
-  if(st.elective && S.electQueue && S.electQueue.length) list = list.concat(ELECTIVES[S.electQueue[0]].steps);
+  const sc = curScene();
+  let list = st.steps.filter(s => (s.scene||"") === sc);
+  if(!sc && st.elective && S.electQueue && S.electQueue.length) list = list.concat(ELECTIVES[S.electQueue[0]].steps);
   const out = [];
   list.forEach(s => { const w = s.t==="night" ? "kui" : s.who; if(w && CH[w] && w!=="sys" && w!=="me" && !out.includes(w)) out.push(w); });
   return out.slice(0, SPOTS.length);
 }
 function worldSync(){
   const st = S && S.stage>=0 ? STAGES[S.stage] : null;
-  const key = S ? `${S.stage}:${S.electQueue&&S.electQueue[0]||""}` : "title";
+  const key = S ? `${S.stage}:${S.electQueue&&S.electQueue[0]||""}:${S.stage>=0?curScene():""}` : "title";
   if(key === W.key) return;
   W.key = key; W.lastWho = null; W.target = null;
   const elect = st && st.elective && S.electQueue && S.electQueue.length ? ELECTIVES[S.electQueue[0]] : null;
-  W.theme = themeOf(elect ? elect.n : st && st.dept);
+  const scene = S && S.stage>=0 ? curScene() : "";
+  W.theme = scene ? themeOf(scene) : themeOf(elect ? elect.n : st && st.dept);
   W.title = !S ? "畢業典禮後 · 醫院大廳" : S.stage<0 ? "招募季 · 醫院大廳" : st ? `${st.y===1?"PGY1":"PGY2"} · ${elect ? elect.n : st.dept}` : "";
+  if(scene==="party") W.title = `${st.y===1?"PGY1":"PGY2"} · 放假 · 高中同學會`;
   W.items = furniture(W.theme); W.npcs = []; buildBlock(); W.patient = null;
   stageWhos().forEach((id,i) => { const [x,y] = SPOTS[i]; if(!blocked(x,y)) W.npcs.push({id, x, y, dir:"down", ph:Math.random()*6}); });
   W.p = {x:7, y:7, fx:7, fy:7, dir:"up", path:[], moving:0};
   if(blocked(7,7)) W.p.y = W.p.fy = 8;
-  W.walkers = W.theme==="village" || W.theme==="office" ? [] : [{id:W.theme==="lobby"?"vis":"pt", x:13, y:7, fx:13, fy:7, dir:"left", path:[], wait:0}];
+  W.walkers = W.theme==="village" || W.theme==="office" || W.theme==="party" ? [] : [{id:W.theme==="lobby"?"vis":"pt", x:13, y:7, fx:13, fy:7, dir:"left", path:[], wait:0}];
   /* 跑跑小Ｃ：每張地圖都在跑 */
   if(!W.npcs.some(n => n.id==="xiaoc")) W.walkers.push({id:"xiaoc", fx:1, fy:blocked(1,7)?8:7, dir:"right", path:[], wait:.5, sp:3.6, run:1});
   W.fade = 1;
@@ -228,7 +236,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。", zhen:"先講你的 PICO。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu"||who==="zhen") ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。", zhen:"先講你的 PICO。", fenhong:"欸，醫生大人來了！"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu"||who==="zhen"||who==="fenhong") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -376,6 +384,8 @@ function drawItem(c, f){
       r(8,0,14,10,"#33424c"); r(10,2,10,6, (Math.floor(W.t*1.5+f.x)%5) ? "#7fd0e0" : "#a8e6f0"); r(11,3,6,1,"rgba(255,255,255,.6)"); r(13,10,4,2,"#33424c");
       if((f.w||1) > 2){ r(TW+8,2,10,8,"#f4f1e8"); r(TW+9,4,8,1,"#bbb"); r(TW+9,6,6,1,"#bbb"); r(TW*2+4,4,6,6,"#e05a47"); r(TW*2+5,2,4,2,"#fff"); }
       if(f.t){ c.fillStyle="#fff"; c.font="bold 11px sans-serif"; c.fillText(f.t, X+30, Y+26); } break;
+    case "table": r(0,TW-2,(f.w||1)*TW,3,"rgba(0,0,0,.15)"); r(0,8,(f.w||1)*TW,TW-8,"#a3342e"); r(0,8,(f.w||1)*TW,4,"#c4473f"); r(0,13,(f.w||1)*TW,1,"rgba(0,0,0,.15)");
+      for(let i=0;i<(f.w||1);i++){ c.fillStyle="#f4f1e8"; c.beginPath(); c.ellipse(X+i*TW+16,Y+16,9,4,0,0,7); c.fill(); r(i*TW+10,13,12,3,["#d9822b","#5a9a3a","#c94f3b"][(i+f.x)%3]); r(i*TW+25,2,4,12,"#3d7a3a"); r(i*TW+25,2,4,3,"#e9c54a"); } break;
     case "sign": r(1,4,(f.w||1)*TW,22,"rgba(0,0,0,.18)"); r(0,2,(f.w||1)*TW,22, f.red ? "#a3342e" : "#2c6e5c"); r(0,2,(f.w||1)*TW,3,"rgba(255,255,255,.18)");
       if(f.red && Math.floor(W.t*2)%2){ r(-8,6,6,6,"#ff5a4f"); r((f.w||1)*TW+2,6,6,6,"#ff5a4f"); }
       c.fillStyle="#fff"; c.font="bold 13px sans-serif"; c.textAlign="center"; c.fillText(f.t, X+(f.w||1)*TW/2, Y+18); c.textAlign="left"; break;
@@ -570,6 +580,6 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。", zhen:"這個數字，換成病人聽得懂的話是什麼？"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。", zhen:"這個數字，換成病人聽得懂的話是什麼？", fenhong:"我們今年分紅入帳了耶～"};
   return lines[id] || "你好。";
 }
