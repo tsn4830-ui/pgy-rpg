@@ -1712,7 +1712,7 @@ function worldPatient(qid){
 }
 function patientReact(ok){
   const P = W.patient; if(!P || P.st !== "crit") return;
-  P.st = ok ? "ok" : "worse"; P.t = 0;
+  P.st = ok ? "ok" : "worse"; P.t = 0; P.age = 0;
   if(ok){ for(let i=0;i<14;i++) W.parts.push({x:P.x, y:P.y-6, vx:(Math.random()-.5)*90, vy:-50-Math.random()*70, t:1.2, col:["#3fbf7f","#f2b630","#e78fae"][i%3]}); }
   else W.shake = .5;
 }
@@ -1750,6 +1750,48 @@ function drawVitals(c){
   c.strokeStyle = P.st==="ok" ? "#3fbf7f" : "#e5484d"; c.beginPath();
   for(let i=0;i<w-16;i++){ const ph = (i + W.t*60) % (P.st==="worse" ? 22 : 34); const yy = ph<2 ? -7 : ph<4 ? 5 : 0; c.lineTo(x0+8+i, y0+h-5+yy*.5); }
   c.stroke();
+}
+
+/* 病人臉部特寫：出狀況時放大顯示哭哭的臉，好轉後變笑臉 */
+function drawCloseup(c){
+  const P = W.patient; if(!P) return;
+  const ok = P.st==="ok", worse = P.st==="worse";
+  const R = 34, pop = Math.min(1, (P.age = (P.age||0) + 1/60) / .25), k = .6 + .4*pop + (ok ? 0 : Math.sin(W.t*10)*.02);
+  const cx = 52, cy = ROWS*TW - 64;
+  c.save(); c.translate(cx, cy); c.scale(k, k);
+  /* 外框 */
+  c.fillStyle = "rgba(10,18,22,.82)"; c.beginPath(); c.arc(0, 0, R+10, 0, 7); c.fill();
+  c.strokeStyle = ok ? "#3fbf7f" : `rgba(229,72,77,${.6+(Math.sin(W.t*6)+1)/5})`; c.lineWidth = 3; c.stroke(); c.lineWidth = 1;
+  /* 臉 */
+  c.fillStyle = worse ? "#d9c3b6" : ok ? "#f6d2b0" : "#efcfb4"; c.beginPath(); c.arc(0, 2, R, 0, 7); c.fill();
+  if(worse){ c.fillStyle = "rgba(110,140,200,.25)"; c.beginPath(); c.arc(0, 2, R, 0, 7); c.fill(); }
+  c.fillStyle = "#4a3a30"; c.beginPath(); c.arc(0, -4, R, Math.PI*1.05, Math.PI*1.95); c.fill(); c.fillRect(-R+2, -12, 8, 10); c.fillRect(R-10, -12, 8, 10);
+  c.strokeStyle = "#2a2220"; c.lineCap = "round"; c.lineWidth = 3;
+  if(ok){
+    c.beginPath(); c.arc(-12, 2, 6, Math.PI*1.1, Math.PI*1.9); c.stroke(); c.beginPath(); c.arc(12, 2, 6, Math.PI*1.1, Math.PI*1.9); c.stroke();
+    c.fillStyle = "rgba(240,120,130,.5)"; c.beginPath(); c.ellipse(-20, 12, 6, 3.5, 0, 0, 7); c.ellipse(20, 12, 6, 3.5, 0, 0, 7); c.fill();
+    c.beginPath(); c.arc(0, 12, 10, Math.PI*.15, Math.PI*.85); c.stroke();
+    c.fillStyle = "#f2b630"; [[-30,-28],[30,-24],[26,26]].forEach(([x,y],i) => { const s = 3 + Math.sin(W.t*5+i)*1.5; c.fillRect(x-s/2, y-.8, s, 1.6); c.fillRect(x-.8, y-s/2, 1.6, s); });
+  } else {
+    /* 八字眉、緊閉的哭哭眼 */
+    c.beginPath(); c.moveTo(-20, -10); c.lineTo(-7, -15); c.moveTo(20, -10); c.lineTo(7, -15); c.stroke();
+    c.beginPath(); c.arc(-12, 0, 6, Math.PI*.15, Math.PI*.85, true); c.stroke(); c.beginPath(); c.arc(12, 0, 6, Math.PI*.15, Math.PI*.85, true); c.stroke();
+    /* 張嘴大哭 */
+    c.fillStyle = "#6b2a2a"; c.beginPath(); c.ellipse(0, 17 + Math.sin(W.t*8)*1, 8, 6 + Math.sin(W.t*8)*1.5, 0, 0, 7); c.fill();
+    c.fillStyle = "#e88a8a"; c.beginPath(); c.ellipse(0, 21, 5, 2.4, 0, 0, 7); c.fill();
+    /* 眼淚：兩條淚流加上往下掉的淚珠 */
+    c.fillStyle = "rgba(110,180,240,.85)"; c.fillRect(-15, 4, 4, 14); c.fillRect(11, 4, 4, 14);
+    for(let i=0;i<3;i++){ const ph = (W.t*1.6 + i/3) % 1; c.globalAlpha = 1 - ph;
+      c.beginPath(); c.arc(-13, 18 + ph*22, 2.6, 0, 7); c.arc(13, 18 + ((ph+.5)%1)*22, 2.6, 0, 7); c.fill(); }
+    c.globalAlpha = 1;
+    if(worse){ c.fillStyle = "rgba(120,190,240,.9)"; c.beginPath(); c.moveTo(26, -22); c.quadraticCurveTo(32, -12, 26, -8); c.quadraticCurveTo(20, -12, 26, -22); c.fill(); }
+  }
+  c.lineCap = "butt"; c.lineWidth = 1;
+  c.restore();
+  const msg = ok ? "好多了，謝謝醫師！" : worse ? "嗚嗚…更不舒服了…" : "嗚嗚…好難受…";
+  c.font = "bold 12px sans-serif"; const w = c.measureText(msg).width + 14, bx = cx + 40, by = cy - 40;
+  c.fillStyle = "#fff"; c.strokeStyle = ok ? "#3fbf7f" : "#e5484d"; c.lineWidth = 1.5; c.beginPath(); c.roundRect ? c.roundRect(bx, by, w, 22, 8) : c.rect(bx, by, w, 22); c.fill(); c.stroke(); c.lineWidth = 1;
+  c.fillStyle = "#223"; c.fillText(msg, bx + 7, by + 15);
 }
 /* 繪製 */
 function drawItem(c, f){
@@ -1874,6 +1916,7 @@ function drawWorld(){
   W.parts.forEach(p => { c.globalAlpha = Math.max(0,p.t); c.fillStyle = p.col; c.fillRect(p.x, p.y, 5, 5); }); c.globalAlpha = 1;
   drawLight(c);
   drawVitals(c);
+  drawCloseup(c);
   c.fillStyle = "rgba(20,30,34,.72)"; c.font = "bold 12px sans-serif"; const tw = c.measureText(W.title).width + 16; c.fillRect(6, 6, tw, 20); c.fillStyle="#fff"; c.fillText(W.title, 14, 20);
   if(W.fade > 0){ c.fillStyle = `rgba(10,16,18,${W.fade})`; c.fillRect(0,0,COLS*TW,ROWS*TW); c.fillStyle = `rgba(255,255,255,${W.fade})`; c.font = "bold 20px sans-serif"; c.textAlign="center"; c.fillText(W.title, COLS*TW/2, ROWS*TW/2); c.textAlign="left"; }
   c.restore();
