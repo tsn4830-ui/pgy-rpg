@@ -1,0 +1,46 @@
+<button id="theme">◐ 畫面明暗</button>|||<button id="theme">◐ 畫面明暗</button>
+    <button id="coffee" title="健康回升，但疲累指數會上升">☕ 喝咖啡</button>
+@@@
+.ctrl button[aria-pressed="true"]{background:var(--drape);color:var(--drape-ink);border-color:var(--drape)}|||.ctrl button[aria-pressed="true"]{background:var(--drape);color:var(--drape-ink);border-color:var(--drape)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--drape);color:var(--drape-ink);padding:8px 16px;border-radius:14px;font-size:14px;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center}
+@@@
+  {k:"mohw1925", t:"衛生福利部。1925 安心專線（24 小時免付費心理諮詢）。"}|||  {k:"mohw1925", t:"衛生福利部。1925 安心專線（24 小時免付費心理諮詢）。"},
+  {k:"fda_caff", t:"U.S. Food and Drug Administration. Spilling the Beans: How Much Caffeine Is Too Much? 健康成人每日咖啡因約 400 毫克以下，通常與危險或負面影響無關。", u:"https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much"},
+  {k:"drake_caff", t:"Drake C, Roehrs T, Shambroom J, Roth T. Caffeine effects on sleep taken 0, 3, or 6 hours before going to bed. J Clin Sleep Med 2013;9(11):1195-1200."}
+@@@
+${bar("健康",S.hp,S.maxhp,S.hp<30)}${bar("幸福"|||${bar("健康",S.hp,S.maxhp,S.hp<30)}${bar("疲累",S.tired||0,100,(S.tired||0)>=70)}${bar("幸福"
+@@@
+  S.hours = 230;
+  S.stage++;|||  S.hours = 230; S.tired = Math.max(0,(S.tired||0)-50); S.cups = 0;
+  S.stage++;
+@@@
+    S.burnout++;|||    S.burnout++; S.tired = Math.min(S.tired||0, 20);
+@@@
+function checkLimits(){
+|||function checkLimits(){
+  if((S.tired||0) >= 100){
+    addLog("咖啡喝太多，在護理站睡著了");
+    S.tired = 30;
+    show(`${speaker("lin",`你在護理站打醫囑，眼睛一閉就睡著了，游標還停在一半。${CH.lin.n}護理長輕輕把你叫醒：「你今天第幾杯咖啡了？咖啡只是把累藏起來，不會幫你補眠。去值班室睡兩個小時，有事我叫你。」`)}
+     <div class="feedback"><strong>真實制度</strong><span>咖啡因可以暫時提神，但不能取代睡眠；即使在睡前 6 小時喝，客觀測得的總睡眠時間仍會減少超過 1 小時${rich("[[drake_caff]]")}。健康成人每日咖啡因建議約 400 毫克以下${rich("[[fda_caff]]")}。</span></div>
+     <p class="fx">${applyFx({hp:10,mood:-3},{lin:1})}　疲累降到 30</p>${nxBtn("去睡一下")}`);
+    document.getElementById("nx").onclick = run; return true;
+  }
+
+@@@
+document.getElementById("theme").onclick = () => {|||let toastT = null;
+function toast(msg){ let t = document.getElementById("toast"); if(!t){ t = document.createElement("div"); t.id = "toast"; t.className = "toast"; t.setAttribute("role","status"); document.body.appendChild(t); }
+  t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+/* 喝咖啡：健康回升，但疲累指數上升；越累越沒效，滿 100 會在護理站睡著 */
+document.getElementById("coffee").onclick = () => {
+  if(!S || S.stage < 0){ toast("先開始遊戲，再來喝咖啡。"); return; }
+  S.tired = S.tired || 0; S.cups = (S.cups || 0) + 1;
+  const gain = S.tired >= 70 ? 3 : S.tired >= 40 ? 6 : 10;
+  S.hp = clamp(S.hp + gain, 0, S.maxhp); S.tired = clamp(S.tired + 12, 0, 100);
+  let msg = `☕ 健康 +${gain}　疲累 +12（現在 ${S.tired}）`;
+  if(gain < 10) msg += "　越累，咖啡越沒效";
+  if(S.cups === 4){ S.mood = clamp(S.mood - 3, 0, 100); msg += "　這一科第 4 杯了，心跳有點快（幸福 -3）"; addLog("這一科已經喝了 4 杯咖啡，大約 400 毫克咖啡因"); }
+  if(S.tired >= 100) msg += "　眼皮好重……";
+  save(); renderSide(); toast(msg);
+};
+document.getElementById("theme").onclick = () => {
