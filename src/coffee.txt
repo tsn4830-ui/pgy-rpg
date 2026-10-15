@@ -44,3 +44,23 @@ document.getElementById("coffee").onclick = () => {
   save(); renderSide(); toast(msg);
 };
 document.getElementById("theme").onclick = () => {
+@@@
+function step0(s, st){
+  const head = (S.step===0) ? stageBanner(st) : "";|||/* 值班、報告、打病歷會增加疲累（同一步只算一次） */
+const TIRE_KIND = {duty:["值班",20], report:["報告",10], chart:["打病歷",8]};
+const TIRE_AT = [[/晚上值班，闌尾切除/,"duty"],[/半夜，阿公要拔鼻胃管/,"duty"],
+  [/要在全科面前報告/,"report"],[/今天誰報告？/,"report"],[/你報告完病史和檢查/,"report"],
+  [/病歷剛寫完/,"chart"],[/出院病摘可以幫我寫嗎/,"chart"],[/趕回病房補寫病歷/,"chart"],[/把你的病歷攤在桌上/,"chart"]];
+function tireFor(s){
+  const key = `${S.stage}:${S.step}:${S.electQueue&&S.electQueue[0]||""}`;
+  if(S.tk === key) return; S.tk = key;
+  const txt = [s.text, s.lead, s.intro].filter(Boolean).join(" ");
+  const kind = s.t==="night" ? "duty" : (TIRE_AT.find(([re]) => re.test(txt)) || [])[1];
+  if(!kind) return;
+  const [lab, n] = TIRE_KIND[kind];
+  S.tired = clamp((S.tired||0) + n, 0, 100); save(); renderSide();
+  toast(`${lab}：疲累 +${n}（現在 ${S.tired}）${S.tired>=70 ? "　快撐不住了，記得找時間休息" : ""}`);
+}
+function step0(s, st){
+  tireFor(s);
+  const head = (S.step===0) ? stageBanner(st) : "";
