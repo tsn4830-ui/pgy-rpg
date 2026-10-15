@@ -1508,7 +1508,7 @@ const LOOK = {
   xiaoc: {coat:"#2f3b52", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
   gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
-  tbxz:  {coat:"#6b5a4a", shirt:"#e9e1c9", hair:"#2a211c", style:"short", skin:"#e6b994"},
+  tbxz:  {coat:"#2b3242", shirt:"#f4f4f2", hair:"#2a211c", style:"short", skin:"#e6b994", tie:"#b42318", shoes:"#15171c", suitcase:"#2f7fb8"},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -1526,6 +1526,14 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
   r(3, 8+bob, 1.2, 8, "rgba(255,255,255,.22)"); r(11.4, 8+bob, 1.6, 8, "rgba(0,0,0,.13)"); r(3, 15.2+bob, 10, .8, "rgba(0,0,0,.12)");
   if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); r(6, 8.4+bob, .6, 3.2, "#56606a"); r(9.4, 8.4+bob, .6, 3.2, "#56606a"); r(5.6, 11.4+bob, 1.4, 1.4, "#8a949c"); }
+  if(L.tie){ r(5.6, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)"); r(9, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)");
+    r(7.3, 8.2+bob, 1.4, 1, L.tie); r(7.1, 9.2+bob, 1.8, 4.2, L.tie); r(7.5, 13.4+bob, 1, .7, L.tie); r(7.3, 9.4+bob, .5, 3.6, "rgba(255,255,255,.2)");
+    r(5.2, 13.2+bob, .7, .7, "#c9ced6"); }
+  if(L.suitcase && dir!=="up" && !c.canvas.noBag){ const sx = dir==="left" ? -4.6 : 14.2;
+    r(sx+1, 9.6, .6, 2.4, "#3b3f46"); r(sx+3.4, 9.6, .6, 2.4, "#3b3f46"); r(sx+1, 9.4, 3, .6, "#3b3f46");
+    r(sx-.3, 11.7, 5.6, 7, OL); r(sx, 12, 5, 6.4, L.suitcase); r(sx, 12, 5, .7, "rgba(255,255,255,.25)");
+    r(sx+1.4, 12.6, .6, 5.4, "rgba(0,0,0,.18)"); r(sx+3, 12.6, .6, 5.4, "rgba(0,0,0,.18)");
+    r(sx+.4, 15, 1.4, 1, "#f2b630"); r(sx+.4, 18.4, 1, .9, "#222"); r(sx+3.6, 18.4, 1, .9, "#222"); }
   r(1.6, 9+bob + (dir==="left"||dir==="right" ? 0 : step), 1.6, 5, L.coat); r(12.8, 9+bob + (dir==="left"||dir==="right" ? 0 : 1-step), 1.6, 5, L.coat);
   r(1.6, 13.6+bob, 1.6, 1.2, L.skin); r(12.8, 13.6+bob, 1.6, 1.2, L.skin);
   r(4, 1+bob, 8, 7, L.skin); r(4, 6.6+bob, 8, .9, "rgba(0,0,0,.07)");
@@ -1559,7 +1567,7 @@ function portrait(id){
   if(PORTRAIT[id]) return PORTRAIT[id];
   try{
     const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
-    const c = cv.getContext("2d"); c.scale(2,2);
+    const c = cv.getContext("2d"); c.scale(2,2); cv.noBag = 1;
     const g = c.createLinearGradient(0,0,0,48), col = (CH[id]||CH.sys).col; g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,.25)");
     c.fillStyle = col; c.fillRect(0,0,48,48); c.fillStyle = g; c.fillRect(0,0,48,48);
     drawChar(c, 8, 6, LOOK[id] ? id : "pt", "down", 0, 2);
