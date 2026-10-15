@@ -20,6 +20,7 @@ const LOOK = {
   xiaoc: {coat:"#2f3b52", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
   gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
+  tbxz:  {coat:"#6b5a4a", shirt:"#e9e1c9", hair:"#2a211c", style:"short", skin:"#e6b994"},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -191,7 +192,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, "……", 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, who==="tbxz" ? "全部都要救！" : "……", who==="tbxz" ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -203,7 +204,7 @@ function worldReact(ok){
   if(ok){ for(let i=0;i<18;i++) W.parts.push({x:px, y:py, vx:(Math.random()-.5)*160, vy:-60-Math.random()*120, t:1, col:["#2c6e5c","#f2b630","#e78fae","#4aa3c7"][i%4]}); }
   else { W.shake = .35; }
   patientReact(ok);
-  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, ok ? "很好！" : "再想想。", 1.6);
+  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, n.id==="tbxz" ? (ok ? "……好，我聽你說。" : "我要告你們！") : (ok ? "很好！" : "再想想。"), 1.6);
 }
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -533,6 +534,6 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！"};
   return lines[id] || "你好。";
 }

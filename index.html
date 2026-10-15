@@ -211,10 +211,12 @@ const CH = {
   xiaoc: {n:"跑跑小Ｃ", role:"醫院老闆", tag:"精神領袖", col:"#e0662b", desc:"齊肩黑髮，深藍西裝外套配橘色跑鞋（她是管理者，不穿白袍），永遠在走廊上小跑步。擅長運動和溝通，還會讀心術：一眼就看出誰累了、誰不敢開口。答題卡關時點地圖上的她，會幫你刪掉一個錯的選項。", twist:"原來小Ｃ每天跑遍全院，是為了在每一科都停一下，用她的讀心術看看大家今天好不好。"},
   gy:    {n:"葛宜長官", role:"健保署審查委員", tag:"超級龜毛的長官", col:"#3b3f58", desc:"西裝筆挺，拿紅筆逐行看病歷，口頭禪是「依據在哪裡？」", twist:"後來你發現，葛長官退件的病歷，幾乎都是真的沒寫清楚。被退過三次之後，你的病歷是全科寫得最好的。"},
   cheng: {n:"鄭耀詩", role:"臨床藥師", tag:"臨床藥師", col:"#3f7f3a", desc:"名字諧音「藥師」。在電話那頭幫你把劑量算第二遍。"},
+  tbxz:  {n:"周遠道", role:"病人家屬", tag:"天邊孝子", col:"#8a5a2b",
+          desc:"名字諧音「週遠道」。平常很少出現，病人病危時才從遠方趕回來，要求「全部都要救」。", twist:"吼得最大聲，往往是因為最愧疚。說開之後，周遠道成了最常打電話來謝謝團隊的家屬。"},
   sys:   {n:"旁白", role:"", col:"#5a6b6f"},
   pager: {n:"呼叫器", role:"值班", col:"#b42318"}
 };
-const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy"];
+const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz"];
 
 /* ======================= 題庫（每題附出處） ======================= */
 const QB = {
@@ -557,7 +559,11 @@ lemon:{t:"LEMON 困難呼吸道評估",q:"LEMON 評估中的「3-3-2 法則」�
  nhidm:{t:"作用機轉相同的降血糖藥",q:"葛長官圈出出院帶藥：glimepiride 加 repaglinide。問題在哪？",
   o:["兩者都是刺激胰島素分泌、作用機轉相同，審查注意事項寫明不可合併使用","沒問題，劑量都在範圍內","repaglinide 要改成注射劑","glimepiride 只能睡前吃"],a:0,
   e:"審查注意事項內科部分：「糖尿病用藥，因藥物作用機轉相同：如 sulfonylureas 類型藥物(glimepiride等)不可與 meglitinides類型藥物(如 repaglinide、nateglinide)合併使用。」兩者都作用在胰島素分泌，合用只會增加低血糖風險。",
-  s:"衛生福利部中央健康保險署。全民健康保險醫療費用審查注意事項（醫院醫療費用審查注意事項）。https://www.nhi.gov.tw/ch/cp-3937-e0cfb-2911-1.html"}
+  s:"衛生福利部中央健康保險署。全民健康保險醫療費用審查注意事項（醫院醫療費用審查注意事項）。https://www.nhi.gov.tw/ch/cp-3937-e0cfb-2911-1.html"},
+ dnrfam:{t:"天邊孝子與 DNR",q:"肺癌末期的阿嬤兩年前親自簽了不施行心肺復甦術意願書（有兩位見證人，健保卡已註記），兩位醫師都已診斷為末期。現在阿嬤意識昏迷、血氧下降，從國外趕回來的兒子要求「插管、電擊全部都要做」，還說要告醫院。依《安寧緩和醫療條例》，怎麼處理才對？",
+  o:["尊重阿嬤本人簽的意願書，不施行心肺復甦術；同時向兒子說明、召開家庭會議，照顧他的情緒","兒子是最近親屬，他的要求可以推翻阿嬤的意願書","只要有任何一位家屬反對，就一定要做心肺復甦術","先插管再說，等法院判決出來再決定"],a:0,
+  e:"病人本人簽署的意願書（含健保卡註記，第 6-1 條與正本同效力）就是決定的依據；家屬不能推翻。第 7 條的「最近親屬同意書」只用在病人沒有簽意願書、又已無法表達意願時，而且也不得違反病人昏迷前明示的意思。法律站得住，溝通才是重點：家庭會議先聽、再說明病況與病人的意願，並把照顧重點放在緩解症狀。",
+  s:"安寧緩和醫療條例（民國 110 年 1 月 20 日修正）第 4、6-1、7 條，全國法規資料庫"}
 };
 
 /* ======================= 劇本工具 ======================= */
@@ -798,7 +804,15 @@ const STAGES = [
   quiz("beers","cheng","鄭耀詩做用藥整合時問你："),
   boss("shih","施醫師：「最後，安寧照護。」",["dyspnea"],1,
    "施醫師：「好的醫師不只會救命，也會陪病人好好走完。」",
-   "施醫師：「鴉片類在末期呼吸困難是對的藥。我們一起跟家屬說明。」",{shih:4})
+   "施醫師：「鴉片類在末期呼吸困難是對的藥。我們一起跟家屬說明。」",{shih:4}),
+  say("sys","傍晚，12 床阿嬤血氧往下掉。阿嬤是肺癌末期，兩年前自己簽了不施行心肺復甦術（DNR）意願書，一直陪在旁邊的是小女兒。"),
+  say("tbxz","護理站門口傳來行李箱輪子的聲音。剛下飛機的周遠道衝進來：「我是她兒子！我從美國趕回來的！插管、電擊、葉克膜，全部都要做！出事我告你們！」"),
+  quiz("dnrfam","tbxz","周遠道拍著護理站的桌子。你先確認自己懂法律："),
+  choose("me","周遠道還在吼，小女兒在旁邊哭。你要怎麼做？",[
+   {l:"請施醫師一起開家庭會議，先聽，再拿出阿嬤親筆簽的意願書",fx:{mood:2,know:2,hours:1},rel:{tbxz:3,shih:2},
+    r:"你先讓周遠道把話說完。他說最後一次見到媽媽是三年前的過年。你把意願書放在桌上：「這是阿嬤自己寫的，她說不想被插管。」周遠道看了很久，最後說：「那……讓她舒服一點。」\n（家屬的憤怒常來自愧疚與來不及。先承接情緒，再談決定；決定的依據是病人自己的意願。）"},
+   {l:"直接說：「法律規定就是這樣，你沒有權利改。」",fx:{mood:-3},rel:{tbxz:-3},
+    r:"你說的沒錯，但周遠道當場打電話給律師，還去投訴。施醫師幫你收拾殘局，會後拍拍你：「法條是底線，不是溝通的開頭。」"}])
  ]},
  {y:2,m:5,dept:"選修",place:"選修五個月（同科最多 2 個月）",elective:2,steps:[
   say("sys","PGY2 不分組訓練有 5 個月選修。你挑兩科深入體驗（其餘月份濃縮帶過）。")]},
@@ -1494,6 +1508,7 @@ const LOOK = {
   xiaoc: {coat:"#2f3b52", shirt:"#e0662b", hair:"#141414", style:"shoulder", skin:"#f3cfb0", band:"#e0662b", shoes:"#ff8a3d"},
   gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
+  tbxz:  {coat:"#6b5a4a", shirt:"#e9e1c9", hair:"#2a211c", style:"short", skin:"#e6b994"},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -1665,7 +1680,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, "……", 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, who==="tbxz" ? "全部都要救！" : "……", who==="tbxz" ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -1677,7 +1692,7 @@ function worldReact(ok){
   if(ok){ for(let i=0;i<18;i++) W.parts.push({x:px, y:py, vx:(Math.random()-.5)*160, vy:-60-Math.random()*120, t:1, col:["#2c6e5c","#f2b630","#e78fae","#4aa3c7"][i%4]}); }
   else { W.shake = .35; }
   patientReact(ok);
-  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, ok ? "很好！" : "再想想。", 1.6);
+  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, n.id==="tbxz" ? (ok ? "……好，我聽你說。" : "我要告你們！") : (ok ? "很好！" : "再想想。"), 1.6);
 }
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -2007,7 +2022,7 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！"};
   return lines[id] || "你好。";
 }
 
