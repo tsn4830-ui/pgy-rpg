@@ -217,10 +217,12 @@ const CH = {
           desc:"名字諧音「晏巡房」（晏＝晚）。白袍皺皺的，黑眼圈很深，總是快下班才出現：「……來，我們查房。」", twist:"晏醫師其實清晨五點就在做胃鏡，下午還有門診和會議。你把查房重點整理成一張表之後，查房從一小時縮成二十分鐘，晏醫師開始固定四點來。"},
   wan:   {n:"萬維峰", role:"內科部主任", tag:"主任查房", col:"#1f3a68",
           desc:"名字諧音「萬威風」。主任查房時走在最前面，整條走廊自動讓路，問題一題接一題。", twist:"萬主任每次回饋都先講你做得好的地方，最後再講一次。很多人後來才知道，主任年輕時被當眾罵到差點離開醫界，所以發誓不讓學生再經歷一次。"},
+  luyin: {n:"陸茵", role:"病人家屬", tag:"錄音家屬", col:"#5a4a6b",
+          desc:"名字諧音「錄音」。雙手抱胸、眉頭深鎖，胸前口袋的手機紅點一直亮著：「你剛剛講的我都錄起來了喔。」", twist:"陸茵上一次家人住院，被醫院前後不一的說法搞到崩潰，從此什麼都錄。你每次都講得一樣清楚，後來陸茵把手機收進口袋：「你講的，我放心。」"},
   sys:   {n:"旁白", role:"", col:"#5a6b6f"},
   pager: {n:"呼叫器", role:"值班", col:"#b42318"}
 };
-const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz","yan","wan"];
+const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz","yan","wan","luyin"];
 
 /* ======================= 題庫（每題附出處） ======================= */
 const QB = {
@@ -575,7 +577,11 @@ lemon:{t:"LEMON 困難呼吸道評估",q:"LEMON 評估中的「3-3-2 法則」�
  sandwich:{t:"三明治回饋法",q:"萬主任查房後給學員回饋，用的是「三明治回饋法」。下列哪一個順序正確？",
   o:["先具體肯定做得好的地方，再提出一兩個明確可改進的地方，最後以鼓勵和總結收尾","先列出所有錯誤，再說明正確答案，最後提醒下次不要再錯","只講優點，避免學員受挫","當眾指出錯誤，讓其他人引以為戒"],a:0,
   e:"三明治回饋（feedback sandwich）把需要改進的建議夾在兩層正向回饋之間：開頭具體點出做得好的行為，中間提出明確、可執行的改進點，最後以肯定與鼓勵作結。好的回饋要及時、具體、針對行為而不是針對人；中間的建議也不能被稱讚淹沒，學員才知道要改什麼。",
-  s:"Dohrenwend A. Serving up the feedback sandwich. Fam Pract Manag 2002;9(10):43-46；Ende J. Feedback in clinical medical education. JAMA 1983;250(6):777-781"}
+  s:"Dohrenwend A. Serving up the feedback sandwich. Fam Pract Manag 2002;9(10):43-46；Ende J. Feedback in clinical medical education. JAMA 1983;250(6):777-781"},
+ record:{t:"家屬偷偷錄音",q:"闌尾切除術後發燒的阿伯，家屬在你說明病情時用手機錄音，事先沒有問你。依台灣法律與實務，下列何者最適當？",
+  o:["家屬錄下自己參與的對話，通常不構成竊錄；照常誠實、一致地說明，把說明內容寫進病歷，並留意不要錄到同病室其他病人","沒經過醫師同意就錄音一定違法，可以立刻報警","有人錄音就不要說明病情，等院方法務處理","把手機拿過來刪掉錄音"],a:0,
+  e:"刑法第 315 條之 1 處罰的是「無故」竊錄「他人」非公開的言論或談話；通訊保障及監察法第 29 條第 3 款規定，監察者為通訊之一方、而非出於不法目的者不罰。家屬錄自己和醫師的對話，一般不算竊錄。比較好的做法是假設每句話都會被聽見：用白話、誠實、前後一致，不推責也不保證結果，並記錄在病歷。若可能錄到同病室其他病人，可以提醒保護他人隱私；搶手機、刪錄音只會引發更大的糾紛。",
+  s:"中華民國刑法第 315 條之 1；通訊保障及監察法第 29 條第 3 款；法律百科〈一般人想錄下自己與對方當面談話或電話通話的內容，需要經過對方同意嗎？〉https://www.legis-pedia.com/article/crime-penalty/626"}
 };
 
 /* ======================= 劇本工具 ======================= */
@@ -689,7 +695,17 @@ const STAGES = [
   quiz("alvarado","ouyang"),
   boss("ouyang","燒燙傷病人送進來。歐陽偉柯：「我問，你答。答錯病人等你。」",["burn","trauma","compart"],2,
    "歐陽偉柯：「……可以。下週那台闌尾切除，你當第一助手。」",
-   "歐陽偉柯沒罵你，只說：「回去讀 ATLS 第 10 版，下次再來。」這大概是他最溫柔的版本。",{ouyang:4})
+   "歐陽偉柯沒罵你，只說：「回去讀 ATLS 第 10 版，下次再來。」這大概是他最溫柔的版本。",{ouyang:4}),
+  say("sys","晚上值班，闌尾切除術後第二天的 15 床阿伯發燒 38.6°C。床邊的家屬陸茵雙手抱胸，胸前口袋的手機紅點一直在閃。"),
+  say("luyin","陸茵斜眼看你：「醫生，你現在講的每一句我都有錄喔。我爸為什麼發燒？是不是你們刀沒開好？」"),
+  quiz("record","luyin","陸茵把手機舉高了一點。你先想清楚："),
+  choose("me","陸茵還在錄。你要怎麼說明？",[
+   {l:"照平常一樣說明：用白話講可能原因、要做的檢查和處置，請陸茵有問題隨時問，並寫進病歷",fx:{know:2,hours:1},rel:{luyin:3},
+    r:"你一項一項說清楚，沒有推責，也沒有打包票。陸茵聽完沉默了一下：「……好，那抽血結果出來跟我說。」你在病歷寫下說明內容和家屬的疑問。\n（就當每句話都會被聽見：誠實、一致、不推責，並記錄在病歷。）"},
+   {l:"「不准錄！手機收起來，不然我不講了。」",fx:{mood:-3},rel:{luyin:-3},
+    r:"陸茵冷笑：「你心虛喔？」隔天醫院收到一封投訴信。家屬錄自己參與的對話通常不違法，拒絕說明只會讓信任更少。"},
+   {l:"含糊帶過「應該沒事啦」，趕快離開",fx:{mood:-1},rel:{luyin:-2},
+    r:"錄音裡只留下一句「應該沒事啦」。半夜阿伯又燒到 39 度，陸茵把錄音放給歐陽偉柯聽。"}])
  ]},
  {y:1,m:1,dept:"一般醫學兒科",place:"兒科病房與急診",steps:[
   say("lee","李爾柯主治從口袋拿出恐龍貼紙：「兒科第一課：先跟小孩打招呼，再跟家長打招呼。」"),
@@ -1546,6 +1562,7 @@ const LOOK = {
   tbxz:  {coat:"#2b3242", shirt:"#f4f4f2", hair:"#2a211c", style:"short", skin:"#e6b994", tie:"#b42318", shoes:"#15171c", suitcase:"#2f7fb8"},
   yan:   {coat:"#e9ebe6", shirt:"#7d8590", hair:"#3a3634", style:"spiky", skin:"#e8c3a0", tired:1, coffee:"#8a5a3b"},
   wan:   {coat:"#f4f6f5", shirt:"#1f3a68", hair:"#c8c8c8", style:"short", skin:"#e9bf98", glasses:1, tie:"#c9a227", chief:1},
+  luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -1570,6 +1587,9 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   if(L.coffee && dir!=="up"){ const cx = dir==="left" ? 0 : 12.6;
     r(cx-.2, 11.4+bob, 2.4, 3.2, OL); r(cx, 11.6+bob, 2, 2.8, "#f4efe6"); r(cx, 12.4+bob, 2, .9, L.coffee); r(cx, 11.2+bob, 2, .5, "#3b3f46");
     if((typeof W === "object" ? W.t : 0) % 1.6 < .8) r(cx+.6, 10.2+bob, .4, .8, "rgba(255,255,255,.55)"); }
+  if(L.phone && dir!=="up"){ const px = dir==="left" ? 4 : 9.6;
+    r(px-.3, 9.2+bob, 3, 4.6, OL); r(px, 9.4+bob, 2.4, 4.2, "#e4c34a"); r(px+.3, 9.8+bob, 1.8, 3, "#1c2433");
+    r(px+.5, 10.1+bob, 1, 1, ((typeof W === "object" ? W.t : 0) || 0) % 1.2 < .7 ? "#ff3b30" : "#a3241e"); }
   if(L.suitcase && dir!=="up" && !c.canvas.noBag){ const sx = dir==="left" ? -4.6 : 14.2;
     r(sx+1, 9.6, .6, 2.4, "#3b3f46"); r(sx+3.4, 9.6, .6, 2.4, "#3b3f46"); r(sx+1, 9.4, 3, .6, "#3b3f46");
     r(sx-.3, 11.7, 5.6, 7, OL); r(sx, 12, 5, 6.4, L.suitcase); r(sx, 12, 5, .7, "rgba(255,255,255,.25)");
@@ -1601,6 +1621,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(L.tired && !blink){ r(5.4+dx, 4.1+bob, 2, .9, L.skin); r(8.6+dx, 4.1+bob, 2, .9, L.skin); r(5.4+dx, 4.9+bob, 2, .25, "#5a4a44"); r(8.6+dx, 4.9+bob, 2, .25, "#5a4a44"); }
     if(L.tired){ r(5.3+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); r(8.5+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); }
     r(4.6+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)"); r(10.2+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)");
+    if(L.frown){ r(5.2+dx, 3.4+bob, 1.2, .5, "#1d1714"); r(6.2+dx, 3.7+bob, 1.2, .5, "#1d1714"); r(8.6+dx, 3.7+bob, 1.2, .5, "#1d1714"); r(9.6+dx, 3.4+bob, 1.2, .5, "#1d1714"); }
     if(L.glasses){ r(5+dx, 4+bob, 2.8, .5, "#555"); r(8.2+dx, 4+bob, 2.8, .5, "#555"); }
     r(7+dx, 6.6+bob, 2, .6, "#b4685a");
   }
@@ -1731,7 +1752,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan") ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -1743,7 +1764,7 @@ function worldReact(ok){
   if(ok){ for(let i=0;i<18;i++) W.parts.push({x:px, y:py, vx:(Math.random()-.5)*160, vy:-60-Math.random()*120, t:1, col:["#2c6e5c","#f2b630","#e78fae","#4aa3c7"][i%4]}); }
   else { W.shake = .35; }
   patientReact(ok);
-  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, n.id==="tbxz" ? (ok ? "……好，我聽你說。" : "我要告你們！") : (ok ? "很好！" : "再想想。"), 1.6);
+  const n = W.npcs.find(n => n.id===W.lastWho); if(n) bubble(n, n.id==="luyin" ? (ok ? "……嗯，講得算清楚。" : "這段我會留著。") : n.id==="tbxz" ? (ok ? "……好，我聽你說。" : "我要告你們！") : (ok ? "很好！" : "再想想。"), 1.6);
 }
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -2073,7 +2094,7 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。"};
   return lines[id] || "你好。";
 }
 
