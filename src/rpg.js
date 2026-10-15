@@ -21,6 +21,7 @@ const LOOK = {
   gy:    {coat:"#3b3f58", shirt:"#f4f6f5", hair:"#6f6f6f", style:"short", skin:"#e8bf9a", glasses:1},
   cheng: {coat:"#f4f6f5", shirt:"#3f7f3a", hair:"#26201c", style:"spiky", skin:"#e5b38b", glasses:1},
   tbxz:  {coat:"#2b3242", shirt:"#f4f4f2", hair:"#2a211c", style:"short", skin:"#e6b994", tie:"#b42318", shoes:"#15171c", suitcase:"#2f7fb8"},
+  yan:   {coat:"#e9ebe6", shirt:"#7d8590", hair:"#3a3634", style:"spiky", skin:"#e8c3a0", tired:1, coffee:"#8a5a3b"},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -41,6 +42,10 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   if(L.tie){ r(5.6, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)"); r(9, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)");
     r(7.3, 8.2+bob, 1.4, 1, L.tie); r(7.1, 9.2+bob, 1.8, 4.2, L.tie); r(7.5, 13.4+bob, 1, .7, L.tie); r(7.3, 9.4+bob, .5, 3.6, "rgba(255,255,255,.2)");
     r(5.2, 13.2+bob, .7, .7, "#c9ced6"); }
+  if(L.tired){ r(4.4, 12.4+bob, 1.2, .4, "rgba(0,0,0,.12)"); r(10.4, 10+bob, 1.2, .4, "rgba(0,0,0,.12)"); }
+  if(L.coffee && dir!=="up"){ const cx = dir==="left" ? 0 : 12.6;
+    r(cx-.2, 11.4+bob, 2.4, 3.2, OL); r(cx, 11.6+bob, 2, 2.8, "#f4efe6"); r(cx, 12.4+bob, 2, .9, L.coffee); r(cx, 11.2+bob, 2, .5, "#3b3f46");
+    if((typeof W === "object" ? W.t : 0) % 1.6 < .8) r(cx+.6, 10.2+bob, .4, .8, "rgba(255,255,255,.55)"); }
   if(L.suitcase && dir!=="up" && !c.canvas.noBag){ const sx = dir==="left" ? -4.6 : 14.2;
     r(sx+1, 9.6, .6, 2.4, "#3b3f46"); r(sx+3.4, 9.6, .6, 2.4, "#3b3f46"); r(sx+1, 9.4, 3, .6, "#3b3f46");
     r(sx-.3, 11.7, 5.6, 7, OL); r(sx, 12, 5, 6.4, L.suitcase); r(sx, 12, 5, .7, "rgba(255,255,255,.25)");
@@ -69,6 +74,8 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     const tt = typeof W === "object" ? W.t : 0, blink = ((tt + HASH(id)*.37) % 4.2) < .13;
     if(blink){ r(5.6+dx, 5+bob, 1.8, .45, "#222"); r(8.8+dx, 5+bob, 1.8, .45, "#222"); }
     else { r(5.5+dx, 4.2+bob, 1.8, 1.8, "#fff"); r(8.7+dx, 4.2+bob, 1.8, 1.8, "#fff"); r(5.9+dx+dx*.3, 4.4+bob, 1.2, 1.5, "#222"); r(9.1+dx+dx*.3, 4.4+bob, 1.2, 1.5, "#222"); r(6+dx, 4.5+bob, .45, .45, "#fff"); r(9.2+dx, 4.5+bob, .45, .45, "#fff"); }
+    if(L.tired && !blink){ r(5.4+dx, 4.1+bob, 2, .9, L.skin); r(8.6+dx, 4.1+bob, 2, .9, L.skin); r(5.4+dx, 4.9+bob, 2, .25, "#5a4a44"); r(8.6+dx, 4.9+bob, 2, .25, "#5a4a44"); }
+    if(L.tired){ r(5.3+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); r(8.5+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); }
     r(4.6+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)"); r(10.2+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)");
     if(L.glasses){ r(5+dx, 4+bob, 2.8, .5, "#555"); r(8.2+dx, 4+bob, 2.8, .5, "#555"); }
     r(7+dx, 6.6+bob, 2, .6, "#b4685a");
@@ -200,7 +207,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, who==="tbxz" ? "全部都要救！" : "……", who==="tbxz" ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…"}[who] || "……", (who==="tbxz"||who==="yan") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -542,6 +549,6 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。"};
   return lines[id] || "你好。";
 }
