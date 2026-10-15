@@ -26,7 +26,7 @@ const LOOK = {
   luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
   chunpu:{coat:"#f2f5f7", shirt:"#f2f5f7", hair:"#5e5a58", style:"bun", skin:"#e6b994", glasses:1, cap:1},
   zhen:  {coat:"#f4f6f5", shirt:"#2d5d7b", hair:"#4a4440", style:"bob", skin:"#ecc3a0", glasses:1},
-  fenhong:{coat:"#4f6378", shirt:"#e9edf2", hair:"#1d1a19", style:"short", skin:"#ecc4a2", glasses:1, badge:"#2f6db5"},
+  fenhong:{coat:"#4f6378", shirt:"#e9edf2", hair:"#1d1a19", style:"short", skin:"#ecc4a2", glasses:1, badge:"#2f6db5", fold:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
@@ -62,6 +62,10 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   if(L.coffee && dir!=="up"){ const cx = dir==="left" ? 0 : 12.6;
     r(cx-.2, 11.4+bob, 2.4, 3.2, OL); r(cx, 11.6+bob, 2, 2.8, "#f4efe6"); r(cx, 12.4+bob, 2, .9, L.coffee); r(cx, 11.2+bob, 2, .5, "#3b3f46");
     if((typeof W === "object" ? W.t : 0) % 1.6 < .8) r(cx+.6, 10.2+bob, .4, .8, "rgba(255,255,255,.55)"); }
+  if(L.fold && dir!=="up"){ const fx = dir==="left" ? -2.8 : 12.4; /* 打開的折疊 iPhone，螢幕是分紅截圖 */
+    r(fx-.3, 9.8+bob, 5.6, 4.8, OL); r(fx, 10.1+bob, 5, 4.2, "#d9d4ca"); r(fx+.3, 10.4+bob, 4.4, 3.6, "#2b5fc4");
+    r(fx+2.45, 10.1+bob, .15, 4.2, "#8f8a80"); r(fx+.6, 10.9+bob, 1.4, .5, "#fff"); r(fx+.6, 12+bob, 3.6, .7, "#38c172"); r(fx+.6, 13+bob, 2.2, .5, "#9ab8f0"); r(fx+3, 10.9+bob, 1.2, .5, "#ffd75e");
+    if(((typeof W === "object" ? W.t : 0) || 0) % 2 < .3) r(fx+3.6, 10.6+bob, .6, .6, "rgba(255,255,255,.8)"); }
   if(L.phone && dir!=="up"){ const px = dir==="left" ? 4 : 9.6;
     r(px-.3, 9.2+bob, 3, 4.6, OL); r(px, 9.4+bob, 2.4, 4.2, "#e4c34a"); r(px+.3, 9.8+bob, 1.8, 3, "#1c2433");
     r(px+.5, 10.1+bob, 1, 1, ((typeof W === "object" ? W.t : 0) || 0) % 1.2 < .7 ? "#ff3b30" : "#a3241e"); }
