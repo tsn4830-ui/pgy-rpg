@@ -127,4 +127,8 @@
  nurse:{t:"「你還要再辯嗎？」",q:"你說明完病情，家屬冷冷地說：「你還要再辯嗎？」下列哪一種回應，最符合處理病人與家屬強烈情緒的建議？",
   o:["先停下說明、回應情緒：「我不是要辯。我聽得出來您很擔心，也對我們很不放心。最讓您擔心的是哪一點？」","把剛剛的醫學理由更詳細地再講一遍，直到家屬接受","「我解釋完了，您不相信也沒辦法。」然後離開","立刻說「都是我們的錯」來息事寧人"],a:0,
   e:"家屬說「你還要再辯嗎？」的時候，卡住的通常是情緒，不是資訊；這時再多講醫學理由，聽起來只會更像辯解。可以用 NURSE 回應情緒：Naming 說出對方的情緒、Understanding 表達理解、Respecting 肯定對方的付出、Supporting 表示會一起處理、Exploring 問清楚最擔心的是什麼。先接住情緒，再回到下一步的檢查、處置和什麼時候再來說明。",
-  s:"Back AL, Arnold RM, Baile WF, Tulsky JA, Fryer-Edwards K. Approaching difficult communication tasks in oncology. CA Cancer J Clin 2005;55(3):164-177"}
+  s:"Back AL, Arnold RM, Baile WF, Tulsky JA, Fryer-Edwards K. Approaching difficult communication tasks in oncology. CA Cancer J Clin 2005;55(3):164-177"},
+ attire:{t:"白袍下的穿著",q:"護理長說你「穿得不夠純樸」。從感染管制與病人安全的角度，照顧病人時下列哪一項最該先調整？",
+  o:["拿掉手鍊、手錶等手腕飾品，長髮綁好，穿包鞋，讓雙手能確實執行手部衛生","把米白色外套換成深色衣服，比較耐髒","不要化妝，看起來比較樸素","洋裝一律改成長褲，才像醫師"],a:0,
+  e:"SHEA 的醫療人員服裝專家建議指出，照顧病人時可考慮「手肘以下淨空」（短袖或捲起袖子、不戴手錶與手腕飾品），以利確實洗手；鞋子要包住腳趾。多數醫院另規定長髮要綁起、避免垂墜飾品勾到管路。顏色、款式、化妝不是感染管制的重點，服裝規定該講的是理由，而不是「純樸」。",
+  s:"Bearman G, et al. Healthcare personnel attire in non-operating-room settings. Infect Control Hosp Epidemiol 2014;35(2):107-121（SHEA Expert Guidance）"}

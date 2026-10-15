@@ -220,10 +220,12 @@ const CH = {
           desc:"名字諧音「萬威風」。主任查房時走在最前面，整條走廊自動讓路，問題一題接一題。", twist:"萬主任每次回饋都先講你做得好的地方，最後再講一次。很多人後來才知道，主任年輕時被當眾罵到差點離開醫界，所以發誓不讓學生再經歷一次。"},
   luyin: {n:"陸茵", role:"病人家屬", tag:"錄音家屬", col:"#5a4a6b",
           desc:"名字諧音「錄音」。雙手抱胸、眉頭深鎖，胸前口袋的手機紅點一直亮著：「你剛剛講的我都錄起來了喔。」", twist:"陸茵上一次家人住院，被醫院前後不一的說法搞到崩潰，從此什麼都錄。你每次都講得一樣清楚，後來陸茵把手機收進口袋：「你講的，我放心。」"},
+  chunpu:{n:"陶淳璞", role:"資深護理長", tag:"病房資深護理長", col:"#7a6a52",
+          desc:"名字諧音「淳樸」。在病房待了三十年，護理站的規矩比病歷還清楚，最看不慣「穿得太漂亮」的新人。", twist:"陶護理長年輕時看過一位醫師的手鍊勾到病人的點滴管，從此對服裝特別嚴格。後來陶護理長把「純樸」改成了三條看得懂的規則：手腕以下不戴飾品、長髮綁好、穿包鞋。"},
   sys:   {n:"旁白", role:"", col:"#5a6b6f"},
   pager: {n:"呼叫器", role:"值班", col:"#b42318"}
 };
-const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz","yan","wan","luyin"];
+const MET_ORDER = ["xiaoc","hsu","bai","zhang","ouyang","lin","kui","rui","wang","lee","tsai","kolas","shih","cheng","gy","tbxz","yan","wan","luyin","chunpu"];
 
 /* ======================= 題庫（每題附出處） ======================= */
 const QB = {
@@ -586,12 +588,17 @@ lemon:{t:"LEMON 困難呼吸道評估",q:"LEMON 評估中的「3-3-2 法則」�
  nurse:{t:"「你還要再辯嗎？」",q:"你說明完病情，家屬冷冷地說：「你還要再辯嗎？」下列哪一種回應，最符合處理病人與家屬強烈情緒的建議？",
   o:["先停下說明、回應情緒：「我不是要辯。我聽得出來您很擔心，也對我們很不放心。最讓您擔心的是哪一點？」","把剛剛的醫學理由更詳細地再講一遍，直到家屬接受","「我解釋完了，您不相信也沒辦法。」然後離開","立刻說「都是我們的錯」來息事寧人"],a:0,
   e:"家屬說「你還要再辯嗎？」的時候，卡住的通常是情緒，不是資訊；這時再多講醫學理由，聽起來只會更像辯解。可以用 NURSE 回應情緒：Naming 說出對方的情緒、Understanding 表達理解、Respecting 肯定對方的付出、Supporting 表示會一起處理、Exploring 問清楚最擔心的是什麼。先接住情緒，再回到下一步的檢查、處置和什麼時候再來說明。",
-  s:"Back AL, Arnold RM, Baile WF, Tulsky JA, Fryer-Edwards K. Approaching difficult communication tasks in oncology. CA Cancer J Clin 2005;55(3):164-177"}
+  s:"Back AL, Arnold RM, Baile WF, Tulsky JA, Fryer-Edwards K. Approaching difficult communication tasks in oncology. CA Cancer J Clin 2005;55(3):164-177"},
+ attire:{t:"白袍下的穿著",q:"護理長說你「穿得不夠純樸」。從感染管制與病人安全的角度，照顧病人時下列哪一項最該先調整？",
+  o:["拿掉手鍊、手錶等手腕飾品，長髮綁好，穿包鞋，讓雙手能確實執行手部衛生","把米白色外套換成深色衣服，比較耐髒","不要化妝，看起來比較樸素","洋裝一律改成長褲，才像醫師"],a:0,
+  e:"SHEA 的醫療人員服裝專家建議指出，照顧病人時可考慮「手肘以下淨空」（短袖或捲起袖子、不戴手錶與手腕飾品），以利確實洗手；鞋子要包住腳趾。多數醫院另規定長髮要綁起、避免垂墜飾品勾到管路。顏色、款式、化妝不是感染管制的重點，服裝規定該講的是理由，而不是「純樸」。",
+  s:"Bearman G, et al. Healthcare personnel attire in non-operating-room settings. Infect Control Hosp Epidemiol 2014;35(2):107-121（SHEA Expert Guidance）"}
 };
 
 /* ======================= 劇本工具 ======================= */
 const say = (who,text) => ({t:"say",who,text});
 const choose = (who,text,opts) => ({t:"choice",who,text,opts});
+const fit = o => Object.assign(o, {outfit:1}); /* 這一段玩家穿便服（地圖上的造型跟著換） */
 const quiz = (id,who,lead) => ({t:"quiz",id,who,lead});
 const boss = (who,intro,ids,pass,win,lose,rel) => ({t:"boss",who,intro,ids,pass,win,lose,rel});
 const shift = (n) => ({t:"night",n});
@@ -733,7 +740,17 @@ const STAGES = [
    {l:"直接說「網路都是假的」",fx:{mood:-2},rel:{lee:-1},r:"她抱著孩子轉身走了。正確的資訊，也需要正確的說法。"}]),
   boss("lee","李爾柯：「最後一題。這個 5 歲的孩子燒了 6 天。」",["kawasaki"],1,
    "李爾柯：「很好。記得也要排心臟超音波。」他給了你一張暴龍貼紙。",
-   "李爾柯：「沒關係，川崎病很容易被當成病毒感染。重點是燒超過五天要想到它。」",{lee:4})
+   "李爾柯：「沒關係，川崎病很容易被當成病毒感染。重點是燒超過五天要想到它。」",{lee:4}),
+  fit(say("sys","週末參加完同學婚禮，你直接趕回病房補寫病歷：米白色毛呢短外套、黑色洋裝、尖頭平底鞋、珍珠耳環，手上還有兩圈手鍊。")),
+  fit(say("chunpu","陶淳璞護理長從護理站後面走出來，從頭看到腳：「這裡是病房，不是伸展台。當醫師要穿得純樸一點，懂嗎？」")),
+  fit(quiz("attire","chunpu","護理站的人都在偷看。你先想清楚，哪些才是真正的問題：")),
+  fit(choose("me","陶護理長還在等你回答。你要怎麼回應？",[
+   {l:"「謝謝護理長提醒。」先把手鍊、耳環拿下來、穿上白袍，再請教病房有哪些服裝規定",fx:{know:2,mood:1},rel:{chunpu:3,lin:1},
+    r:"陶護理長看你拆下手鍊，表情緩和了一點：「手腕以下不戴東西、耳環別垂下來、白袍穿上，這樣就好。外套很好看，下班再穿。」\n（服裝規定的重點是感染管制和病人安全，不是品味。該改的地方改，不必為了「純樸」否定自己。）"},
+   {l:"「穿什麼是我的自由，跟護理長有什麼關係？」",fx:{mood:-2},rel:{chunpu:-3},
+    r:"護理站一片安靜。穿著風格確實是你的事，但手鍊會妨礙洗手，垂墜的耳環也可能勾到管路，這部分護理長說的沒錯。語氣一硬，對的那一半也聽不進去了。"},
+   {l:"隔天換成一身灰色運動服，什麼都不說",fx:{mood:-3},rel:{chunpu:1},
+    r:"陶護理長看了你一眼，沒說話。但你手上的手鍊還在。換了衣服，真正的問題卻沒解決；「純樸」不是規則，感控才是。"}]))
  ]},
  {y:1,m:1,dept:"一般醫學婦產科",place:"產房與婦科門診",steps:[
   say("tsai","蔡富燦主治：「不管醫師是什麼性別，做乳房或骨盆檢查前都要先說明、取得同意，並請第三人陪同。這是保護病人，也保護你。」[[gmc]]"),
@@ -1581,12 +1598,17 @@ const LOOK = {
   yan:   {coat:"#e9ebe6", shirt:"#7d8590", hair:"#3a3634", style:"spiky", skin:"#e8c3a0", tired:1, coffee:"#8a5a3b"},
   wan:   {coat:"#f4f6f5", shirt:"#1f3a68", hair:"#c8c8c8", style:"short", skin:"#e9bf98", glasses:1, tie:"#c9a227", chief:1},
   luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
+  chunpu:{coat:"#f2f5f7", shirt:"#f2f5f7", hair:"#5e5a58", style:"bun", skin:"#e6b994", glasses:1, cap:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
 /* 玩家自選外觀：男生、女生、無性別（舊存檔沒有這個欄位，就是無性別） */
 function playerGender(){ return (typeof S === "object" && S && S.gender) || "x"; }
-function meLook(){ const g = playerGender(); return g==="m" ? LOOK.me : g==="f" ? {...LOOK.me, style:"shoulder", hair:"#2a1d18"} : {...LOOK.me, style:"bob", hair:"#3b2a22"}; }
+/* 劇情標記 outfit 的段落：米白毛呢短外套、黑洋裝、珍珠耳環、手鍊 */
+const OUTFIT = {coat:"#ece6d6", shirt:"#1a1a1e", shoes:"#111", legs:"#e9bf98", skirt:"#1a1a1e", tweed:1, pearls:1, bangle:"#d8b55a"};
+function inOutfit(){ try{ const st = STAGES[S.stage].steps[S.step]; return !!(st && st.outfit); }catch(e){ return false; } }
+function meLook(){ const b = meBase(); return inOutfit() ? {...b, ...OUTFIT} : b; }
+function meBase(){ const g = playerGender(); return g==="m" ? LOOK.me : g==="f" ? {...LOOK.me, style:"shoulder", hair:"#2a1d18"} : {...LOOK.me, style:"bob", hair:"#3b2a22"}; }
 function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   const L = id==="me" ? meLook() : (LOOK[id] || LOOK.pt);
   const r = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(x + a*s, y + b*s, w*s, h*s); };
@@ -1596,11 +1618,14 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   r(3.4, 14.6, 4.2, 4.8 - step, OL); r(8.4, 14.6, 4.2, 3.8 + step, OL);
   r(2.4, 7.4+bob, 11.2, 8.8, OL); r(1, 8.6+bob, 2.8, 6.6, OL); r(12.2, 8.6+bob, 2.8, 6.6, OL);
   r(3.2, -0.4+bob, 9.6, 8.8, OL);
-  r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40"); r(4, 15, 1, 3, "rgba(255,255,255,.12)");
+  r(4, 15, 3, 4 - step, L.legs || "#2e3a40"); r(9, 15, 3, 3 + step, L.legs || "#2e3a40"); r(4, 15, 1, 3, "rgba(255,255,255,.12)");
   if(L.shoes){ r(3.5, 18 - step, 4, 1.4, L.shoes); r(8.5, 17 + step, 4, 1.4, L.shoes); }
   r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
   r(3, 8+bob, 1.2, 8, "rgba(255,255,255,.22)"); r(11.4, 8+bob, 1.6, 8, "rgba(0,0,0,.13)"); r(3, 15.2+bob, 10, .8, "rgba(0,0,0,.12)");
   if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); r(6, 8.4+bob, .6, 3.2, "#56606a"); r(9.4, 8.4+bob, .6, 3.2, "#56606a"); r(5.6, 11.4+bob, 1.4, 1.4, "#8a949c"); }
+  if(L.skirt){ r(3.2, 14.6+bob, 9.6, 2, L.skirt); r(3.2, 16.2+bob, 3, .6, L.skirt); }
+  if(L.tweed){ [[3.6,9],[5,11.5],[4,13.6],[11,9.4],[10.6,12],[11.8,14],[3.4,11],[12,11]].forEach(([a,b]) => r(a, b+bob, .6, .6, "#bfb39a")); r(6.2, 8+bob, .5, 7, "#d7cfb8"); r(9.3, 8+bob, .5, 7, "#d7cfb8"); }
+  if(L.bangle){ r(12.6, 13.2+bob, 2, .5, L.bangle); }
   if(L.tie){ r(5.6, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)"); r(9, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)");
     r(7.3, 8.2+bob, 1.4, 1, L.tie); r(7.1, 9.2+bob, 1.8, 4.2, L.tie); r(7.5, 13.4+bob, 1, .7, L.tie); r(7.3, 9.4+bob, .5, 3.6, "rgba(255,255,255,.2)");
     r(5.2, 13.2+bob, .7, .7, "#c9ced6"); }
@@ -1632,6 +1657,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(L.style==="pony"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); if(dir!=="down") r(dir==="left"?11.8:2.2, 3+bob, 1.8, 5, h); else r(12, 2.4+bob, 1.4, 4, h); }
     if(L.style==="short"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
     if(L.band) r(3.6, 1.6+bob, 8.8, 1.1, L.band);
+    if(L.cap && dir!=="up"){ r(5, -1+bob, 6, 1.6, "#ffffff"); r(5, -.2+bob, 6, .5, "#3b6ea8"); }
     r(5, 0.5+bob, 3.4, .6, "rgba(255,255,255,.28)");
   }
   if(dir!=="up"){
@@ -1642,6 +1668,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(L.tired && !blink){ r(5.4+dx, 4.1+bob, 2, .9, L.skin); r(8.6+dx, 4.1+bob, 2, .9, L.skin); r(5.4+dx, 4.9+bob, 2, .25, "#5a4a44"); r(8.6+dx, 4.9+bob, 2, .25, "#5a4a44"); }
     if(L.tired){ r(5.3+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); r(8.5+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); }
     r(4.6+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)"); r(10.2+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)");
+    if(L.pearls){ r(3.3+dx, 5.6+bob, .9, .9, "#f6f1e4"); r(11.8+dx, 5.6+bob, .9, .9, "#f6f1e4"); }
     if(L.frown){ r(5.2+dx, 3.4+bob, 1.2, .5, "#1d1714"); r(6.2+dx, 3.7+bob, 1.2, .5, "#1d1714"); r(8.6+dx, 3.7+bob, 1.2, .5, "#1d1714"); r(9.6+dx, 3.4+bob, 1.2, .5, "#1d1714"); }
     if(L.glasses){ r(5+dx, 4+bob, 2.8, .5, "#555"); r(8.2+dx, 4+bob, 2.8, .5, "#555"); }
     r(7+dx, 6.6+bob, 2, .6, "#b4685a");
@@ -1649,7 +1676,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
 }
 const PORTRAIT = {};
 function portrait(id){
-  const pk = id==="me" ? "me" + playerGender() : id;
+  const pk = id==="me" ? "me" + playerGender() + (inOutfit() ? "o" : "") : id;
   if(PORTRAIT[pk]) return PORTRAIT[pk];
   try{
     const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
@@ -1774,7 +1801,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin") ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -2116,7 +2143,7 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。"};
   return lines[id] || "你好。";
 }
 

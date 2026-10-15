@@ -24,12 +24,17 @@ const LOOK = {
   yan:   {coat:"#e9ebe6", shirt:"#7d8590", hair:"#3a3634", style:"spiky", skin:"#e8c3a0", tired:1, coffee:"#8a5a3b"},
   wan:   {coat:"#f4f6f5", shirt:"#1f3a68", hair:"#c8c8c8", style:"short", skin:"#e9bf98", glasses:1, tie:"#c9a227", chief:1},
   luyin: {coat:"#3d3d46", shirt:"#c94f4f", hair:"#1f1a18", style:"short", skin:"#e3b48f", frown:1, phone:1, shoes:"#f4f4f2"},
+  chunpu:{coat:"#f2f5f7", shirt:"#f2f5f7", hair:"#5e5a58", style:"bun", skin:"#e6b994", glasses:1, cap:1},
   pt:    {coat:"#9fc3df", shirt:"#9fc3df", hair:"#d9d9d9", style:"short", skin:"#eac29c"},
   vis:   {coat:"#c98b4a", shirt:"#6b4a2a", hair:"#3b2b22", style:"long", skin:"#e1b088"}
 };
 /* 玩家自選外觀：男生、女生、無性別（舊存檔沒有這個欄位，就是無性別） */
 function playerGender(){ return (typeof S === "object" && S && S.gender) || "x"; }
-function meLook(){ const g = playerGender(); return g==="m" ? LOOK.me : g==="f" ? {...LOOK.me, style:"shoulder", hair:"#2a1d18"} : {...LOOK.me, style:"bob", hair:"#3b2a22"}; }
+/* 劇情標記 outfit 的段落：米白毛呢短外套、黑洋裝、珍珠耳環、手鍊 */
+const OUTFIT = {coat:"#ece6d6", shirt:"#1a1a1e", shoes:"#111", legs:"#e9bf98", skirt:"#1a1a1e", tweed:1, pearls:1, bangle:"#d8b55a"};
+function inOutfit(){ try{ const st = STAGES[S.stage].steps[S.step]; return !!(st && st.outfit); }catch(e){ return false; } }
+function meLook(){ const b = meBase(); return inOutfit() ? {...b, ...OUTFIT} : b; }
+function meBase(){ const g = playerGender(); return g==="m" ? LOOK.me : g==="f" ? {...LOOK.me, style:"shoulder", hair:"#2a1d18"} : {...LOOK.me, style:"bob", hair:"#3b2a22"}; }
 function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   const L = id==="me" ? meLook() : (LOOK[id] || LOOK.pt);
   const r = (a,b,w,h,col) => { c.fillStyle = col; c.fillRect(x + a*s, y + b*s, w*s, h*s); };
@@ -39,11 +44,14 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   r(3.4, 14.6, 4.2, 4.8 - step, OL); r(8.4, 14.6, 4.2, 3.8 + step, OL);
   r(2.4, 7.4+bob, 11.2, 8.8, OL); r(1, 8.6+bob, 2.8, 6.6, OL); r(12.2, 8.6+bob, 2.8, 6.6, OL);
   r(3.2, -0.4+bob, 9.6, 8.8, OL);
-  r(4, 15, 3, 4 - step, "#2e3a40"); r(9, 15, 3, 3 + step, "#2e3a40"); r(4, 15, 1, 3, "rgba(255,255,255,.12)");
+  r(4, 15, 3, 4 - step, L.legs || "#2e3a40"); r(9, 15, 3, 3 + step, L.legs || "#2e3a40"); r(4, 15, 1, 3, "rgba(255,255,255,.12)");
   if(L.shoes){ r(3.5, 18 - step, 4, 1.4, L.shoes); r(8.5, 17 + step, 4, 1.4, L.shoes); }
   r(3, 8+bob, 10, 8, L.coat); r(6.5, 8+bob, 3, 7, L.shirt);
   r(3, 8+bob, 1.2, 8, "rgba(255,255,255,.22)"); r(11.4, 8+bob, 1.6, 8, "rgba(0,0,0,.13)"); r(3, 15.2+bob, 10, .8, "rgba(0,0,0,.12)");
   if(L.coat === "#f4f6f5"){ r(3, 8+bob, 10, .6, "#d5dbd8"); r(10, 11+bob, 2, 1.5, "#9aa"); r(6, 8.4+bob, .6, 3.2, "#56606a"); r(9.4, 8.4+bob, .6, 3.2, "#56606a"); r(5.6, 11.4+bob, 1.4, 1.4, "#8a949c"); }
+  if(L.skirt){ r(3.2, 14.6+bob, 9.6, 2, L.skirt); r(3.2, 16.2+bob, 3, .6, L.skirt); }
+  if(L.tweed){ [[3.6,9],[5,11.5],[4,13.6],[11,9.4],[10.6,12],[11.8,14],[3.4,11],[12,11]].forEach(([a,b]) => r(a, b+bob, .6, .6, "#bfb39a")); r(6.2, 8+bob, .5, 7, "#d7cfb8"); r(9.3, 8+bob, .5, 7, "#d7cfb8"); }
+  if(L.bangle){ r(12.6, 13.2+bob, 2, .5, L.bangle); }
   if(L.tie){ r(5.6, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)"); r(9, 8+bob, 1.4, 3.6, "rgba(0,0,0,.28)");
     r(7.3, 8.2+bob, 1.4, 1, L.tie); r(7.1, 9.2+bob, 1.8, 4.2, L.tie); r(7.5, 13.4+bob, 1, .7, L.tie); r(7.3, 9.4+bob, .5, 3.6, "rgba(255,255,255,.2)");
     r(5.2, 13.2+bob, .7, .7, "#c9ced6"); }
@@ -75,6 +83,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(L.style==="pony"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); if(dir!=="down") r(dir==="left"?11.8:2.2, 3+bob, 1.8, 5, h); else r(12, 2.4+bob, 1.4, 4, h); }
     if(L.style==="short"){ r(3.4, 2+bob, 1, 2, h); r(11.6, 2+bob, 1, 2, h); }
     if(L.band) r(3.6, 1.6+bob, 8.8, 1.1, L.band);
+    if(L.cap && dir!=="up"){ r(5, -1+bob, 6, 1.6, "#ffffff"); r(5, -.2+bob, 6, .5, "#3b6ea8"); }
     r(5, 0.5+bob, 3.4, .6, "rgba(255,255,255,.28)");
   }
   if(dir!=="up"){
@@ -85,6 +94,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
     if(L.tired && !blink){ r(5.4+dx, 4.1+bob, 2, .9, L.skin); r(8.6+dx, 4.1+bob, 2, .9, L.skin); r(5.4+dx, 4.9+bob, 2, .25, "#5a4a44"); r(8.6+dx, 4.9+bob, 2, .25, "#5a4a44"); }
     if(L.tired){ r(5.3+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); r(8.5+dx, 6.0+bob, 2.2, .9, "rgba(80,55,105,.62)"); }
     r(4.6+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)"); r(10.2+dx, 5.9+bob, 1.2, .7, "rgba(232,120,120,.4)");
+    if(L.pearls){ r(3.3+dx, 5.6+bob, .9, .9, "#f6f1e4"); r(11.8+dx, 5.6+bob, .9, .9, "#f6f1e4"); }
     if(L.frown){ r(5.2+dx, 3.4+bob, 1.2, .5, "#1d1714"); r(6.2+dx, 3.7+bob, 1.2, .5, "#1d1714"); r(8.6+dx, 3.7+bob, 1.2, .5, "#1d1714"); r(9.6+dx, 3.4+bob, 1.2, .5, "#1d1714"); }
     if(L.glasses){ r(5+dx, 4+bob, 2.8, .5, "#555"); r(8.2+dx, 4+bob, 2.8, .5, "#555"); }
     r(7+dx, 6.6+bob, 2, .6, "#b4685a");
@@ -92,7 +102,7 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
 }
 const PORTRAIT = {};
 function portrait(id){
-  const pk = id==="me" ? "me" + playerGender() : id;
+  const pk = id==="me" ? "me" + playerGender() + (inOutfit() ? "o" : "") : id;
   if(PORTRAIT[pk]) return PORTRAIT[pk];
   try{
     const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
@@ -217,7 +227,7 @@ function gate(who, head, go){
   if(!who || !CH[who] || who==="sys" || who==="me" || who===W.lastWho) { W.lastWho = who && who!=="sys" ? who : W.lastWho; return go(); }
   const n = npcOf(who); W.target = who;
   let done = false;
-  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin") ? 2.4 : 1.2); go(); };
+  const fire = () => { if(done) return; done = true; W.target = null; W.lastWho = who; bubble(n, {tbxz:"全部都要救！", yan:"（呵欠）來…查房…", wan:"今天誰報告？", luyin:"（錄音中●）你講啊。", chunpu:"這裡不是伸展台。"}[who] || "……", (who==="tbxz"||who==="yan"||who==="wan"||who==="luyin"||who==="chunpu") ? 2.4 : 1.2); go(); };
   W.fire = () => walkTo(n, fire);
   const c = CH[who];
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
@@ -559,6 +569,6 @@ const XIAOC_LINES = ["跑起來！今天也辛苦了！","病人安全第一，�
 function idleLine(id){
   const lines = {zhang:"病人不會等你準備好。", ouyang:"交班單 NPO 那欄寫了沒？", lin:"手部衛生五時機，背一次。", kui:"給藥前我會再核對一次喔。", rui:"叫我護理師就好。",
     wang:"急診的夜很長，記得喝水。", lee:"小朋友不是縮小版的大人。", tsai:"先驗孕，再說別的。", kolas:"醫療不只在醫院裡。", shih:"先跟阿公平視再說話。",
-    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。"};
+    cheng:"開藥前先查腎功能。", hsu:"……應該沒事吧？開玩笑的。", gy:"診斷依據在哪裡？病歷沒寫，就等於沒做。", bai:"這週的班我們重新排過了。", tbxz:"我大老遠趕回來，你們要負責！", yan:"……我查完就讓你走，真的。", wan:"你說得很好。我們再往下想一步。", luyin:"我都有錄喔。你再講一次。", chunpu:"手腕以下，什麼都不要戴。"};
   return lines[id] || "你好。";
 }
