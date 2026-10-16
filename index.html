@@ -1747,9 +1747,13 @@ function drawChar(c, x, y, id, dir="down", frame=0, s=2){
   if(L.coffee && dir!=="up"){ const cx = dir==="left" ? 0 : 12.6;
     r(cx-.2, 11.4+bob, 2.4, 3.2, OL); r(cx, 11.6+bob, 2, 2.8, "#f4efe6"); r(cx, 12.4+bob, 2, .9, L.coffee); r(cx, 11.2+bob, 2, .5, "#3b3f46");
     if((typeof W === "object" ? W.t : 0) % 1.6 < .8) r(cx+.6, 10.2+bob, .4, .8, "rgba(255,255,255,.55)"); }
-  if(L.fold && dir!=="up"){ const fx = dir==="left" ? -2.8 : 12.4; /* 打開的 iPhone Duo（折疊機），螢幕是分紅截圖 */
-    r(fx-.3, 9.8+bob, 5.6, 4.8, OL); r(fx, 10.1+bob, 5, 4.2, "#d9d4ca"); r(fx+.3, 10.4+bob, 4.4, 3.6, "#2b5fc4");
-    r(fx+2.45, 10.1+bob, .15, 4.2, "#8f8a80"); r(fx+.6, 10.9+bob, 1.4, .5, "#fff"); r(fx+.6, 12+bob, 3.6, .7, "#38c172"); r(fx+.6, 13+bob, 2.2, .5, "#9ab8f0"); r(fx+3, 10.9+bob, 1.2, .5, "#ffd75e");
+  if(L.fold && dir!=="up"){ const fx = dir==="left" ? -2.8 : 12.4; /* 打開的 iPhone Duo（銀色折疊機，沙丘桌布） */
+    r(fx-.3, 9.8+bob, 5.6, 4.8, OL); r(fx, 10.1+bob, 5, 4.2, "#e4e5e8"); r(fx, 10.1+bob, 5, .3, "#f7f7f9");
+    r(fx+.3, 10.4+bob, 4.4, 3.6, "#b9cfe0"); r(fx+.3, 10.4+bob, 4.4, 1, "#9fbbd3");
+    r(fx+.9, 11.6+bob, 2.6, .7, "#5e5a52"); r(fx+1.4, 11.3+bob, 1.4, .4, "#6e695f");
+    r(fx+.3, 12.2+bob, 4.4, 1.8, "#d8c7a4"); r(fx+.3, 12.9+bob, 2.4, .5, "#c4b089"); r(fx+2.6, 13.4+bob, 2.1, .6, "#e6d8b8");
+    r(fx+2.45, 10.1+bob, .12, 4.2, "#a7a8ad");
+    r(fx-.9, 10.3+bob, 1, 1, "#d0d1d5"); r(fx-.75, 10.45+bob, .7, .7, "#2b2d33"); r(fx-.9, 11.4+bob, 1, 1, "#d0d1d5"); r(fx-.75, 11.55+bob, .7, .7, "#2b2d33");
     if(((typeof W === "object" ? W.t : 0) || 0) % 2 < .3) r(fx+3.6, 10.6+bob, .6, .6, "rgba(255,255,255,.8)"); }
   if(L.forms && dir!=="up"){ const fx = dir==="left" ? -1.4 : 12; /* 一疊評量表＋螢光筆 */
     r(fx-.3, 10.2+bob, 4.4, 5, OL); r(fx, 10.5+bob, 3.8, 4.4, "#fdfcf7"); r(fx+.3, 10.8+bob, 3.8, 4.4, "#f2efe4");
