@@ -1,16 +1,16 @@
 /* 背景音樂：每個科別一首公眾領域（CC0）曲子，來源 FreePD.com。按「♪ 音樂」才開始播放。 */
 const MUSIC = {
   lobby:{f:"lobby", t:"Slice of Life", a:"Bryan Teoh"},
-  med:{f:"med", t:"Study and Relax", a:"Kevin MacLeod"},
+  med:{f:"med", t:"Busybody", a:"Bryan Teoh"},
   surg:{f:"surg", t:"Gotta Keep On Movin", a:"Bryan Teoh"},
   peds:{f:"peds", t:"Happy Whistling Ukulele", a:"Rafael Krux"},
   ob:{f:"ob", t:"Kalimba Relaxation Music", a:"Kevin MacLeod"},
   er:{f:"er", t:"Rush", a:""},
-  night:{f:"night", t:"Night Vigil", a:"Kevin MacLeod"},
-  comm:{f:"comm", t:"Barnville", a:"Rafael Krux"},
-  geri:{f:"geri", t:"Nostalgic Piano", a:""},
+  night:{f:"night", t:"Inventing Flight", a:"Bryan Teoh"},
+  comm:{f:"comm", t:"Still Pickin", a:"Kevin MacLeod"},
+  geri:{f:"geri", t:"Wisdom in the Sun", a:"Kevin MacLeod"},
   elect:{f:"elect", t:"Travelers Notebook", a:""},
-  eval:{f:"eval", t:"Think About It", a:""},
+  eval:{f:"eval", t:"Inspiration", a:""},
   match:{f:"match", t:"Hopeful", a:"Rafael Krux"},
   ending:{f:"ending", t:"Journey of Hope", a:"Alexander Nakarada"}
 };

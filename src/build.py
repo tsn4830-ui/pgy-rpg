@@ -96,7 +96,7 @@ for a,b in KT_NAMES:
 k3 = '以下三家醫院與廣告均為虛構，只借用說明會的格式。'
 assert e.count(k3)==1; e = e.replace(k3, '以下以光田綜合醫院為藍圖，改成諧音的虛構「光甜綜合醫院」三個院區；廣告內容均為虛構，只借用說明會的格式。')
 e = e.replace('<h2>選擇你的訓練醫院</h2>','<h2>選擇你的訓練院區</h2>')
-MCREDIT = '<p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目，每個科別一首。Slice of Life、Gotta Keep On Movin（Bryan Teoh）；Study and Relax、Kalimba Relaxation Music、Night Vigil（Kevin MacLeod）；Happy Whistling Ukulele、Barnville、Hopeful（Rafael Krux）；Journey of Hope（Alexander Nakarada）；Rush、Nostalgic Piano、Travelers Notebook、Think About It。</p>'
+MCREDIT = '<p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目，每個科別一首。Slice of Life、Gotta Keep On Movin、Busybody、Inventing Flight（Bryan Teoh）；Kalimba Relaxation Music、Wisdom in the Sun、Still Pickin（Kevin MacLeod）；Happy Whistling Ukulele、Hopeful（Rafael Krux）；Journey of Hope（Alexander Nakarada）；Rush、Travelers Notebook、Inspiration。</p>'
 _k = '臨床處置請以最新指引與院內規範為準。</p>'
 assert h.count(_k)==1; h = h.replace(_k, _k + '\n  ' + MCREDIT)
 assert h.count('醫院與人物皆為虛構')==1; h = h.replace('醫院與人物皆為虛構','醫院與人物皆為虛構（以光田綜合醫院為藍圖，院名與各科人物名字採諧音）')
