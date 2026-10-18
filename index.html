@@ -1302,6 +1302,14 @@ async function certImage(){
   const close = () => dlg.remove();
   dlg.onclick = e => { if(e.target === dlg) close(); };
   dlg.querySelector("#certclose").onclick = close;
+  /* 在 Claude artifact 裡，下載要透過 downloads 權限；公開網站用一般連結 */
+  const dl = dlg.querySelector("a.primary");
+  if(window.claude && window.claude.use) dl.onclick = async e => {
+    e.preventDefault();
+    const d = await window.claude.use("downloads").catch(() => null);
+    if(!d){ toast("這裡無法下載，請長按或右鍵圖片另存"); return; }
+    cv.toBlob(b => d.save({filename:`PGY結訓證書-${S.name}.png`, data:b}).catch(err => { if(err && err.code !== "declined") toast("下載沒有成功，請長按或右鍵圖片另存"); }), "image/png");
+  };
   cv.toBlob(b => { try{
     const file = new File([b], "PGY結訓證書.png", {type:"image/png"});
     if(navigator.canShare && navigator.canShare({files:[file]})){ const sb = dlg.querySelector("#certshare"); sb.hidden = false;
