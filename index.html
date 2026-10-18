@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="臺灣 PGY 兩年訓練的角色扮演遊戲，每題附參考文獻。"></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>呆丸 PGY 物語｜台灣 PGY 醫師生存 RPG</title><meta name="description" content="台灣 PGY 醫師兩年訓練的像素角色扮演遊戲：值班、報告、錄音家屬、主任查房，每一道臨床題都附參考文獻。手機、電腦都能玩，免費。"><link rel="canonical" href="https://tsn4830-ui.github.io/pgy-rpg/"><meta name="theme-color" content="#2c6e5c"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="PGY 物語"><meta property="og:type" content="website"><meta property="og:site_name" content="呆丸 PGY 物語"><meta property="og:title" content="呆丸 PGY 物語｜台灣 PGY 醫師生存 RPG"><meta property="og:description" content="台灣 PGY 醫師兩年訓練的像素角色扮演遊戲：值班、報告、錄音家屬、主任查房，每一道臨床題都附參考文獻。手機、電腦都能玩，免費。"><meta property="og:url" content="https://tsn4830-ui.github.io/pgy-rpg/"><meta property="og:image" content="https://tsn4830-ui.github.io/pgy-rpg/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="zh_TW"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://tsn4830-ui.github.io/pgy-rpg/og.png"></head><body>
 <title>呆丸 PGY 物語</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -90,7 +90,18 @@ a{color:var(--drape)}
 .log .when{font-family:var(--f-mono);font-size:11px;color:var(--faint);padding-top:2px}
 .log .star{color:var(--warn)}
 /* story card */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:14px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:14px;min-width:0;box-shadow:0 1px 2px rgba(16,40,34,.04),0 10px 28px -12px rgba(16,40,34,.14)}
+.panel{box-shadow:0 1px 2px rgba(16,40,34,.04),0 10px 28px -14px rgba(16,40,34,.12)}
+.primary{box-shadow:0 2px 0 rgba(0,0,0,.18),0 6px 14px -6px rgba(44,110,92,.6);transition:transform .12s ease,box-shadow .12s ease,filter .12s ease}
+.primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.primary:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.opt{transition:border-color .15s ease,background-color .15s ease,transform .12s ease,box-shadow .15s ease}
+.opt:not(:disabled):hover{transform:translateX(3px);box-shadow:0 4px 14px -8px rgba(16,40,34,.35);background:var(--surface)}
+.ctrl button{transition:background-color .15s ease,border-color .15s ease}
+.ctrl button:hover{border-color:var(--drape)}
+.stat i b{transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.legal{font-size:12px;color:var(--muted);text-align:center;margin:4px 0 0}
+.legal a{color:var(--muted);margin:0 6px}
 .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
 .speaker{display:flex;gap:12px;align-items:flex-start}
 .av{flex:0 0 auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:19px;color:#fff}
@@ -151,7 +162,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 
 <div class="app">
   <header class="top">
-    <h1>呆丸 PGY 物語</h1><span class="ver">◐ v5.0 測試版</span>
+    <h1>呆丸 PGY 物語</h1><span class="ver">v6.0</span>
     <nav class="links" aria-label="讀書網站">
       <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
@@ -164,6 +175,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
     <button id="skip">跳到下一個決定 »</button>
     <button id="auto" aria-pressed="false">⋯ 自動播放</button>
     <button id="music" aria-pressed="false">♪ 音樂</button>
+    <button id="sfx" aria-pressed="true">🔔 音效</button>
     <button id="theme">◐ 畫面明暗</button>
     <button id="coffee" title="健康回升，但疲累指數會上升">☕ 喝咖啡</button>
     <button id="login" hidden>☁ 用 Google 登入</button>
@@ -185,6 +197,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
   </div>
   <p class="foot">醫院與人物皆為虛構（以光田綜合醫院為藍圖，院名與各科人物名字採諧音）。醫學內容依所附參考文獻撰寫，僅供學習；臨床處置請以最新指引與院內規範為準。</p>
   <p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目，每個科別一首。Slice of Life、Gotta Keep On Movin（Bryan Teoh）；Study and Relax、Kalimba Relaxation Music、Night Vigil（Kevin MacLeod）；Happy Whistling Ukulele、Barnville、Hopeful（Rafael Krux）；Journey of Hope（Alexander Nakarada）；Rush、Nostalgic Piano、Travelers Notebook、Think About It。</p>
+  <p class="legal"><a href="https://tsn4830-ui.github.io/pgy-rpg/privacy.html" target="_blank" rel="noopener">隱私權政策</a>·<a href="https://tsn4830-ui.github.io/pgy-rpg/terms.html" target="_blank" rel="noopener">使用條款</a>·<a href="https://tsn4830-ui.github.io/pgy-rpg/credits.html" target="_blank" rel="noopener">製作與授權</a>·© 2026 呆丸 PGY 物語</p>
 </div>
 
 <script>
@@ -1284,7 +1297,7 @@ function next(){ S.step++; save(); checkLimits() || run(); }
 
 function checkLimits(){
   if((S.tired||0) >= 100){
-    addLog("咖啡喝太多，在護理站睡著了");
+    addLog("咖啡喝太多，在護理站睡著了"); SFX.warn();
     S.tired = 30;
     show(`${speaker("lin",`你在護理站打醫囑，眼睛一閉就睡著了，游標還停在一半。${CH.lin.n}護理長輕輕把你叫醒：「你今天第幾杯咖啡了？咖啡只是把累藏起來，不會幫你補眠。去值班室睡兩個小時，有事我叫你。」`)}
      <div class="feedback"><strong>真實制度</strong><span>咖啡因可以暫時提神，但不能取代睡眠；即使在睡前 6 小時喝，客觀測得的總睡眠時間仍會減少超過 1 小時${rich("[[drake_caff]]")}。健康成人每日咖啡因建議約 400 毫克以下${rich("[[fda_caff]]")}。</span></div>
@@ -1466,7 +1479,7 @@ function endStage(){
   if(st.m){ S.hourLog.push({lab:st.dept.replace("一般醫學",""), h:S.hours}); addLog(`完成 ${st.dept}（${st.m} 個月）`); }
   S.month += st.m;
   const rest = st.m ? applyFx({hp:25, mood:5}) : "";
-  S.hours = 230; S.tired = Math.max(0,(S.tired||0)-50); S.cups = 0;
+  SFX.level(); S.hours = 230; S.tired = Math.max(0,(S.tired||0)-50); S.cups = 0;
   S.stage++; S.step = 0; S.electQueue = null;
   const nx = STAGES[S.stage];
   if(!nx) return ending();
@@ -1582,6 +1595,30 @@ document.getElementById("auto").onclick = e => {
   e.currentTarget.setAttribute("aria-pressed", on);
   clearInterval(autoTimer); if(on) autoTimer = setInterval(advanceOnce, 2800);
 };
+/* 音效：用 Web Audio 即時合成，不需要音檔；可在上方「音效」開關 */
+const SFX = (() => {
+  let ctx = null, on = true;
+  try{ on = localStorage.getItem("pgy-sfx") !== "0"; }catch(e){}
+  const tone = (f, d, type="sine", v=.07, when=0) => { if(!on) return; try{
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if(ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime + when, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t+.012); g.gain.exponentialRampToValueAtTime(.0001, t+d);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+d+.03); }catch(e){} };
+  return {
+    get on(){ return on; }, set(v){ on = v; try{ localStorage.setItem("pgy-sfx", v ? "1" : "0"); }catch(e){} },
+    click(){ tone(700,.05,"triangle",.035); },
+    ok(){ tone(660,.12,"triangle",.07); tone(990,.2,"triangle",.07,.09); },
+    bad(){ tone(233,.2,"sawtooth",.035); tone(175,.26,"sawtooth",.035,.11); },
+    coffee(){ tone(520,.08,"sine",.06); tone(780,.14,"sine",.06,.08); },
+    level(){ [523,659,784,1047].forEach((f,i) => tone(f,.2,"triangle",.06,i*.1)); },
+    warn(){ tone(330,.18,"square",.03); tone(247,.3,"square",.03,.16); }
+  };
+})();
+(() => { const b = document.getElementById("sfx"); if(!b) return;
+  const lab = () => { b.setAttribute("aria-pressed", SFX.on); b.textContent = SFX.on ? "🔔 音效" : "🔕 音效"; }; lab();
+  b.onclick = () => { SFX.set(!SFX.on); lab(); SFX.click(); };
+  document.addEventListener("click", e => { const t = e.target.closest("#view .primary, #view .opt:not([data-k]), #nx"); if(t) SFX.click(); }, true);
+})();
 let toastT = null;
 function toast(msg){ let t = document.getElementById("toast"); if(!t){ t = document.createElement("div"); t.id = "toast"; t.className = "toast"; t.setAttribute("role","status"); document.body.appendChild(t); }
   t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
@@ -1595,7 +1632,7 @@ document.getElementById("coffee").onclick = () => {
   if(gain < 10) msg += "　越累，咖啡越沒效";
   if(S.cups === 4){ S.mood = clamp(S.mood - 3, 0, 100); msg += "　這一科第 4 杯了，心跳有點快（幸福 -3）"; addLog("這一科已經喝了 4 杯咖啡，大約 400 毫克咖啡因"); }
   if(S.tired >= 100) msg += "　眼皮好重……";
-  save(); renderSide(); toast(msg);
+    save(); renderSide(); toast(msg); SFX.coffee();
 };
 document.getElementById("theme").onclick = () => {
   const root = document.documentElement;
@@ -1941,6 +1978,7 @@ function gate(who, head, go){
   document.getElementById("nx").onclick = e => { if(!e.isTrusted || REDUCED) fire(); else { W.fire(); setTimeout(fire, 1800); } };
 }
 function worldReact(ok){
+  ok ? SFX.ok() : SFX.bad();
   const px = W.p.fx*TW + TW/2, py = W.p.fy*TW;
   if(ok){ for(let i=0;i<18;i++) W.parts.push({x:px, y:py, vx:(Math.random()-.5)*160, vy:-60-Math.random()*120, t:1, col:["#2c6e5c","#f2b630","#e78fae","#4aa3c7"][i%4]}); }
   else { W.shake = .35; }
@@ -2295,4 +2333,5 @@ if(window.claude?.hot?.ready){ window.claude.hot.ready(d => { if(d && d.S){ resu
 else { const d = window.claude?.hot?.data; if(d && d.S){ resume(d.S); } else start(); }
 </script>
 
+<script>if("serviceWorker" in navigator && location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script>
 </body></html>

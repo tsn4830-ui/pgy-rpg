@@ -1,0 +1,17 @@
+{
+  "name": "呆丸 PGY 物語",
+  "short_name": "PGY 物語",
+  "description": "台灣 PGY 醫師兩年訓練的角色扮演遊戲，每題附參考文獻。",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef1ef",
+  "theme_color": "#2c6e5c",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

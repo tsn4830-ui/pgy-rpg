@@ -100,7 +100,7 @@ MCREDIT = '<p class="foot">背景音樂：FreePD.com 公眾領域（CC0）曲目
 _k = '臨床處置請以最新指引與院內規範為準。</p>'
 assert h.count(_k)==1; h = h.replace(_k, _k + '\n  ' + MCREDIT)
 assert h.count('醫院與人物皆為虛構')==1; h = h.replace('醫院與人物皆為虛構','醫院與人物皆為虛構（以光田綜合醫院為藍圖，院名與各科人物名字採諧音）')
-for a,b2 in [x.split('|||') for fn in ('gender.txt','coffee.txt') for x in open(fn,encoding='utf-8').read().strip().split('\n@@@\n')]:
+for a,b2 in [x.split('|||') for fn in ('gender.txt','coffee.txt','polish.txt') for x in open(fn,encoding='utf-8').read().strip().split('\n@@@\n')]:
     n=[d.count(a),e.count(a),h.count(a)]; assert sum(n)==1,(a[:60],n)
     if n[0]: d=d.replace(a,b2)
     elif n[1]: e=e.replace(a,b2)
@@ -116,7 +116,20 @@ print('built',len(out))
 import json, os
 fb = json.load(open('fbconfig.json')) if os.path.exists('fbconfig.json') else None
 pub = out.replace('const FB_CONFIG = null;', 'const FB_CONFIG = '+json.dumps(fb)+';') if fb else out
-html = '<!doctype html>\n<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="臺灣 PGY 兩年訓練的角色扮演遊戲，每題附參考文獻。"></head><body>\n'+pub+'\n</body></html>\n'
+SITE='https://tsn4830-ui.github.io/pgy-rpg/'
+DESC='台灣 PGY 醫師兩年訓練的像素角色扮演遊戲：值班、報告、錄音家屬、主任查房，每一道臨床題都附參考文獻。手機、電腦都能玩，免費。'
+HEAD=('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+ '<title>呆丸 PGY 物語｜台灣 PGY 醫師生存 RPG</title>'
+ f'<meta name="description" content="{DESC}"><link rel="canonical" href="{SITE}">'
+ '<meta name="theme-color" content="#2c6e5c"><link rel="manifest" href="manifest.webmanifest">'
+ '<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">'
+ '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="PGY 物語">'
+ f'<meta property="og:type" content="website"><meta property="og:site_name" content="呆丸 PGY 物語"><meta property="og:title" content="呆丸 PGY 物語｜台灣 PGY 醫師生存 RPG">'
+ f'<meta property="og:description" content="{DESC}"><meta property="og:url" content="{SITE}"><meta property="og:image" content="{SITE}og.png">'
+ '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="zh_TW">'
+ f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE}og.png">')
+SW='<script>if("serviceWorker" in navigator && location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script>'
+html = '<!doctype html>\n<html lang="zh-Hant"><head>'+HEAD+'</head><body>\n'+pub+'\n'+SW+'\n</body></html>\n'
 os.makedirs('/mnt/project-files/pgy-rpg/deploy/pgy', exist_ok=True)
 open('/mnt/project-files/pgy-rpg/deploy/pgy/index.html','w',encoding='utf-8').write(html)
 open('standalone.html','w',encoding='utf-8').write(html)
