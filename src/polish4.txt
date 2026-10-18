@@ -1,0 +1,63 @@
+<span class="ver">v6.2</span>|||<span class="ver">v6.3</span>
+@@@
+<button class="ghost" id="cards">看知識卡</button>|||<button class="ghost" id="cards">看知識卡</button><button class="ghost" id="certimg">🖼 證書存成圖片</button>
+@@@
+document.getElementById("cards").onclick = () => setTab("cards");|||document.getElementById("cards").onclick = () => setTab("cards");
+  document.getElementById("certimg").onclick = certImage;
+@@@
+.cert small{font-size:11px;color:#7a6a4a}|||.cert small{font-size:11px;color:#7a6a4a}
+#certdlg{position:fixed;inset:0;z-index:90;background:rgba(10,20,16,.72);display:grid;place-items:center;padding:16px;animation:spIn .25s ease both}
+#certdlg .box{background:var(--surface);border-radius:16px;padding:16px;display:grid;gap:12px;max-width:min(480px,100%);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+#certdlg img{width:100%;max-height:68vh;object-fit:contain;border-radius:8px;display:block}
+#certdlg .row{justify-content:center;flex-wrap:wrap}
+#certdlg a.primary{text-decoration:none;display:inline-flex;align-items:center}
+@@@
+function introSide(){|||/* 結訓證書圖：1080×1350（社群直式），含玩家像素小人 */
+async function certImage(){
+  try{ await document.fonts.ready; }catch(e){}
+  const W = 1080, H = 1350, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const c = cv.getContext("2d");
+  const serif = '"Noto Serif TC","Songti TC","PMingLiU",serif', sans = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+  const txt = (t, y, size, font, col, weight="700", maxW=860) => { let s = size; do { c.font = `${weight} ${s}px ${font}`; s -= 2; } while(c.measureText(t).width > maxW && s > 18); c.fillStyle = col; c.textAlign = "center"; c.fillText(t, W/2, y); };
+  const g = c.createLinearGradient(0,0,W,H); g.addColorStop(0,"#fffaf0"); g.addColorStop(1,"#f3e6c8"); c.fillStyle = g; c.fillRect(0,0,W,H);
+  c.strokeStyle = "#b08a3e"; c.lineWidth = 10; c.strokeRect(40,40,W-80,H-80); c.lineWidth = 3; c.strokeRect(62,62,W-124,H-124);
+  [[62,62],[W-62,62],[62,H-62],[W-62,H-62]].forEach(([x,y]) => { c.fillStyle = "#b08a3e"; c.beginPath(); c.arc(x,y,12,0,7); c.fill(); });
+  txt("呆丸 PGY 物語", 150, 32, sans, "#8a7240", "500");
+  txt("結 訓 證 書", 250, 96, serif, "#3a2e1a", "900");
+  c.fillStyle = "#2c6e5c"; c.beginPath(); c.arc(W/2, 440, 120, 0, 7); c.fill();
+  c.fillStyle = "rgba(255,255,255,.12)"; c.beginPath(); c.arc(W/2, 440, 104, 0, 7); c.fill();
+  try{ drawChar(c, W/2 - 80, 335, "me", "down", 0, 10); }catch(e){}
+  txt(`${S.name} 醫師`, 650, 76, serif, "#3a2e1a", "900");
+  c.fillStyle = "#b08a3e"; c.fillRect(W/2-220, 678, 440, 3);
+  const h = (HOSP.find(x => x.id === S.hosp) || {}).n || "呆丸綜合醫院";
+  txt("完成「二年期醫師畢業後一般醫學訓練」24 個月", 750, 36, sans, "#4a3c22", "500");
+  txt(`訓練醫院：${h}`, 805, 34, sans, "#4a3c22", "500");
+  txt(`下一站：${S.spec || ""}`, 860, 40, serif, "#2c6e5c", "800");
+  const pct = S.total ? Math.round(S.right/S.total*100) : 0;
+  [["答對率", pct + "%"], ["知識卡", Object.keys(S.cards).length + " 張"], ["成就", `${Object.keys(S.ach||{}).length}／${ACH.length}`]].forEach(([k,v],i) => {
+    const x = 170 + i*260, y = 920;
+    c.fillStyle = "rgba(255,255,255,.75)"; c.strokeStyle = "#d8c08a"; c.lineWidth = 2;
+    c.beginPath(); c.roundRect ? c.roundRect(x, y, 220, 130, 18) : c.rect(x, y, 220, 130); c.fill(); c.stroke();
+    c.textAlign = "center"; c.fillStyle = "#8a7240"; c.font = `500 26px ${sans}`; c.fillText(k, x+110, y+46);
+    c.fillStyle = "#3a2e1a"; c.font = `800 44px ${serif}`; c.fillText(v, x+110, y+104);
+  });
+  const d = new Date(); txt(`結訓日 ${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`, 1130, 28, sans, "#7a6a4a", "500");
+  c.save(); c.translate(W-200, H-196); c.rotate(-.24); c.strokeStyle = "#b8322a"; c.lineWidth = 6; c.globalAlpha = .85;
+  c.beginPath(); c.arc(0,0,78,0,7); c.stroke(); c.beginPath(); c.arc(0,0,66,0,7); c.lineWidth = 2; c.stroke();
+  c.fillStyle = "#b8322a"; c.textAlign = "center"; c.font = `900 34px ${sans}`; c.fillText("PGY", 0, -6); c.fillText("結訓", 0, 36); c.restore();
+  txt("tsn4830-ui.github.io/pgy-rpg · 遊戲紀念，非正式文件", 1240, 24, sans, "#8a7a5a", "500");
+  const url = cv.toDataURL("image/png");
+  const dlg = document.createElement("div"); dlg.id = "certdlg"; dlg.setAttribute("role","dialog"); dlg.setAttribute("aria-label","結訓證書圖片");
+  dlg.innerHTML = `<div class="box"><img src="${url}" alt="${esc(S.name)} 醫師的結訓證書"><p class="meta" style="margin:0;text-align:center">手機也可以長按圖片儲存</p>
+   <div class="row"><a class="primary" href="${url}" download="PGY結訓證書-${esc(S.name)}.png">⬇ 下載圖片</a><button class="ghost" id="certshare" hidden>分享</button><button class="ghost" id="certclose">關閉</button></div></div>`;
+  document.body.appendChild(dlg); SFX.level();
+  const close = () => dlg.remove();
+  dlg.onclick = e => { if(e.target === dlg) close(); };
+  dlg.querySelector("#certclose").onclick = close;
+  cv.toBlob(b => { try{
+    const file = new File([b], "PGY結訓證書.png", {type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ const sb = dlg.querySelector("#certshare"); sb.hidden = false;
+      sb.onclick = () => navigator.share({files:[file], title:"呆丸 PGY 物語", text:`我在呆丸 PGY 物語完成兩年 PGY 訓練，下一站：${S.spec}！`}).catch(()=>{}); }
+  }catch(e){} });
+}
+function introSide(){
