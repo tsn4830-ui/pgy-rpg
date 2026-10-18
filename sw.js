@@ -1,5 +1,5 @@
 /* 呆丸 PGY 物語：離線快取。頁面走「網路優先」，拿不到才用快取，所以更新會立刻生效。 */
-const CACHE = "pgy-rpg-v61";
+const CACHE = "pgy-rpg-v62";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

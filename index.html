@@ -181,13 +181,30 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 .tablebox{overflow-x:auto}
 .foot{font-size:12px;color:var(--muted);text-align:center;margin:0}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-@media (prefers-reduced-motion:no-preference){.card.enter{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+@media (prefers-reduced-motion:no-preference){.card.enter{animation:in .34s cubic-bezier(.2,.8,.2,1)}@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card.enter > *{animation:in .4s cubic-bezier(.2,.8,.2,1) both}.card.enter > *:nth-child(2){animation-delay:.05s}.card.enter > *:nth-child(3){animation-delay:.1s}.card.enter > *:nth-child(n+4){animation-delay:.14s}
+.dchip{animation:chip 1.6s ease-out forwards}.strip .new{animation:cell .5s cubic-bezier(.2,.9,.3,1.4) both}}
+.stat{position:relative}
+.dchip{position:absolute;right:3.8em;top:-8px;font-size:12px;font-weight:700;pointer-events:none;padding:0 6px;border-radius:8px;background:var(--surface)}
+.dchip.up{color:#1f7a4d}.dchip.down{color:#b23a2e}
+@keyframes chip{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0;transform:translateY(-12px)}}
+.strip{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin:4px 0}
+.strip div{aspect-ratio:1;border-radius:3px;background:var(--empty)}
+@keyframes cell{from{transform:scale(0);opacity:0}to{transform:none;opacity:1}}
+.cert{position:relative;padding:28px 20px 30px;border:3px double #b08a3e;border-radius:6px;background:linear-gradient(135deg,#fffaf0,#f6ecd6);color:#3a2e1a;text-align:center;display:grid;gap:8px;box-shadow:inset 0 0 0 6px #fffaf0,inset 0 0 0 7px #d8c08a}
+.cert .ct{font-family:var(--f-display);font-size:26px;letter-spacing:.3em}
+.cert .cn{font-family:var(--f-display);font-size:22px;border-bottom:1px solid #b08a3e;padding:0 18px;justify-self:center}
+.cert p{margin:0;font-size:14px;line-height:1.8}
+.cert p span{display:inline-block;white-space:nowrap;margin:0 5px}
+@media (max-width:520px){.cert{padding-bottom:84px}.cert .seal{right:50%;margin-right:-31px;bottom:12px}}
+.cert small{font-size:11px;color:#7a6a4a}
+.cert .seal{position:absolute;right:18px;bottom:16px;width:62px;height:62px;border:2px solid #b8322a;border-radius:50%;color:#b8322a;display:grid;place-items:center;font-weight:800;font-size:13px;line-height:1.1;transform:rotate(-14deg);opacity:.85}
 .jump{margin-top:12px}.jump summary{cursor:pointer;color:var(--accent,#2c6e5c);font-weight:600}.jumps{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.jumps button{font-size:13px}.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}
 </style>
 
 <div class="app">
   <header class="top">
-    <h1>呆丸 PGY 物語</h1><span class="ver">v6.1</span>
+    <h1>呆丸 PGY 物語</h1><span class="ver">v6.2</span>
     <nav class="links" aria-label="讀書網站">
       <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
@@ -1206,6 +1223,38 @@ function renderSide(){
   </section>`;
   side.querySelectorAll("[data-log]").forEach(b => b.onclick = () => { const l = S.log[+b.dataset.log]; l.s = l.s?0:1; save(); renderSide(); });
 }
+/* 數值變化：長條從舊值滑到新值，旁邊浮出 +/− */
+let PREV_BARS = null;
+const _renderSide = renderSide;
+renderSide = function(){
+  _renderSide();
+  if(!S || S.stage < 0){ PREV_BARS = null; return; }
+  const cur = [...document.querySelectorAll("#side .stat")].map(el => ({el, lab:el.querySelector("span").textContent, w:parseFloat(el.querySelector("b").style.width), v:parseFloat(el.querySelector("em").textContent)}));
+  if(PREV_BARS) cur.forEach(c => {
+    const p = PREV_BARS[c.lab]; if(!p) return;
+    if(Math.abs(p.w - c.w) > .01){ const b = c.el.querySelector("b"); b.style.transition = "none"; b.style.width = p.w + "%"; void b.offsetWidth; b.style.transition = ""; b.style.width = c.w + "%"; }
+    const d = Math.round(c.v - p.v);
+    if(d && isFinite(d) && c.lab !== "四週工時"){
+      const bad = c.lab === "疲累" ? d > 0 : d < 0;
+      const s = document.createElement("span"); s.className = "dchip " + (bad ? "down" : "up"); s.textContent = (d > 0 ? "+" : "−") + Math.abs(d);
+      c.el.appendChild(s); setTimeout(() => s.remove(), 1700);
+    }
+  });
+  PREV_BARS = Object.fromEntries(cur.map(c => [c.lab, {w:c.w, v:c.v}]));
+};
+/* 換科時的 24 格人生地圖，剛完成的格子會彈出來 */
+function lifeStrip(from){
+  const cells = []; STAGES.forEach(s => { for(let k=0;k<s.m;k++) cells.push(colOf(s.dept)); });
+  return `<div class="strip" aria-label="人生地圖 ${S.month}/24">${cells.map((c,i) => i < S.month ? `<div class="${i>=from?"new":""}" style="background:${c};${i>=from?`animation-delay:${(i-from)*.12+.2}s`:""}"></div>` : "<div></div>").join("")}</div>`;
+}
+/* 結局的結訓證書（遊戲紀念，非正式文件） */
+function certHtml(){
+  const h = (HOSP.find(x => x.id === S.hosp) || {}).n || "呆丸綜合醫院";
+  const pct = S.total ? Math.round(S.right/S.total*100) : 0;
+  return `<div class="cert" role="img" aria-label="結訓證書"><span class="ct">結訓證書</span><span class="cn">${esc(S.name)} 醫師</span>
+   <p><span>完成「二年期醫師畢業後</span><span>一般醫學訓練」24 個月</span><br><span>訓練醫院：${esc(h)}</span><br><span>臨床題答對率 ${pct}%</span><span>知識卡 ${Object.keys(S.cards).length} 張</span><span>成就 ${Object.keys(S.ach||{}).length}／${ACH.length}</span><br><span>下一站：${esc(S.spec)}</span></p>
+   <small>呆丸 PGY 物語 · 遊戲紀念，非正式文件</small><span class="seal">PGY<br>結訓</span></div>`;
+}
 function introSide(){
   return `<section class="panel"><div class="panel-h"><h3>這是什麼遊戲</h3></div>
    <p class="meta" style="margin:0">一款以真實制度為骨架的文字 RPG。兩年 24 格人生地圖，每一格是一個月的輪訓。題目答完會收進知識卡，並附參考文獻與讀書網站的延伸閱讀。</p></section>
@@ -1248,7 +1297,7 @@ function show(html){
   const r = v.getBoundingClientRect(); if(r.top < 0) window.scrollTo({top: window.scrollY + r.top - 8});
 }
 function afterRender(){
-  document.getElementById("waiting").hidden = !V().querySelector(".opt:not([disabled]), #nm, .ad");
+  document.getElementById("waiting").hidden = !V().querySelector(".opt:not([disabled]), .ad");
 }
 document.addEventListener("click", e => {
   const a = e.target.closest("a.ref"); if(!a) return;
@@ -1511,7 +1560,7 @@ function endStage(){
   if(!nx) return ending();
   if(st.m === 0){ return run(); }
   show(`<div class="banner"><span class="eyebrow">輪訓結束 · ${S.month}/24 個月</span><h2>${esc(st.dept)} 完成</h2></div>
-   <p>換科前休了一天假，四週工時重新起算。人生地圖又填滿了 ${st.m} 格。</p><p class="fx">${rest}</p>${nxBtn("前往：" + nx.dept)}`);
+   <p>換科前休了一天假，四週工時重新起算。人生地圖又填滿了 ${st.m} 格。</p>${lifeStrip(S.month - st.m)}<p class="fx">${rest}</p>${nxBtn("前往：" + nx.dept)}`);
   document.getElementById("nx").onclick = run;
 }
 
@@ -1550,6 +1599,7 @@ function finalScreen(){
   show(`<div class="banner"><span class="eyebrow">結局</span><h2>${esc(S.name)} 醫師，${esc(S.spec)}</h2></div>
    <p>${esc(S.verdict)}</p>
    <p>答對率 ${Math.round(pct*100)}%（${S.right}／${S.total}）· 醫學知識 ${S.know} · 知識卡 ${Object.keys(S.cards).length}／${Object.keys(QB).length} · 過勞倒下 ${S.burnout} 次 · 成就 ${Object.keys(S.ach||{}).length}／${ACH.length}</p>
+   ${certHtml()}
    <h3>那些人後來</h3><ul>${epi}</ul>
    <div class="field"><label for="note">✎ 留下一句話（給兩年前的自己）</label><textarea id="note" rows="2" maxlength="120">${esc(S.note||"")}</textarea></div>
    <div class="row"><button class="primary" id="again">重新開始</button><button class="ghost" id="cards">看知識卡</button></div>`);
