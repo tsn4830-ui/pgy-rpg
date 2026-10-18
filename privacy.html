@@ -9,7 +9,7 @@ main{max-width:760px;margin:0 auto;background:var(--surface);border:1px solid va
 h1{font-size:28px;margin:0 0 4px}h2{font-size:19px;margin:28px 0 6px}p,li{color:var(--ink)}.meta{color:var(--muted);font-size:14px;margin:0 0 18px}
 a{color:var(--drape)}.back{display:inline-block;margin-bottom:14px;font-size:14px}
 </style></head><body><main><a class="back" href="./">← 回到遊戲</a>
-<h1>隱私權政策</h1><p class="meta">最後更新：2026 年 10 月 18 日</p>
+<h1>隱私權政策</h1><p class="meta">最後更新：2026 年 10 月 19 日</p>
 <p>「呆丸 PGY 物語」（以下稱本遊戲）是一款免費的醫學教育角色扮演遊戲。我們盡量少收集資料，以下說明收集什麼、為什麼、存在哪裡。</p>
 <h2>不登入時</h2>
 <p>遊戲進度（你輸入的名字、選擇的性別、科別進度、數值、知識卡與訓練紀錄）只存在你自己瀏覽器的 localStorage，不會傳到任何伺服器。清除瀏覽器資料就會一併刪除。</p>
@@ -19,8 +19,10 @@ a{color:var(--drape)}.back{display:inline-block;margin-bottom:14px;font-size:14p
 <li>登入後，遊戲進度會存到 Google Cloud Firestore，以你的帳號識別碼（uid）分開存放；資料庫規則限定只有你本人能讀寫自己的存檔。</li>
 <li>你的 Email 或顯示名稱只用來在畫面上顯示「目前登入的帳號」，不會另外儲存或寄送任何信件。</li>
 </ul>
+<h2>匿名遊玩人數</h2>
+<p>為了知道有多少人在玩，公開網站會在 Firestore 的 <code>stats</code> 資料表裡，替每一天累加三個數字：當天打開遊戲的瀏覽器數、按下「開始報到」的次數、玩到結訓的次數。這些數字只是計數，不包含名字、Email、帳號、IP 位址或任何可以辨識你的資料。為了不重複計算同一天的造訪，你的瀏覽器 localStorage 會記下「今天已經算過」的日期。</p>
 <h2>我們不做的事</h2>
-<ul><li>不放廣告、不使用追蹤或分析工具、不販售或分享個人資料。</li>
+<ul><li>不放廣告、不使用第三方追蹤或分析工具、不販售或分享個人資料。</li>
 <li>不收集病人資料。遊戲中的病例、醫院與人物都是虛構的，請不要在名字欄位輸入真實病人資訊。</li></ul>
 <h2>第三方服務</h2>
 <p>網頁字型由 Google Fonts 提供；登入與雲端存檔使用 Google Firebase；網站託管於 GitHub Pages。這些服務各自依其隱私權政策處理連線紀錄。</p>

@@ -216,7 +216,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 
 <div class="app">
   <header class="top">
-    <h1>呆丸 PGY 物語</h1><span class="ver">v6.4</span>
+    <h1>呆丸 PGY 物語</h1><span class="ver">v6.5</span>
     <nav class="links" aria-label="讀書網站">
       <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
@@ -1153,6 +1153,13 @@ async function fbInit(){
   const [app, au, fs] = await Promise.all([import(base+"firebase-app.js"), import(base+"firebase-auth.js"), import(base+"firebase-firestore.js")]);
   const a = app.initializeApp(FB_CONFIG), auth = au.getAuth(a), db = fs.getFirestore(a);
   CLOUD.fb = {auth, au};
+  /* 匿名遊玩人數：只記每天的次數（stats/日期），不含任何個人資料；測試與本機不記 */
+  if(!navigator.webdriver && location.protocol === "https:"){
+    const day = new Date().toLocaleDateString("sv-SE", {timeZone:"Asia/Taipei"});
+    CLOUD.stat = k => fs.setDoc(fs.doc(db, "stats", day), {[k]: fs.increment(1)}, {merge:true}).catch(() => {});
+    let seen = ""; try{ seen = localStorage.getItem("pgy-seen") || ""; localStorage.setItem("pgy-seen", day); }catch(e){}
+    if(seen !== day) CLOUD.stat("visitors");
+  }
   document.getElementById("login").onclick = async () => {
     if(auth.currentUser){ await au.signOut(auth); return; }
     const pv = new au.GoogleAuthProvider();
@@ -1388,7 +1395,7 @@ function titleScreen(){
    <div class="row"><button class="primary" id="go">開始報到</button>${saved && saved.stage>=0 ? `<button class="ghost" id="cont">繼續上次進度（${saved.month<12?"PGY1":"PGY2"}，第 ${saved.month} 個月）</button>`:""}</div>
    <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
    <p class="meta" id="acct">${cloudNote()}</p>`);
-  document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); S.gender = gsel(); chooseHospital(); };
+  document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); S.gender = gsel(); countStat("start"); chooseHospital(); };
   const c = document.getElementById("cont"); if(c) c.onclick = () => { saved.gender = gsel(); resume(saved); };
 }
 
@@ -1657,7 +1664,7 @@ function ending(){ BGM.end = true; musicTo("ending");
     else if(pct >= 0.55) verdict = `面試有點緊張，但你把 PGY 兩年的病人故事講得很真誠。你錄取了${sp}。`;
     else verdict = `第一志願醫院的${sp}名額很少，你沒有錄取。張乃珂學姊陪你整理面試回饋，你去參加其他醫院的第二波招募，最後錄取另一家醫院的${sp}。她說：「第一家沒上很常見，訓練是在哪裡都能好好學的。」`;
     addLog(`申請 ${sp}`);
-    S.stage = STAGES.length; S.spec = sp; S.verdict = verdict; save();
+    S.stage = STAGES.length; S.spec = sp; S.verdict = verdict; save(); countStat("finish");
     finalScreen();
   });
 }
@@ -2810,6 +2817,7 @@ function typewrite(){
   v.addEventListener("click", skip, true); clearTimeout(typewrite.t); typewrite.t = setTimeout(done, t + 200);
 }
 
+function countStat(k){ try{ if(CLOUD.stat) CLOUD.stat(k); }catch(e){} }
 function start(){ S = null; titleScreen(); }
 worldInit();
 window.claude?.hot?.snapshot?.(() => ({S}));

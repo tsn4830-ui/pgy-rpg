@@ -1,0 +1,17 @@
+<span class="ver">v6.4</span>|||<span class="ver">v6.5</span>
+@@@
+  CLOUD.fb = {auth, au};|||  CLOUD.fb = {auth, au};
+  /* 匿名遊玩人數：只記每天的次數（stats/日期），不含任何個人資料；測試與本機不記 */
+  if(!navigator.webdriver && location.protocol === "https:"){
+    const day = new Date().toLocaleDateString("sv-SE", {timeZone:"Asia/Taipei"});
+    CLOUD.stat = k => fs.setDoc(fs.doc(db, "stats", day), {[k]: fs.increment(1)}, {merge:true}).catch(() => {});
+    let seen = ""; try{ seen = localStorage.getItem("pgy-seen") || ""; localStorage.setItem("pgy-seen", day); }catch(e){}
+    if(seen !== day) CLOUD.stat("visitors");
+  }
+@@@
+S = fresh(n); S.gender = gsel(); chooseHospital(); };|||S = fresh(n); S.gender = gsel(); countStat("start"); chooseHospital(); };
+@@@
+    S.stage = STAGES.length; S.spec = sp; S.verdict = verdict; save();|||    S.stage = STAGES.length; S.spec = sp; S.verdict = verdict; save(); countStat("finish");
+@@@
+function start(){ S = null; titleScreen(); }|||function countStat(k){ try{ if(CLOUD.stat) CLOUD.stat(k); }catch(e){} }
+function start(){ S = null; titleScreen(); }
