@@ -1,0 +1,309 @@
+<span class="ver">v6.3</span>|||<span class="ver">v6.4</span>
+@@@
+#certdlg a.primary{text-decoration:none;display:inline-flex;align-items:center}|||#certdlg a.primary{text-decoration:none;display:inline-flex;align-items:center}
+.scene{margin:0;display:grid;gap:8px}
+.scene canvas{width:100%;height:auto;border-radius:12px;display:block;image-rendering:auto;box-shadow:0 8px 24px -12px rgba(16,40,34,.45)}
+.scene figcaption{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted);align-items:center}
+.scene figcaption strong{color:var(--ink);font-size:13px;margin-right:4px}
+.scene figcaption span{border:1px solid var(--line);border-radius:99px;padding:1px 8px;background:var(--surface)}
+.typing .tw{opacity:0;animation:twin .14s ease forwards}
+@keyframes twin{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}
+@@@
+function afterRender(){|||function afterRender(){
+  drawScenes(); typewrite();
+@@@
+<h2>${esc(st.dept)} 完成</h2></div>|||<h2>${esc(st.dept)} 完成</h2></div>${sceneFig(nx)}
+@@@
+<p class="fx">${fx}</p>${nxBtn("七月一日，報到（從頭開始）")}|||<p class="fx">${fx}</p>${sceneFig(STAGES[0])}${nxBtn("七月一日，報到（從頭開始）")}
+@@@
+function start(){ S = null; titleScreen(); }|||/* 各科過場插圖：320×130 格、放大 3 倍的像素風場景，細節照真實醫療現場配置 */
+Object.assign(LOOK, {
+  scrub: {coat:"#3d6fa8", shirt:"#3d6fa8", hair:"#3d6fa8", style:"cap", skin:"#e6b994"},
+  anes:  {coat:"#4f8a6e", shirt:"#4f8a6e", hair:"#4f8a6e", style:"cap", skin:"#eac29c"},
+  rn:    {coat:"#e78fae", shirt:"#e78fae", hair:"#2a1d18", style:"bun", skin:"#f3cfb0"},
+  emt:   {coat:"#24324f", shirt:"#e07a2b", hair:"#141414", style:"short", skin:"#d9a77f"},
+  mom:   {coat:"#c9a27a", shirt:"#efe6d6", hair:"#2a1d18", style:"long", skin:"#efc8a6"},
+  elder: {coat:"#8aa3b8", shirt:"#8aa3b8", hair:"#e4e4e4", style:"short", skin:"#e0b38f"},
+  phn:   {coat:"#f4f6f5", shirt:"#6aa2c9", hair:"#1d1a19", style:"bob", skin:"#c99068"}
+});
+const SCENE_INFO = {
+  ward:  {cap:"內科病房", find:["床頭氧氣流量表與潮濕瓶","壁式抽吸器","輸液幫浦","生理監視器","床尾乾洗手液","尿袋掛在床緣、低於膀胱","防跌標示","行動護理車（給藥前掃條碼）","床欄拉起","叫人鈴"]},
+  or:    {cap:"開刀房", find:["無影燈","麻醉機的呼吸囊與揮發罐","監視器上的 EtCO₂ 波形","麻醉隔簾","器械台與 Mayo 台","電燒機與腳踏","抽吸瓶","紗布器械清點板","手術安全查核 Time-out"]},
+  peds:  {cap:"兒科病房", find:["高欄嬰兒床","手臂固定板保護點滴","針筒幫浦","臉譜疼痛量表","身高量尺","噴霧治療器","陪病家屬與陪病椅"]},
+  ob:    {cap:"產房", find:["產台與腳架","胎兒監視器：胎心音與宮縮兩條曲線","嬰兒輻射保暖台","甦醒球與新生兒面罩","新生兒體重秤","點滴幫浦","肌膚接觸海報"]},
+  er:    {cap:"急診", find:["檢傷站","急救車與電擊器","走廊加床","救護車入口與救護技術員","移動式 X 光機","氧氣鋼瓶","急救區監視器"]},
+  er_n:  {cap:"急診夜班", find:["凌晨三點的時鐘","檢傷站","急救車與電擊器","走廊加床","救護車入口","移動式 X 光機","急救區監視器"]},
+  comm:  {cap:"東部衛生所", find:["中央山脈","衛生所","居家訪視包：血壓計、血糖機","一週藥盒","公衛護理師","機車","預防接種海報"]},
+  geri:  {cap:"老年醫學病房", find:["現實導向板（日期、天氣，預防譫妄）","大字時鐘","助行器","一週藥盒","老花眼鏡與助聽器","低床與離床警示墊","家人照片","坐到椅子上的早期活動"]},
+  clinic:{cap:"門診", find:["健保卡讀卡機","叫號燈","雙螢幕電子病歷","檢查床與床單紙","電子血壓計","壁掛式耳鏡","洗手台"]}
+};
+function sceneKey(st){
+  if(!st || !st.m) return null; const d = st.dept;
+  if(d.includes("急診")) return d.includes("夜") ? "er_n" : "er";
+  if(d.includes("婦產")) return "ob"; if(d.includes("兒科")) return "peds";
+  if(d.includes("外科")) return "or"; if(d.includes("社區")) return "comm";
+  if(d.includes("老年")) return "geri"; if(d.includes("選修")) return "clinic";
+  if(d.includes("內科")) return "ward"; return null;
+}
+function sceneFig(st){
+  const k = sceneKey(st); if(!k) return "";
+  const I = SCENE_INFO[k];
+  return `<figure class="scene"><canvas data-scene="${k}" width="960" height="312" role="img" aria-label="${esc(I.cap)}插圖"></canvas>
+   <figcaption><strong>找找看・${esc(I.cap)}</strong>${I.find.map(f => `<span>${esc(f)}</span>`).join("")}</figcaption></figure>`;
+}
+function drawScenes(){ V().querySelectorAll("canvas[data-scene]").forEach(cv => { try{ drawScene(cv, cv.dataset.scene); }catch(e){} }); }
+function drawScene(cv, k){
+  const c = cv.getContext("2d"); c.setTransform(3,0,0,3,0,0); c.clearRect(0,0,320,104);
+  const R = (x,y,w,h,col) => { c.fillStyle = col; c.fillRect(x,y,w,h); };
+  const O = (x,y,w,h,col,lw=1) => { c.strokeStyle = col; c.lineWidth = lw; c.strokeRect(x+.5,y+.5,w-1,h-1); };
+  const L = (pts,col,lw=1) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); pts.forEach(([x,y],i) => i ? c.lineTo(x,y) : c.moveTo(x,y)); c.stroke(); };
+  const C = (x,y,r,col) => { c.fillStyle = col; c.beginPath(); c.arc(x,y,r,0,7); c.fill(); };
+  const T = (t,x,y,size,col,al="left",w="700") => { c.font = `${w} ${size}px "Noto Sans TC","PingFang TC",sans-serif`; c.fillStyle = col; c.textAlign = al; c.fillText(t,x,y); };
+  const P = (id,x,y,s=1.25,dir="down") => { try{ drawChar(c,x,y,id,dir,0,s); }catch(e){} };
+  const PM = (id,x,y,s=1.25) => { P(id,x,y,s); R(x+4.4*s,y+4.6*s,7.2*s,2.8*s,"#cfe3f0"); R(x+4.4*s,y+4.6*s,7.2*s,.5*s,"#a9c6da"); };
+  const ME = (x,y,s=1.25,id="me") => { (id==="me"?P:PM)(id,x,y,s); const w = 7; R(x+8*s-w/2,y-7,w,5,"#2c6e5c"); T("你",x+8*s,y-3.3,3.6,"#fff","center"); c.fillStyle="#2c6e5c"; c.beginPath(); c.moveTo(x+8*s-1.5,y-2); c.lineTo(x+8*s+1.5,y-2); c.lineTo(x+8*s,y-.4); c.fill(); };
+  const room = (wall,floor,line,y=86) => {
+    R(0,0,320,y,wall); R(0,y,320,130-y,floor); R(0,y-3,320,3,line);
+    for(let x=0;x<320;x+=20) R(x,y,1,130-y,"rgba(0,0,0,.05)"); for(let yy=y+10;yy<130;yy+=12) R(0,yy,320,1,"rgba(0,0,0,.05)");
+    for(let i=0;i<60;i++) R((i*53)%320, y+4+(i*29)%(126-y), 1, 1, "rgba(0,0,0,.08)");
+  };
+  const clock = (x,y,r,h,m) => { C(x,y,r,"#fff"); c.strokeStyle="#333"; c.lineWidth=1; c.beginPath(); c.arc(x,y,r,0,7); c.stroke();
+    const a = (h%12+m/60)/12*Math.PI*2, b = m/60*Math.PI*2; L([[x,y],[x+Math.sin(a)*r*.5,y-Math.cos(a)*r*.5]],"#222",1.2); L([[x,y],[x+Math.sin(b)*r*.8,y-Math.cos(b)*r*.8]],"#222",.8); };
+  const monitor = (x,y,w,h,o={}) => {
+    R(x-1,y-1,w+2,h+2,"#5b6470"); R(x,y,w,h,"#0d1417");
+    const ecg = []; for(let i=0;i<w*0.62;i++){ const p = i%14; ecg.push([x+2+i, y+5+(p===6?-4:p===7?3:p===8?-1:0)]); } L(ecg,"#39e27c",.6);
+    const sp = []; for(let i=0;i<w*0.62;i++) sp.push([x+2+i, y+11-Math.max(0,Math.sin(i/2.2))*2.4]); L(sp,"#3cc8f0",.6);
+    if(o.co2){ const e = []; for(let i=0;i<w*0.62;i++){ const p=i%16; e.push([x+2+i, y+17-(p>3&&p<12?3:0)]); } L(e,"#f2d43c",.6); }
+    T(o.hr||"78", x+w-2, y+7, 5, "#39e27c","right"); T(o.sp||"98", x+w-2, y+13, 5, "#3cc8f0","right"); T(o.bp||"122/76", x+w-2, y+h-2, 3.6, "#f06a6a","right");
+  };
+  const ivpole = (x,y,o={}) => { R(x,y,1,46,"#9aa3ab"); R(x-6,y+46,13,1.5,"#7b848c"); C(x-5,y+48,1.2,"#333"); C(x+6,y+48,1.2,"#333");
+    R(x-4,y,9,1,"#9aa3ab"); R(x-5,y+1,4,8,"rgba(220,240,255,.9)"); O(x-5,y+1,4,8,"#9cc"); R(x-4,y+5,2,3,"rgba(150,200,240,.8)"); R(x-3.6,y+9,1,4,"#cde");
+    if(o.pump!==false){ R(x-3,y+18,7,9,"#e9ecee"); O(x-3,y+18,7,9,"#9aa3ab"); R(x-2,y+19,5,3,"#16302a"); T("80",x+.5,y+21.6,2.6,"#7ff0b0","center"); }
+    if(o.line) L([[x-3.5,y+13],[x-3,y+18]],"#cde",.5); };
+  const handrub = (x,y) => { R(x,y,4,7,"#f3f5f6"); O(x,y,4,7,"#9aa"); R(x+1,y+1,2,2,"#4aa3d9"); R(x+1.5,y+7,1,1.5,"#9aa"); };
+
+  if(k === "ward"){
+    room("#dfece6","#cfd8d3","#b8c7bf");
+    R(0,0,320,6,"#eef3f0"); R(10,6,300,1,"#9fb0a8"); /* 隔簾軌道 */
+    R(212,7,42,75,"#bcd9e6"); for(let i=0;i<7;i++) R(214+i*6,7,1,75,"#a6c6d4"); /* 隔簾 */
+    R(28,22,80,14,"#c9d6cf"); O(28,22,80,14,"#9fb0a8"); /* 床頭設備帶 */
+    R(34,25,5,8,"#2f8f4e"); C(36.5,25,2.6,"#e8f4ea"); R(35,33,3,5,"rgba(200,230,255,.9)"); O(35,33,3,5,"#8ab"); T("O₂",36.5,31,2.6,"#fff","center");
+    R(46,25,6,6,"#f2f2f2"); O(46,25,6,6,"#777"); C(49,28,2,"#d33"); R(47,32,4,7,"rgba(240,240,220,.9)"); O(47,32,4,7,"#999"); T("吸",49,38,2.6,"#555","center");
+    R(60,26,4,4,"#e33"); T("叫人鈴",62,34,2.6,"#555","center"); R(72,25,4,3,"#fff"); R(80,25,4,3,"#fff"); R(88,25,4,3,"#fff");
+    monitor(112,14,30,22); R(126,36,2,8,"#7b848c");
+    /* 病床 */
+    R(26,52,94,6,"#f4f4f2"); R(26,58,94,5,"#c9ced2"); R(30,63,3,18,"#8a929a"); R(112,63,3,18,"#8a929a"); C(31,82,2,"#333"); C(114,82,2,"#333");
+    R(24,40,4,24,"#b9c0c6"); R(118,46,4,18,"#b9c0c6");
+    R(32,46,18,7,"#ffffff"); R(36,44,9,8,"#e2b48c"); R(36,43,9,3,"#cfcfcf"); R(38,47,1,1,"#333"); R(42,47,1,1,"#333"); L([[37,49],[33,52]],"#9fd3e8",.5); L([[44,49],[48,52]],"#9fd3e8",.5);
+    R(46,48,70,8,"#a9c7e6"); R(46,48,70,2,"#c6dcf0");
+    R(54,58,30,2,"#9aa3ab"); for(let i=0;i<6;i++) R(56+i*5,55,1,4,"#9aa3ab"); /* 床欄 */
+    R(96,62,6,8,"rgba(250,230,120,.75)"); O(96,62,6,8,"#c9b45a"); L([[99,62],[96,56]],"#e8d88a",.5); T("尿袋",99,74,2.6,"#7a6a20","center");
+    handrub(116,42);
+    ivpole(16,30,{line:true}); L([[13,43],[22,50],[36,52]],"#cde",.5);
+    R(4,58,14,14,"#d8c8a8"); R(5,54,4,4,"#fff"); R(10,55,3,3,"#bfe1f2"); /* 床旁桌 */
+    R(150,18,46,28,"#fafafa"); O(150,18,46,28,"#8a9"); T("今日照護團隊",173,24,3.4,"#2c6e5c","center");
+    T("主治：王醫師",153,30,3,"#333"); T("護理師：小葵",153,35,3,"#333"); T("NPO 00:00",153,40,3,"#b33"); R(184,32,9,9,"#f2c230"); T("防跌",188.5,38.5,2.8,"#333","center");
+    /* 行動護理車 */
+    R(256,56,22,4,"#dfe5ea"); R(258,48,18,8,"#2b2f36"); R(259,49,16,6,"#7ab8e8"); R(260,60,2,20,"#8a929a"); R(272,60,2,20,"#8a929a"); R(256,70,22,8,"#cfd6dc"); C(261,81,1.6,"#333"); C(273,81,1.6,"#333"); R(277,52,3,5,"#333"); T("掃條碼",267,66,2.6,"#333","center");
+    P("rn",282,60); ME(160,64); L([[166,74],[168,79],[172,79]],"#333",.5); R(171,78,3,3,"#888");
+  }
+  if(k === "or"){
+    room("#cfe3e2","#b7c5c6","#8fa9aa",90);
+    for(let x=0;x<320;x+=10) R(x,0,1,87,"rgba(255,255,255,.35)"); for(let y=0;y<87;y+=10) R(0,y,320,1,"rgba(255,255,255,.35)");
+    /* 無影燈 */
+    L([[120,0],[120,8],[104,14]],"#9aa3ab",1.5); L([[120,8],[142,12]],"#9aa3ab",1.5);
+    c.fillStyle="#e8ecee"; c.beginPath(); c.ellipse(102,17,14,5,0,0,7); c.fill(); c.fillStyle="#fffbe0"; c.beginPath(); c.ellipse(102,19,10,2.5,0,0,7); c.fill();
+    c.fillStyle="#e8ecee"; c.beginPath(); c.ellipse(146,15,11,4,0,0,7); c.fill(); c.fillStyle="#fffbe0"; c.beginPath(); c.ellipse(146,17,8,2,0,0,7); c.fill();
+    c.fillStyle="rgba(255,250,210,.25)"; c.beginPath(); c.moveTo(92,20); c.lineTo(112,20); c.lineTo(128,60); c.lineTo(84,60); c.fill();
+    /* 手術台與病人 */
+    R(80,60,82,6,"#3c6fa6"); R(80,58,82,3,"#5287c0"); R(116,66,10,14,"#6d767f"); R(106,80,30,4,"#5a636b");
+    R(74,40,2,22,"#9aa3ab"); R(74,40,14,1.5,"#9aa3ab"); R(76,41,10,18,"#5287c0"); /* 麻醉隔簾 */
+    R(64,55,12,5,"#e0b38f"); R(62,55,4,4,"#3d6fa8"); L([[66,56],[58,50]],"#d7dde0",1); /* 頭與管路 */
+    /* 麻醉機 */
+    R(26,30,30,52,"#e4e8eb"); O(26,30,30,52,"#8a929a"); monitor(28,14,26,20,{co2:1,hr:"72",sp:"99",bp:"110/68"}); R(40,34,2,0,"#000");
+    R(30,40,6,10,"#f5d76e"); R(37,40,6,10,"#7fb3e0"); T("Sevo",33,52,2.4,"#333","center"); T("Des",40,52,2.4,"#333","center");
+    R(46,38,7,14,"rgba(200,220,240,.6)"); O(46,38,7,14,"#7b848c"); for(let i=0;i<5;i++) R(46,40+i*2.6,7,.8,"#4a7fb0"); /* 風箱 */
+    C(52,60,3,"#1f2a33"); T("呼吸囊",52,67,2.4,"#333","center"); R(30,72,22,2,"#b0b8bf"); R(20,50,4,32,"#2f8f4e"); T("O₂",22,48,2.6,"#333","center");
+    C(30,84,1.6,"#333"); C(52,84,1.6,"#333");
+    /* 器械台 */
+    R(176,54,40,3,"#d5dbe0"); R(176,50,40,4,"#7aa7d6"); for(let i=0;i<9;i++) R(179+i*4,47,1,4,"#cfd6dc"); R(212,47,3,3,"#fff"); R(208,47,3,3,"#fff"); R(178,57,2,26,"#8a929a"); R(212,57,2,26,"#8a929a");
+    R(156,46,18,2,"#cfd6dc"); R(157,44,14,2,"#7aa7d6"); R(165,48,1.5,30,"#8a929a"); T("Mayo",165,43,2.6,"#333","center");
+    /* 電燒機 */
+    R(232,52,22,14,"#eef0f2"); O(232,52,22,14,"#8a929a"); R(234,54,8,4,"#1d2b2b"); T("30",238,57.4,2.8,"#ffcf3c","center"); C(247,56,1.6,"#2f6db5"); C(251,56,1.6,"#f2c230"); R(232,66,22,16,"#c8ced3"); R(236,86,10,3,"#2f6db5"); L([[240,82],[240,86]],"#555",.6); T("電燒",243,63,2.6,"#333","center");
+    /* 抽吸瓶 */
+    for(let i=0;i<2;i++){ R(262+i*8,38,6,10,"rgba(230,240,245,.9)"); O(262+i*8,38,6,10,"#8a929a"); R(262+i*8,43,6,5,"rgba(200,60,60,.6)"); }
+    /* 清點板 */
+    R(262,8,52,26,"#fbfbfb"); O(262,8,52,26,"#6d767f"); T("清點",288,13,3.2,"#2c6e5c","center"); T("紗布 10／10 ✓",265,19,2.8,"#333"); T("器械 32／32 ✓",265,24,2.8,"#333"); T("Time-out ✓ 08:12",265,30,2.8,"#b33");
+    clock(190,14,7,8,25);
+    PM("scrub",100,40,1.25); PM("scrub",134,40,1.25); PM("anes",54,60,1.2); ME(188,62,1.2,"scrub");
+  }
+  if(k === "peds"){
+    room("#fdf2dc","#e9dcc4","#d8c4a0");
+    [["#e85d5d",0],["#f2a33a",3],["#f2d43c",6],["#5bbf6a",9],["#4aa3d9",12]].forEach(([col,i]) => { c.strokeStyle=col; c.lineWidth=2.4; c.beginPath(); c.arc(60,48,34-i,Math.PI,2*Math.PI); c.stroke(); });
+    C(36,22,4,"#fff"); C(40,20,5,"#fff"); C(84,24,4,"#fff"); C(88,22,4,"#fff");
+    /* 長頸鹿身高尺 */
+    R(108,10,10,74,"#f6d27a"); for(let y=12;y<84;y+=4) R(108,y,3,.6,"#8a6a20"); for(let i=0;i<6;i++) C(114,16+i*12,1.5,"#c4882e"); T("cm",113,9,2.8,"#8a6a20","center");
+    /* 臉譜量表 */
+    R(130,12,70,18,"#fff"); O(130,12,70,18,"#c9b"); T("疼痛量表",165,17,3,"#7a5a20","center");
+    ["#5bbf6a","#9ccc55","#f2d43c","#f2a33a","#ee7a3a","#e85d5d"].forEach((col,i) => { const x=137+i*11; C(x,24,4,col); R(x-2,22,1,1,"#333"); R(x+1,22,1,1,"#333"); L(i<2?[[x-2,25.4],[x,26.6],[x+2,25.4]]:i<4?[[x-2,26],[x+2,26]]:[[x-2,27],[x,25.6],[x+2,27]],"#333",.5); T(String(i*2),x,30-.4+4,2.4,"#555","center"); });
+    /* 嬰兒床 */
+    R(128,46,70,4,"#f4f4f2"); R(128,66,70,4,"#f4f4f2"); for(let i=0;i<15;i++) R(129+i*4.7,46,1.4,24,"#e4e7ea"); R(126,46,3,36,"#d3d8dc"); R(197,46,3,36,"#d3d8dc"); C(128,83,1.6,"#333"); C(198,83,1.6,"#333");
+    R(134,58,14,7,"#fff"); R(138,56,8,7,"#f3cfb0"); R(138,55,8,2,"#4a3422"); R(140,58,1,1,"#333"); R(143,58,1,1,"#333");
+    R(146,58,46,8,"#ffd3e2"); for(let i=0;i<6;i++) C(152+i*7,61,1.2,"#fff");
+    R(160,56,10,4,"#f0f0f0"); O(160,56,10,4,"#9aa"); T("固定板",165,54,2.4,"#555","center"); L([[165,56],[176,40],[226,30]],"#cde",.5);
+    /* 針筒幫浦 */
+    ivpole(228,26,{pump:false}); R(222,44,13,7,"#f2f4f5"); O(222,44,13,7,"#8a929a"); R(223,45,9,2,"rgba(220,240,255,.9)"); R(223,48,5,2,"#16302a"); T("2.5",225.5,49.8,2,"#7ff0b0","center");
+    /* 噴霧器 */
+    R(240,70,14,10,"#eef0f2"); O(240,70,14,10,"#8a929a"); R(243,64,4,6,"rgba(200,230,255,.8)"); L([[245,64],[248,58],[252,58]],"#b8dbe8",.6); C(252,57,2.5,"rgba(170,220,240,.7)"); T("噴霧",247,78,2.6,"#333","center");
+    /* 玩具與陪病椅 */
+    R(20,76,6,6,"#e85d5d"); R(26,78,5,5,"#4aa3d9"); R(23,72,5,5,"#f2d43c"); C(32,30,4,"#ff8fb0"); L([[32,34],[34,60]],"#999",.4);
+    R(262,62,40,8,"#8fb3a3"); R(262,56,8,14,"#7aa090"); R(266,70,2,12,"#666"); R(296,70,2,12,"#666");
+    P("mom",270,46); P("lee",70,62); ME(92,64);
+  }
+  if(k === "ob"){
+    room("#f6e6ea","#d9cdd2","#c7aeb7");
+    R(16,14,40,26,"#fff"); O(16,14,40,26,"#c7aeb7"); T("肌膚接觸",36,21,3.4,"#8a3b5c","center"); T("出生後",36,27,2.8,"#555","center"); T("母嬰親善",36,33,2.8,"#555","center"); C(36,37,1.6,"#e8a");
+    clock(76,16,7,4,47); T("Apgar 1′ 5′",76,30,2.6,"#8a3b5c","center");
+    /* 產台 */
+    c.fillStyle="#fff2b8"; c.beginPath(); c.ellipse(130,10,10,4,0,0,7); c.fill(); L([[130,0],[130,6]],"#9aa3ab",1.2);
+    R(96,54,64,7,"#d8e2ea"); R(94,48,22,8,"#cfd9e1"); R(118,61,20,20,"#9aa3ab"); R(110,81,36,3,"#7b848c");
+    R(160,52,14,2,"#9aa3ab"); R(172,44,3,10,"#9aa3ab"); R(169,42,8,3,"#7a8a96"); T("腳架",173,40,2.6,"#555","center");
+    R(98,46,10,7,"#fff"); R(100,44,8,7,"#efc8a6"); R(99,42,10,3,"#2a1d18"); R(106,50,48,7,"#e9a7c0"); R(126,47,16,6,"#e9a7c0");
+    L([[136,50],[140,44],[180,36]],"#e07a9a",.6); L([[132,52],[140,48],[180,42]],"#7a9ad0",.6);
+    /* 胎兒監視器 */
+    R(180,30,28,26,"#eef0f2"); O(180,30,28,26,"#8a929a"); R(182,32,24,10,"#0d1417"); T("FHR 142",184,37,3,"#ff6b8a"); T("UC",184,41,2.6,"#7ab8ff");
+    R(182,44,24,16,"#fffdf4"); const f=[], u=[]; for(let i=0;i<24;i++){ f.push([182+i,48+Math.sin(i/1.3)*.9]); u.push([182+i,57-Math.max(0,Math.sin((i-6)/4))*4]); } L(f,"#d33",.5); L(u,"#336",.5); for(let i=0;i<5;i++) R(182+i*6,44,.4,16,"rgba(220,120,140,.4)");
+    R(184,60,22,22,"#dfe3e6"); C(186,84,1.5,"#333"); C(204,84,1.5,"#333");
+    ivpole(84,24,{line:true});
+    /* 輻射保暖台 */
+    R(236,12,40,6,"#e4e8eb"); R(240,18,32,3,"#ff9a3c"); c.fillStyle="rgba(255,150,60,.18)"; c.beginPath(); c.moveTo(240,21); c.lineTo(272,21); c.lineTo(280,52); c.lineTo(232,52); c.fill();
+    R(268,18,3,64,"#9aa3ab"); R(232,52,48,6,"#eef0f2"); R(232,46,48,6,"rgba(220,235,245,.5)"); O(232,46,48,6,"#b0bcc6"); R(236,58,40,22,"#e4e8eb"); C(238,82,1.5,"#333"); C(276,82,1.5,"#333");
+    R(248,48,10,4,"#f3cfb0"); R(256,47,6,5,"#f3cfb0"); R(246,49,6,3,"#fff");
+    C(240,42,3,"rgba(220,240,255,.9)"); R(240,40,7,4,"rgba(200,220,240,.9)"); T("甦醒球",244,37,2.4,"#555","center");
+    R(286,62,24,6,"#eef0f2"); R(288,58,20,4,"#cfe0ea"); R(292,68,12,4,"#cfd6dc"); R(294,69,8,2,"#1d2b2b"); T("3240g",298,70.6,2,"#7ff0b0","center"); T("嬰兒秤",298,56,2.6,"#555","center");
+    P("tsai",150,62); P("rn",208,62); ME(62,62);
+  }
+  if(k === "er" || k === "er_n"){
+    const night = k === "er_n";
+    room(night?"#c9d2d8":"#e3e9ec", night?"#a8b2b8":"#c8d0d4", "#9aa6ad");
+    R(0,0,320,8,night?"#b5bfc6":"#f1f4f5"); for(let i=0;i<5;i++) R(10+i*66,2,30,3,night?"#f6f2d0":"#fff");
+    /* 救護車入口 */
+    R(6,20,50,64,"#7aa0b5"); R(8,22,22,62,"rgba(200,230,245,.6)"); R(32,22,22,62,"rgba(200,230,245,.6)"); R(30,22,2,62,"#5a7a8c"); R(4,12,54,8,"#c0392b"); T("救護車入口",31,18,4,"#fff","center");
+    if(night){ R(8,22,22,30,"rgba(20,30,60,.6)"); R(32,22,22,30,"rgba(20,30,60,.6)"); }
+    /* 救護技術員推床 */
+    R(56,66,34,4,"#f4f4f2"); R(58,70,2,12,"#9aa3ab"); R(86,70,2,12,"#9aa3ab"); C(59,83,1.6,"#333"); C(87,83,1.6,"#333"); R(60,62,8,5,"#e0b38f"); R(66,62,22,5,"#e86a5a"); R(58,60,6,2,"#f4f4f2");
+    P("emt",88,54,1.15);
+    /* 檢傷站 */
+    R(98,46,48,24,"#d9e2e6"); R(96,44,52,3,"#8a9aa3"); R(100,36,14,10,"#2b2f36"); R(101,37,12,8,"#7ab8e8"); R(118,40,6,5,"#e8ecee"); C(121,42,1.6,"#d33");
+    R(98,22,48,12,"#2c6e5c"); T("檢傷站",122,30,5,"#fff","center");
+    P("rn",126,30,1.1);
+    /* 走廊加床 */
+    for(let i=0;i<2;i++){ const x=152+i*34; R(x,70,30,4,"#f4f4f2"); R(x+2,74,2,8,"#9aa3ab"); R(x+26,74,2,8,"#9aa3ab"); R(x+2,66,7,5,"#efc8a6"); R(x+8,67,20,4,i?"#9fbcd6":"#c9b8d8"); C(x+3,83,1.4,"#333"); C(x+27,83,1.4,"#333"); }
+    R(150,58,64,7,"#fff7d6"); T("加床 A1 · A2",182,63,3,"#8a6a20","center");
+    ivpole(160,36,{pump:false});
+    /* 急救區 */
+    R(222,10,92,8,"#c0392b"); T("急救區",268,16,5,"#fff","center");
+    monitor(272,22,32,22,{hr:night?"138":"112",sp:"91",bp:"84/50"});
+    R(226,50,22,32,"#d63b30"); for(let i=0;i<4;i++){ R(228,53+i*7,18,5,"#e85a4f"); R(235,55+i*7,4,1,"#ffd7d0"); } C(229,84,1.6,"#333"); C(245,84,1.6,"#333"); T("急救車",237,48.4,2.6,"#333","center");
+    R(228,40,18,9,"#f2d43c"); R(230,42,8,5,"#1d2b2b"); L([[232,44],[233,42.5],[234,45],[235,44]],"#39e27c",.5); C(242,44,1.6,"#d33"); T("AED",242,40,2.4,"#333","center");
+    R(254,48,6,34,"#2f8f4e"); C(257,48,3,"#2f8f4e"); R(255,42,4,4,"#9aa3ab"); T("O₂",257,60,2.8,"#fff","center");
+    /* 移動式 X 光 */
+    R(290,62,22,20,"#e8ecee"); O(290,62,22,20,"#8a929a"); R(298,42,3,22,"#9aa3ab"); R(300,42,14,3,"#9aa3ab"); R(308,45,8,6,"#cfd6dc"); T("X光",301,73,3,"#333","center"); C(292,84,1.5,"#333"); C(310,84,1.5,"#333");
+    clock(186,30,6, night?3:14, night?12:20);
+    P("wang",204,58,1.15); ME(256,62,1.15);
+  }
+  if(k === "comm"){
+    const g = c.createLinearGradient(0,0,0,70); g.addColorStop(0,"#9fd0f0"); g.addColorStop(1,"#e6f4fb"); c.fillStyle=g; c.fillRect(0,0,320,80);
+    c.fillStyle="#7d9db8"; c.beginPath(); c.moveTo(0,52); [[30,28],[60,40],[96,18],[130,36],[170,14],[208,34],[240,22],[280,40],[320,26],[320,60],[0,60]].forEach(([x,y])=>c.lineTo(x,y)); c.fill();
+    c.fillStyle="#5f8a6a"; c.beginPath(); c.moveTo(0,62); [[40,46],[90,56],[140,44],[200,58],[260,46],[320,56],[320,70],[0,70]].forEach(([x,y])=>c.lineTo(x,y)); c.fill();
+    C(286,14,6,"#fff3b0"); C(60,14,4,"#fff"); C(66,12,5,"#fff"); C(72,14,4,"#fff");
+    R(0,70,320,60,"#9bc27a"); for(let i=0;i<12;i++) R(i*28,100,20,1,"#86b066"); R(0,84,320,8,"#b9b2a3"); R(0,87.5,320,.6,"#fff");
+    /* 衛生所 */
+    R(110,36,110,48,"#f1ede4"); R(106,32,118,6,"#c45a3c"); R(110,38,110,3,"#d9d2c4");
+    R(136,22,58,12,"#2c6e5c"); T("衛生所",165,31,6.5,"#fff","center");
+    for(let i=0;i<4;i++){ R(116+i*26,46,16,12,"#9fc8e0"); O(116+i*26,46,16,12,"#8a8478"); R(123.5+i*26,46,1,12,"#8a8478"); }
+    R(156,62,18,22,"#7a5a3a"); R(164.5,62,1,22,"#5a4028"); C(170,74,.8,"#e8d08a");
+    R(116,62,30,16,"#fff"); O(116,62,30,16,"#999"); T("流感疫苗",131,68,3,"#c0392b","center"); T("成人健檢",131,74,3,"#2c6e5c","center");
+    R(182,62,30,16,"#fff"); O(182,62,30,16,"#999"); T("長照 1966",197,68,3,"#2c6e5c","center"); T("戒菸門診",197,74,3,"#555","center");
+    /* 檳榔樹 */
+    [[30,40],[46,46],[250,42],[300,40]].forEach(([x,y]) => { R(x,y,1.6,44,"#8a8a6a"); for(let a=0;a<6;a++){ const t=a/6*Math.PI*2; L([[x+.8,y],[x+.8+Math.cos(t)*7,y+Math.sin(t)*3+2]],"#3f7a3a",1.2); } });
+    /* 機車 */
+    C(70,96,4,"#222"); C(88,96,4,"#222"); R(70,88,18,5,"#d9d9d9"); R(80,84,6,5,"#e85d5d"); R(70,86,6,3,"#333"); L([[86,84],[88,80]],"#555",1); R(64,90,6,4,"#2c6e5c"); T("訪視包",67,100,2.6,"#333","center");
+    /* 居家訪視：血壓計、血糖機、藥盒 */
+    R(230,86,52,17,"#fff8e8"); O(230,86,52,17,"#c9b48a"); T("居家訪視",256,90.5,3,"#7a5a20","center");
+    R(234,93,12,8,"#3d6fa8"); C(240,97,2.4,"#e4e8eb"); R(250,93,7,9,"#eee"); R(251,94,5,3,"#1d2b2b"); T("102",253.5,96.4,2,"#7ff0b0","center");
+    for(let i=0;i<7;i++){ R(260+(i%4)*5,93+Math.floor(i/4)*5,4,4,["#e85d5d","#f2a33a","#f2d43c","#5bbf6a","#4aa3d9","#7a5bb3","#e88fb0"][i]); }
+    P("kolas",186,72,1.15); P("phn",206,74,1.15); P("elder",100,74,1.15); R(114,82,1,14,"#7a5a3a"); ME(132,74,1.15);
+  }
+  if(k === "geri"){
+    room("#efe9dc","#d6cbb4","#bfae8c");
+    R(0,0,320,86,"rgba(255,240,210,.25)");
+    /* 現實導向板 */
+    R(14,12,74,40,"#2f5a4a"); O(14,12,74,40,"#c9a46a",2); T("今天是",51,20,3.6,"#e8f0e8","center"); T("10 月 18 日 星期六",51,28,4.4,"#fff","center"); T("天氣：晴 ☀",51,36,3.4,"#ffe9a0","center"); T("早餐 7:30｜復健 10:00",51,44,3,"#d6e8de","center"); T("你在：老年醫學病房",51,50,2.8,"#d6e8de","center");
+    clock(108,22,10,10,10); T("大字時鐘",108,38,2.8,"#555","center");
+    R(126,14,24,18,"#d9c7a8"); R(128,16,20,14,"#9ec0d8"); C(134,22,2.2,"#f3cfb0"); C(142,22,2.2,"#f3cfb0"); R(132,24,4,6,"#c45a3c"); R(140,24,4,6,"#3d6fa8"); T("家人照片",138,36,2.6,"#555","center");
+    /* 低床與離床警示墊 */
+    R(150,62,90,5,"#f4f4f2"); R(150,67,90,6,"#c9ced2"); R(150,54,4,20,"#b9c0c6"); C(154,75,1.5,"#333"); C(236,75,1.5,"#333");
+    R(156,56,16,7,"#fff"); R(174,58,60,6,"#e3c9a0"); R(150,78,34,7,"#f2d43c"); O(150,78,34,7,"#b8961c"); T("離床警示墊",167,83.4,2.6,"#5a4a10","center");
+    R(244,30,10,8,"#f2c230"); T("防跌",249,36,3,"#333","center");
+    /* 床旁桌：藥盒、眼鏡、助聽器 */
+    R(250,60,32,4,"#c9a46a"); R(252,64,3,18,"#a8854c"); R(278,64,3,18,"#a8854c");
+    ["日","一","二","三","四","五","六"].forEach((d,i) => { R(252+i*4,55,3.5,5,["#e85d5d","#f2a33a","#f2d43c","#5bbf6a","#4aa3d9","#7a5bb3","#e88fb0"][i]); });
+    T("一週藥盒",266,53,2.6,"#555","center"); C(254,59.6,0,"#000");
+    c.strokeStyle="#333"; c.lineWidth=.6; c.beginPath(); c.arc(274,58,1.6,0,7); c.arc(279,58,1.6,0,7); c.stroke();
+    C(266,58,1.4,"#e0c0a8"); R(267,57,1,2.4,"#e0c0a8");
+    /* 椅子上的長者與助行器 */
+    R(60,66,26,6,"#7a9a8a"); R(60,52,6,20,"#6a8a7a"); R(62,72,2,12,"#555"); R(82,72,2,12,"#555");
+    P("elder",64,48,1.2);
+    R(92,58,2,26,"#aab2b8"); R(108,58,2,26,"#aab2b8"); R(92,58,18,2,"#aab2b8"); R(92,70,18,1.4,"#aab2b8"); C(93,85,1.4,"#555"); C(109,85,1.4,"#555"); T("助行器",101,56,2.6,"#555","center");
+    P("shih",116,62,1.15); ME(196,62,1.15);
+  }
+  if(k === "clinic"){
+    room("#e6eef3","#cbd5db","#a9b8c1");
+    R(10,10,44,16,"#1d2b33"); T("08 診",32,17,4,"#9fe0ff","center"); T("看診號碼 23",32,23.6,3.6,"#ff6b5a","center");
+    /* 檢查床 */
+    R(16,60,58,8,"#5a8aa8"); R(16,58,58,3,"#f8f8f6"); R(14,52,10,8,"#5a8aa8"); R(20,68,3,14,"#8a929a"); R(68,68,3,14,"#8a929a"); R(58,52,10,6,"#eee"); C(63,55,2.4,"#ddd"); T("床單紙",63,50,2.6,"#555","center");
+    /* 洗手台 */
+    R(84,54,20,4,"#f4f6f8"); R(86,58,16,24,"#dfe5ea"); L([[94,54],[94,48],[98,48]],"#9aa3ab",1.2); handrub(106,42); R(86,30,18,14,"#cfe3ef"); O(86,30,18,14,"#8a929a");
+    /* 壁掛耳鏡、血壓計 */
+    R(114,24,22,10,"#eef0f2"); O(114,24,22,10,"#8a929a"); R(117,34,2,8,"#333"); R(129,34,2,8,"#333"); C(118,43,1.6,"#2f6db5"); C(130,43,1.6,"#2f6db5"); T("耳鏡",125,22,2.6,"#555","center");
+    R(232,52,16,10,"#f2f4f5"); O(232,52,16,10,"#8a929a"); R(234,54,8,4,"#1d2b2b"); T("128",238,57.2,2.6,"#7ff0b0","center"); L([[248,58],[258,64]],"#555",.6); R(256,62,8,6,"#3d6fa8"); T("血壓計",240,50,2.6,"#555","center");
+    /* 醫師桌 */
+    R(150,62,84,5,"#c9a46a"); R(152,67,4,16,"#a8854c"); R(226,67,4,16,"#a8854c");
+    R(168,38,26,18,"#22272e"); R(169,39,24,15,"#e8f0f6"); for(let i=0;i<5;i++) R(171,41+i*2.6,18-(i%2)*6,1,"#7a8a96");
+    R(198,38,26,18,"#22272e"); R(199,39,24,15,"#f4f6f8"); R(201,41,10,8,"#cfd6dc"); R(213,41,8,3,"#2c6e5c"); R(213,45,8,1,"#999"); R(213,47,6,1,"#999");
+    R(180,56,2,6,"#555"); R(210,56,2,6,"#555");
+    R(160,56,12,6,"#e8ecee"); O(160,56,12,6,"#8a929a"); R(162,54,8,3,"#4aa36b"); T("健保卡",166,53,2.6,"#2c6e5c","center");
+    R(176,60,30,2,"#ddd"); C(226,58,2.4,"#fff"); R(224,52,4,6,"#fff");
+    /* 病人椅 */
+    R(258,70,18,4,"#7a8a96"); R(262,74,2,10,"#555"); R(272,74,2,10,"#555");
+    P("pt",258,52,1.15); ME(196,64,1.15); P("zhen",290,60,1.1);
+  }
+  /* 柔和暗角 */
+  const vg = c.createRadialGradient(160,52,60,160,52,190); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.18)"); c.fillStyle = vg; c.fillRect(0,0,320,104);
+}
+
+/* 對話打字機：字一個一個浮出來；點對話框可直接顯示全文 */
+function typewrite(){
+  if(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const boxes = [...V().querySelectorAll(".says")]; if(!boxes.length) return;
+  let t = 0;
+  boxes.forEach(box => {
+    const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, {acceptNode: n => n.parentElement.closest(".who") || !n.nodeValue.trim() && !n.nodeValue.includes("\n") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    const nodes = []; while(walker.nextNode()) nodes.push(walker.currentNode);
+    const total = nodes.reduce((a,n) => a + n.nodeValue.length, 0); if(!total) return;
+    const per = Math.min(26, 1500 / total);
+    nodes.forEach(n => {
+      const f = document.createDocumentFragment();
+      for(const ch of n.nodeValue){ const s = document.createElement("span"); s.className = "tw"; s.textContent = ch; s.style.animationDelay = (t += per).toFixed(0) + "ms"; f.appendChild(s); }
+      n.parentNode.replaceChild(f, n);
+    });
+    t += 120;
+  });
+  const v = V(); v.classList.add("typing");
+  const done = () => { v.classList.remove("typing"); v.removeEventListener("click", skip, true); };
+  const skip = e => { if(e.target.closest(".says")) done(); };
+  v.addEventListener("click", skip, true); clearTimeout(typewrite.t); typewrite.t = setTimeout(done, t + 200);
+}
+
+function start(){ S = null; titleScreen(); }
