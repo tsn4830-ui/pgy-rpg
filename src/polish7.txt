@@ -1,2 +1,8 @@
    <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>|||   <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
    <a class="try3d" href="https://tsn4830-ui.github.io/pgy-rpg/3d/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border-radius:14px;text-decoration:none;color:#f3efe6;background:linear-gradient(135deg,#1b2140,#2c6e5c);box-shadow:0 8px 22px rgba(20,30,60,.25)"><span style="font-size:26px">🏥</span><span><b style="display:block;font-size:15px">新！3D 試玩：凌晨四點的內科病房</b><small style="opacity:.8">在立體病房裡走動、找護理長和學姊，答兩題附文獻的臨床題</small></span></a>
+@@@
+speaker("lin","林護禮護理長擋在你面前：「你這四週已經超過 320 小時了。|||speaker("cuijiao","教學部的崔嬌秘書打電話來：「工時系統顯示你這四週已經超過 320 小時了，我已經通知總醫師調整排班。
+@@@
+回去睡覺。」[[cgmh]]")}|||今天交完班就回去睡覺。」[[cgmh]]")}
+@@@
+applyFx({hp:15,mood:-3},{lin:2})|||applyFx({hp:15,mood:-3},{})

@@ -138,8 +138,8 @@ function lwSeg(z0,z1,y0,y1){ const m = new THREE.Mesh(new THREE.BoxGeometry(z1-z
 lwSeg(-D/2+.11, 2.2, 0, 1.05); lwSeg(-D/2+.11, 2.2, 1.05, H); lwSeg(3.9, D/2, 0, 1.05); lwSeg(3.9, D/2, 1.05, H); lwSeg(2.2, 3.9, 2.45, H);
 add(lw, at(BOX(1.7,2.45,.06,"#c9b48e",{r:.5}),3.05,1.225,-.04), at(BOX(.08,.35,.08,"#b9bfc4",{m:.8,r:.3}),2.4,1.15,.0));
 const doorSign = sign("7F 內科病房", 1.7, .34, "#2c6e5c", "#ffffff", 120, {glow:.15}); doorSign.position.set(3.05, 2.75, .12); lw.add(doorSign);
-const wbTex = canvasTex(1024,600,(g,w,h) => { g.fillStyle = "#fbfbf8"; g.fillRect(0,0,w,h); g.strokeStyle = "#9aa3ab"; g.lineWidth = 18; g.strokeRect(0,0,w,h); g.fillStyle = "#2c6e5c"; g.font = `800 64px ${FONT}`; g.fillText("今日照護團隊", 40, 96); g.font = `600 44px ${FONT}`; g.fillStyle = "#333";
-  ["主治：王醫師　R3：張乃珂","值班 PGY：你","護理長：林護禮","11 床 跌倒高危險","12 床 NPO 00:00 · 胰島素","15 床 洗腎 · 追蹤 K⁺"].forEach((l,i) => g.fillText(l, 40, 170+i*68)); g.fillStyle = "#f2c230"; g.fillRect(820,30,160,80); g.fillStyle = "#333"; g.font = `800 44px ${FONT}`; g.fillText("防跌", 855, 86); });
+const wbTex = canvasTex(1024,600,(g,w,h) => { g.fillStyle = "#fbfbf8"; g.fillRect(0,0,w,h); g.strokeStyle = "#9aa3ab"; g.lineWidth = 18; g.strokeRect(0,0,w,h); g.fillStyle = "#2c6e5c"; g.font = `800 64px ${FONT}`; g.fillText("大夜班 值班表", 40, 96); g.font = `600 44px ${FONT}`; g.fillStyle = "#333";
+  ["值班住院醫師：R3 張乃珂","值班 PGY：你","大夜護理師：陳葵 等 2 位","11 床 跌倒高危險","12 床 糖尿病 · 胰島素","15 床 血液透析 · 追蹤 K⁺"].forEach((l,i) => g.fillText(l, 40, 170+i*68)); g.fillStyle = "#f2c230"; g.fillRect(820,30,160,80); g.fillStyle = "#333"; g.font = `800 44px ${FONT}`; g.fillText("防跌", 855, 86); });
 const wb = new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.4), new THREE.MeshStandardMaterial({map:wbTex, roughness:.4})); wb.position.set(-1.6,1.85,.12); lw.add(wb);
 const clockTex = canvasTex(256,256,()=>{}); const clock = new THREE.Mesh(new THREE.CircleGeometry(.32,40), new THREE.MeshStandardMaterial({map:clockTex, roughness:.5})); clock.position.set(.9,2.55,.12); lw.add(clock);
 function drawClock(){ const g = clockTex.userData.g, now = new Date(); g.clearRect(0,0,256,256); g.fillStyle = "#fff"; g.beginPath(); g.arc(128,128,124,0,7); g.fill(); g.lineWidth = 10; g.strokeStyle = "#2c3a3a"; g.stroke(); g.fillStyle = "#333"; for(let i=0;i<12;i++){ const a = i/12*Math.PI*2; g.fillRect(128+Math.sin(a)*100-3, 128-Math.cos(a)*100-8, 6, 16); }
@@ -265,47 +265,81 @@ const blobTex = canvasTex(128,128,(g) => { const gr = g.createRadialGradient(64,
 function makeChar(L){
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
   const blob = new THREE.Mesh(new THREE.PlaneGeometry(.9,.9), new THREE.MeshBasicMaterial({map:blobTex, transparent:true, depthWrite:false})); blob.rotation.x = -Math.PI/2; blob.position.y = .01; root.add(blob);
-  const legL = RB(.15,.38,.17,L.legs||"#33404a",{rad:.06}), legR = legL.clone(); at(legL,-.1,.19,0); at(legR,.1,.19,0);
-  const shoeL = RB(.17,.08,.24,L.shoes||"#2a2f33",{rad:.035}), shoeR = shoeL.clone(); at(shoeL,-.1,.04,.03); at(shoeR,.1,.04,.03);
-  legL.add(at(shoeL.clone(),0,-.15,.03)); legR.add(at(shoeR.clone(),0,-.15,.03));
-  add(body, legL, legR);
-  const torso = RB(.52,.56,.34,L.coat,{rad:.12,r:.75}); at(torso,0,.66,0); body.add(torso);
-  add(body, at(RB(.18,.4,.02,L.shirt,{rad:.01}),0,.7,.17));
-  if(L.coat === "#f4f6f5"){ add(body, at(BOX(.12,.1,.02,"#e3e7e6"),.14,.55,.175), at(BOX(.015,.09,.02,"#2f6db5"),.12,.6,.18)); const st = new THREE.Mesh(new THREE.TorusGeometry(.16,.016,8,24,Math.PI*1.25), mat("#2a2f33",{r:.4})); st.position.set(0,.86,.05); st.rotation.set(Math.PI/2.2,0,-Math.PI*.12); body.add(st); add(body, at(CYL(.035,.035,.02,"#c0c6cc",{m:.8,r:.25}),.1,.62,.19)); }
-  if(L.badge) add(body, at(BOX(.1,.13,.01,"#ffffff"),-.15,.75,.175));
-  const armL = new THREE.Group(), armR = new THREE.Group(); armL.position.set(-.32,.88,0); armR.position.set(.32,.88,0);
-  add(armL, at(RB(.13,.42,.15,L.coat,{rad:.06,r:.75}),0,-.2,0), at(SPH(.07,L.skin),0,-.44,0)); add(armR, at(RB(.13,.42,.15,L.coat,{rad:.06,r:.75}),0,-.2,0), at(SPH(.07,L.skin),0,-.44,0));
-  add(body, armL, armR);
-  const head = new THREE.Group(); head.position.y = 1.22; body.add(head);
-  const face = SPH(.32,L.skin,{r:.6}); face.scale.set(1,.96,.95); head.add(face);
-  [-.11,.11].forEach(ex => { add(head, at(SPH(.04,"#1f1a17",{r:.3,seg:12,seg2:8}),ex,.02,.29), at(SPH(.012,"#ffffff",{seg:8,seg2:6,cast:false}),ex+.013,.035,.325)); });
-  [-.18,.18].forEach(ex => { const b = new THREE.Mesh(new THREE.CircleGeometry(.05,16), mat("#ff9aa2",{op:.45})); b.position.set(ex,-.07,.29); b.rotation.y = ex*1.2; head.add(b); });
-  add(head, at(BOX(.08,.018,.01,"#a0524a",{cast:false}),0,-.12,.31));
-  if(L.glasses){ [-.11,.11].forEach(ex => { const r = new THREE.Mesh(new THREE.TorusGeometry(.07,.012,6,20), mat("#2a2f33",{r:.3})); r.position.set(ex,.02,.31); head.add(r); }); add(head, at(BOX(.08,.012,.01,"#2a2f33"),0,.03,.32)); }
-  const hairMat = mat(L.hair,{r:.55});
-  const cap = new THREE.Mesh(new THREE.SphereGeometry(.345,28,16,0,Math.PI*2,0,Math.PI*(L.style==="bob"||L.style==="long"||L.style==="shoulder"?.62:.5)), hairMat); cap.castShadow = true; cap.position.set(0,.03,-.02); cap.rotation.x = -.25; head.add(cap);
-  if(L.style !== "cap"){ add(head, at(RB(.5,.12,.1,L.hair,{rad:.05,material:hairMat}),0,.2,.24)); }
-  if(L.style === "bun") add(head, at(SPH(.14,L.hair,{material:hairMat}),0,.28,-.26));
-  if(L.style === "long" || L.style === "shoulder") add(head, at(RB(.62,L.style==="long"?.62:.4,.22,L.hair,{rad:.1,material:hairMat}),0,L.style==="long"?-.2:-.08,-.14));
-  if(L.style === "pony") add(head, at(RB(.14,.4,.14,L.hair,{rad:.06,material:hairMat}),0,-.05,-.36));
-  if(L.style === "spiky") for(let i=0;i<6;i++){ const c = new THREE.Mesh(new THREE.ConeGeometry(.07,.18,8), hairMat); c.position.set(-.2+i*.08,.3,.05); c.rotation.z = (i-2.5)*.15; head.add(c); }
-  if(L.style === "cap"){ cap.material = mat(L.hair,{r:.9}); }
+  const CAP = (r,len,col,o={}) => { const m = new THREE.Mesh(new THREE.CapsuleGeometry(r,len,6,16), o.material || mat(col,o)); m.castShadow = true; return m; };
+  const fab = col => mat(col,{r:.85});
+  const coatOn = !!L.coat && L.coat !== L.shirt;
+  /* 腿：從髖部轉動 */
+  const mkLeg = sx => { const g = new THREE.Group(); g.position.set(sx,.42,0);
+    add(g, at(CAP(.075,.2,null,{material:fab(L.legs||"#33404a")}),0,-.19,0), at(RB(.16,.08,.25,L.shoes||"#2a2f33",{rad:.035,r:.4}),0,-.38,.035), at(BOX(.15,.012,.2,"#ffffff",{cast:false}),0,-.415,.035)); return g; };
+  const legL = mkLeg(-.1), legR = mkLeg(.1); add(body, legL, legR);
+  const hips = new THREE.Mesh(new THREE.CylinderGeometry(.2,.21,.14,24), fab(L.legs||"#33404a")); hips.scale.z = .78; hips.position.y = .48; body.add(hips);
+  /* 上身 */
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(.19,.215,.44,28), fab(L.shirt)); torso.scale.z = .74; torso.position.y = .74; body.add(torso);
+  const shoulders = new THREE.Mesh(new THREE.SphereGeometry(.2,24,12,0,Math.PI*2,0,Math.PI/2), fab(coatOn ? L.coat : L.shirt)); shoulders.scale.set(1.12,.42,.8); shoulders.position.y = .955; body.add(shoulders);
+  if(coatOn){
+    const coat = new THREE.Mesh(new THREE.CylinderGeometry(.215,.275,.66,32,1,true,.3,Math.PI*2-.6), new THREE.MeshStandardMaterial({color:L.coat, roughness:.8, side:THREE.DoubleSide})); coat.scale.z = .8; coat.position.y = .63; body.add(coat);
+    [-1,1].forEach(sd => { const lap = RB(.07,.3,.02,L.coat,{rad:.008,r:.8}); lap.position.set(sd*.075,.84,.165); lap.rotation.z = sd*.32; lap.rotation.y = sd*.25; body.add(lap); });
+    add(body, at(RB(.12,.11,.02,L.coat,{rad:.01,r:.8}),.15,.47,.215), at(RB(.11,.1,.02,L.coat,{rad:.01,r:.8}),-.15,.47,.215));
+    add(body, at(CYL(.011,.011,.12,"#2f6db5",{seg:8}),.12,.54,.222), at(CYL(.011,.011,.1,"#c0392b",{seg:8}),.15,.535,.222));
+    if(L.tie) add(body, at(RB(.05,.2,.015,L.tie,{rad:.006}),0,.8,.15));
+  } else {
+    const vs = new THREE.Shape(); vs.moveTo(-.075,0); vs.lineTo(.075,0); vs.lineTo(0,-.1); vs.closePath(); const v = new THREE.Mesh(new THREE.ShapeGeometry(vs), mat(L.vneck||"#f2f2f2",{r:.9})); v.position.set(0,.955,.149); v.rotation.x = -.12; body.add(v);
+    add(body, at(RB(.13,.1,.02,L.shirt,{rad:.01,r:.85}),.1,.67,.15), at(CYL(.01,.01,.1,"#333",{seg:8}),.07,.7,.162), at(CYL(.012,.012,.09,"#e8e8e8",{seg:8}),.12,.7,.162));
+  }
+  if(L.badge !== 0){ const bd = new THREE.Group(); add(bd, at(RB(.085,.115,.012,"#ffffff",{rad:.01,r:.5}),0,0,0), at(BOX(.085,.025,.014,L.badgeCol||"#2c6e5c"),0,.042,0), at(BOX(.04,.045,.015,"#c9d3da"),0,-.01,0)); bd.position.set(coatOn ? -.14 : -.1, .76, coatOn ? .2 : .155); bd.rotation.x = -.12; body.add(bd); }
+  if(L.steth){ const pts = [[-.13,.86,.17],[-.16,.97,.08],[-.11,1.0,-.1],[0,1.0,-.15],[.11,1.0,-.1],[.16,.97,.08],[.1,.84,.19],[.06,.7,.2]].map(q => new THREE.Vector3(...q));
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,.013,8,false), mat(L.steth,{r:.45})); body.add(tube);
+    const cp = at(CYL(.035,.035,.025,"#c0c6cc",{m:.85,r:.2}),.06,.68,.205); cp.rotation.x = Math.PI/2; add(body, cp, at(SPH(.018,"#c0c6cc",{m:.85,r:.2}),-.13,.86,.18)); }
+  const neck = CYL(.065,.07,.1,L.skin,{r:.6}); neck.position.y = 1.0; body.add(neck);
+  /* 手臂：從肩膀轉動 */
+  const mkArm = sx => { const g = new THREE.Group(); g.position.set(sx,.92,0); const sl = coatOn ? L.coat : (L.sleeve || L.shirt);
+    add(g, at(CAP(.07,.22,null,{material:fab(sl)}),0,-.17,0), at(SPH(.062,L.skin,{r:.6}),0,-.4,0)); if(!coatOn && L.shortSleeve){ g.children[0].scale.y = .55; g.children[0].position.y = -.1; add(g, at(CAP(.052,.16,L.skin,{r:.6}),0,-.27,0)); } g.rotation.z = sx > 0 ? .12 : -.12; return g; };
+  const armL = mkArm(-.28), armR = mkArm(.28); add(body, armL, armR);
+  /* 頭 */
+  const head = new THREE.Group(); head.position.y = 1.3; body.add(head);
+  const skinM = mat(L.skin,{r:.55});
+  const face = new THREE.Mesh(new THREE.SphereGeometry(.33,48,32), skinM); face.scale.set(1,.95,.93); face.castShadow = true; head.add(face);
+  [-1,1].forEach(sd => { const e = SPH(.06,L.skin,{material:skinM,seg:12,seg2:8}); e.scale.set(.6,1,.9); e.position.set(sd*.325,-.03,0); head.add(e); });
+  const eyeM = mat(L.eye||"#2b1f1a",{r:.25}), whiteM = new THREE.MeshBasicMaterial({color:"#ffffff"}), browM = mat(L.brow||L.hair,{r:.6});
+  [-1,1].forEach(sd => {
+    const e = new THREE.Mesh(new THREE.SphereGeometry(.052,20,14), eyeM); e.scale.set(.82,1.18,.45); e.position.set(sd*.115,-.015,.292); e.rotation.y = sd*.32; head.add(e);
+    const h1 = new THREE.Mesh(new THREE.SphereGeometry(.016,10,8), whiteM); h1.position.set(sd*.115+.016,.012,.312); head.add(h1);
+    const h2 = new THREE.Mesh(new THREE.SphereGeometry(.008,8,6), whiteM); h2.position.set(sd*.115-.012,-.04,.31); head.add(h2);
+    const br = RB(.085,.018,.02,null,{material:browM,rad:.008,cast:false}); br.position.set(sd*.118,.085,.3); br.rotation.set(-.2,sd*.3,sd*-.1); head.add(br);
+    const bl = new THREE.Mesh(new THREE.CircleGeometry(.048,20), mat("#ff8f9a",{op:.38})); bl.position.set(sd*.19,-.085,.262); bl.rotation.y = sd*.62; head.add(bl);
+  });
+  add(head, at(SPH(.02,"#e8a885",{r:.6,seg:10,seg2:8}),0,-.07,.31));
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(.03,.008,6,14,Math.PI), mat("#9a4a44",{r:.5})); mouth.position.set(0,-.13,.292); mouth.rotation.z = Math.PI; mouth.rotation.x = -.2; head.add(mouth);
+  if(L.glasses){ const gm = mat(L.glasses === 1 ? "#2a2f33" : L.glasses,{r:.3,m:.4}); [-1,1].forEach(sd => { const r = new THREE.Mesh(new THREE.TorusGeometry(.068,.009,8,24), gm); r.scale.y = .85; r.position.set(sd*.115,-.01,.318); r.rotation.y = sd*.3; head.add(r); const t = BOX(.012,.012,.26,null,{material:gm}); t.position.set(sd*.19,0,.17); t.rotation.y = sd*-.12; head.add(t); }); add(head, at(BOX(.07,.01,.01,null,{material:gm}),0,.0,.33)); }
+  /* 頭髮：頭頂、後腦、瀏海 */
+  const hairMat = new THREE.MeshStandardMaterial({color:L.hair, roughness:.45, metalness:.05});
+  const top = new THREE.Mesh(new THREE.SphereGeometry(.355,40,20,0,Math.PI*2,0,Math.PI*.5), hairMat); top.scale.set(1.02,1.02,.98); top.position.set(0,.025,-.01); top.rotation.x = -.22; head.add(top);
+  const backLen = L.style === "bob" ? .82 : L.style === "long" ? .95 : .66;
+  const back = new THREE.Mesh(new THREE.SphereGeometry(.352,40,20,Math.PI,Math.PI,0,Math.PI*backLen), hairMat); back.position.set(0,.02,-.015); head.add(back);
+  const sides = L.style === "bob" ? .82 : .5;
+  [-1,1].forEach(sd => { const s2 = new THREE.Mesh(new THREE.SphereGeometry(.35,24,16,(sd>0?Math.PI:0) - Math.PI*.13,Math.PI*.26,0,Math.PI*sides), hairMat); s2.position.set(0,.02,0); s2.scale.set(1.03,1,1); head.add(s2); });
+  const fringe = L.fringe || [[-.2,.12,-.5],[-.1,.15,-.15],[0,.155,.1],[.11,.15,.3],[.21,.12,.55]];
+  fringe.forEach(([x,y,rz]) => { const lk = new THREE.Mesh(new THREE.SphereGeometry(.075,16,12), hairMat); lk.scale.set(1,1.25,.5); lk.position.set(x,y+.055,.27 - Math.abs(x)*.3); lk.rotation.set(-.35, x*1.6, rz); head.add(lk); });
+  if(L.style === "bun"){ add(head, at(SPH(.13,null,{material:hairMat}),0,.24,-.25)); const tie = new THREE.Mesh(new THREE.TorusGeometry(.085,.022,8,20), mat(L.tieCol||"#c0392b",{r:.5})); tie.position.set(0,.19,-.2); tie.rotation.x = .9; head.add(tie); }
+  if(L.style === "pony"){ add(head, at(CAP(.075,.22,null,{material:hairMat}),0,-.1,-.36)); }
+  if(L.style === "bob") [-1,1].forEach(sd => { const lk = new THREE.Mesh(new THREE.SphereGeometry(.1,16,12), hairMat); lk.scale.set(.7,1.6,.9); lk.position.set(sd*.29,-.12,.08); lk.rotation.z = sd*.15; head.add(lk); });
+  if(L.clip){ add(head, at(RB(.08,.025,.025,L.clip,{rad:.01}),-.2,.2,.24)); }
   root.userData = {body, legL, legR, armL, armR, head, t:Math.random()*10};
-  root.traverse(o => { if(o.isMesh && o !== blob) o.castShadow = true; });
+  root.traverse(o => { if(o.isMesh && o !== blob && !o.material.transparent) o.castShadow = true; });
   return root;
 }
 const LOOK = {
-  me:   {coat:"#f4f6f5", shirt:"#2c6e5c", hair:"#2a211c", style:"short", skin:"#f1c8a5"},
-  lin:  {coat:"#30506e", shirt:"#30506e", hair:"#8c8c8c", style:"short", skin:"#e2b48c", legs:"#30506e", badge:1},
-  kui:  {coat:"#e78fae", shirt:"#e78fae", hair:"#3a2a22", style:"bob", skin:"#f6d2b8", legs:"#e78fae", shoes:"#f4f4f2", badge:1},
-  zhang:{coat:"#f4f6f5", shirt:"#a3342e", hair:"#2b1d18", style:"bun", skin:"#eec4a0", glasses:1}
+  me:   {coat:"#f6f7f6", shirt:"#9cc3e6", legs:"#2f3a48", hair:"#2a211c", style:"short", skin:"#f1c8a5", steth:"#2a2f33", badgeCol:"#2c6e5c"},
+  kui:  {coat:"#e78fae", shirt:"#e78fae", legs:"#e78fae", sleeve:"#e78fae", shortSleeve:1, hair:"#3a2a22", style:"bob", skin:"#f6d2b8", shoes:"#f4f4f2", clip:"#ffd166", badgeCol:"#c2557a", fringe:[[-.19,.13,-.45],[-.08,.155,-.1],[.04,.155,.15],[.15,.14,.4]]},
+  zhang:{coat:"#f6f7f6", shirt:"#8e2f2a", legs:"#2b2b33", hair:"#2b1d18", style:"bun", skin:"#eec4a0", glasses:1, steth:"#8e2f2a", tieCol:"#2b1d18", badgeCol:"#a3342e"},
+  rn:   {coat:"#7fa8cf", shirt:"#7fa8cf", legs:"#7fa8cf", sleeve:"#7fa8cf", shortSleeve:1, hair:"#231915", style:"pony", skin:"#e9bf9c", shoes:"#f4f4f2", badgeCol:"#2a6f86"}
 };
 const CHARS = {
-  lin:  {n:"林護禮", role:"內科病房護理長", col:"#30506e", pos:[-4.6,0,1.6], face:0.4},
-  kui:  {n:"陳葵（小葵）", role:"新手護理師", col:"#c2557a", pos:[-.95,0,-1.6], face:0.6},
-  zhang:{n:"張乃珂", role:"內科 R3", col:"#a3342e", pos:[5.9,0,-1.2], face:-0.9}
+  kui:  {n:"陳葵（小葵）", role:"大夜班護理師", col:"#c2557a", pos:[-.95,0,-1.6], face:0.6},
+  zhang:{n:"張乃珂", role:"內科 R3・今晚值班學姊", col:"#a3342e", pos:[5.9,0,-1.2], face:-0.9},
+  rn:   {n:"大夜護理師", role:"大夜班護理師", col:"#2a6f86", pos:[-4.9,0,1.7], face:0.9}
 };
-Object.entries(CHARS).forEach(([k,c]) => { const m = makeChar(LOOK[k]); m.position.set(...c.pos); m.rotation.y = c.face; m.userData.id = k; scene.add(m); c.mesh = m; block(c.pos[0], c.pos[2], .55, .55); });
+Object.entries(CHARS).forEach(([k,c]) => { const m = makeChar(LOOK[k]); m.position.set(...c.pos); m.rotation.y = c.face; m.userData.id = k; scene.add(m); c.mesh = m; block(c.pos[0], c.pos[2], .55, .55); c.ob = OBST.length - 1; });
 const me = makeChar(LOOK.me); me.position.set(1.5, 0, 3.6); me.rotation.y = Math.PI; scene.add(me);
 
 /* ---------- 名牌（HTML，保持清楚） ---------- */
@@ -331,13 +365,16 @@ const QB = {
   hyperk:{q:"15 床慢性腎病病人，K 7.1 mEq/L，心電圖出現高尖 T 波、QRS 變寬。第一步？",
     o:["靜脈注射 10% calcium gluconate 穩定心肌細胞膜","立刻口服 Kayexalate 後觀察","先給 furosemide 利尿","等明天的血液透析排程"],a:0,
     e:"有心電圖變化時，先用鈣劑穩定心肌膜（不會降低血鉀），接著用 regular insulin 10 單位加葡萄糖把鉀移入細胞，再處理排除（利尿、結合劑、透析）。打胰島素後要監測血糖。",
-    s:"UK Kidney Association. Clinical Practice Guideline: Treatment of Acute Hyperkalaemia in Adults（2020）"}
+    s:"UK Kidney Association. Clinical Practice Guideline: Treatment of Acute Hyperkalaemia in Adults（2020）"},
+  sbar:{q:"15 分鐘後小葵回測，12 床血糖 112 mg/dL，阿伯醒了。你要向值班學姊報告，哪一種說法最符合 SBAR？",
+    o:["「12 床 72 歲第 2 型糖尿病阿伯，04:00 叫不醒、血糖 38（S）；這次因肺炎住院，晚餐吃很少，睡前長效胰島素照打（B）；推 50% 葡萄糖 25 g 後回測 112、意識恢復，我判斷是進食減少加上胰島素造成的低血糖（A）；建議接下來密切追蹤血糖，並請主治醫師查房時調整胰島素（R）。」","「學姊，12 床剛剛血糖很低，不過我處理好了。」","從入院第一天開始，照時間順序把所有檢驗值念一遍","「12 床的事你看一下病歷就知道了。」"],a:0,
+    e:"SBAR 依序是 Situation（現在發生什麼事）、Background（相關背景）、Assessment（你的判斷）、Recommendation（你的建議，或需要對方做什麼）。用固定結構報告，求助和交班時比較不會漏掉重要資訊。",
+    s:"Institute for Healthcare Improvement. SBAR Tool: Situation-Background-Assessment-Recommendation；WHO Patient Safety Solutions, Volume 1, Solution 3: Communication During Patient Hand-Overs（2007）"}
 };
 const STORY = [
-  {who:"lin", goal:"去護理站找林護禮護理長", lines:["凌晨四點了，學弟妹。今晚你值班，我先跟你說兩件事。","第一，12 床阿伯剛剛叫不太醒，小葵在床邊測血糖。第二，15 床的抽血報告出來了，鉀很高，張乃珂學姊在那邊看心電圖。","先去 12 床。走過去，點小葵就能說話。"]},
-  {who:"kui", goal:"到 12 床找小葵", lines:["學長姐！阿伯叫不太醒，我剛測血糖只有 38。點滴是通的，他沒辦法吞。"], quiz:"hypogly", after:["好，我馬上去拿 50% 葡萄糖，15 分鐘後再測一次！謝謝你這麼快就來。"]},
-  {who:"zhang", goal:"到 15 床找張乃珂學姊", lines:["你來啦。15 床洗腎病人，K 7.1，你看這張心電圖：T 波很尖，QRS 也變寬了。","我考你，第一步要做什麼？"], quiz:"hyperk", after:["對，鈣劑先上，再用胰島素加葡萄糖把鉀移進細胞，然後聯絡腎臟科安排透析。打完胰島素記得追血糖，不然又多一個 12 床。"]},
-  {who:"lin", goal:"回護理站跟林護禮報告", lines:["兩床都穩住了，做得好。天快亮了，交班前把病歷補完。","這是 3D 試玩章節的結尾。完整的兩年 PGY 劇情在主遊戲裡，等你回來。"], end:true}
+  {who:"kui", goal:"小葵 call 你：快去 12 床", lines:["學長姐！12 床阿伯叫不太醒，我剛測指尖血糖只有 38 mg/dL。","他晚餐吃很少，睡前的長效胰島素照打。點滴是通的，現在沒辦法吞。"], quiz:"hypogly", after:["好，我馬上去拿 50% 葡萄糖，15 分鐘後再測一次。","對了，檢驗科剛剛打電話報 15 床的危急值，鉀 7.1。值班的乃珂學姊已經在 15 床了。"]},
+  {who:"zhang", goal:"到 15 床找值班學姊張乃珂", lines:["你來啦。15 床洗腎病人，K 7.1，剛拉的心電圖 T 波很尖，QRS 也變寬了。","我考你，第一步要做什麼？"], quiz:"hyperk", after:["對，鈣劑先上，再用胰島素加葡萄糖把鉀移進細胞，我來聯絡腎臟科安排緊急透析。打完胰島素記得追血糖。","你先去護理站等我，等一下用 SBAR 跟我報告 12 床。"], walk:{k:"zhang", path:[[5.9,.35],[-2.75,.35],[-2.75,1.5]], face:-Math.PI/2}},
+  {who:"zhang", goal:"到護理站，用 SBAR 向值班學姊報告 12 床", lines:["好，12 床現在怎麼樣？照 SBAR 講給我聽。"], quiz:"sbar", after:["很清楚。低血糖要寫進病歷，早上交班也要提，讓主治醫師查房時調整胰島素。","天快亮了，把 progress note 補完。今晚辛苦了。"], end:true}
 ];
 let stepI = 0, busy = false;
 function setGoal(){ const s = STORY[stepI]; dawnGoal = Math.min(1, stepI/STORY.length); const g = document.getElementById("goal"); g.hidden = !s; if(s) g.textContent = "目標：" + s.goal; Object.keys(CHARS).forEach(k => { TAGS[k].innerHTML = CHARS[k].n + (s && s.who === k ? '<span class="bang">！</span>' : ""); }); }
@@ -365,13 +402,15 @@ const score = {right:0, total:0};
 async function talk(k){
   if(busy) return; const s = STORY[stepI];
   busy = true; faceTo(CHARS[k].mesh, me); faceTo(me, CHARS[k].mesh);
+  if(CHARS[k].mesh.userData.path?.length){ await say(k, "我處理完馬上過去，你先到護理站等我。"); dlg.hidden = true; busy = false; return; }
   if(!s || s.who !== k){ await say(k, idle[k]); dlg.hidden = true; busy = false; return; }
   for(const l of s.lines) await say(k, l);
   if(s.quiz){ await quiz(k, s.quiz); for(const l of s.after) await say(k, l); }
+  if(s.walk){ const c = CHARS[s.walk.k]; c.mesh.userData.path = s.walk.path.map(([x,z]) => new THREE.Vector3(x,0,z)); c.mesh.userData.endFace = s.walk.face; OBST[c.ob] = [99,99,99,99]; }
   dlg.hidden = true; stepI++; setGoal(); busy = false;
   if(s.end){ dlg.hidden = false; dlg.innerHTML = `<div class="who"><span class="av" style="background:#2c6e5c">✓</span><span><b>試玩完成</b><small>臨床題 ${score.right}／${score.total}</small></span></div><div class="txt">謝謝你值完這個 3D 夜班。完整兩年、24 個月的訓練、40 位以上的角色和 100 多道附文獻的臨床題都在主遊戲裡。</div><div class="row"><button type="button" id="again">再走一圈</button><button type="button" onclick="location.href='../'">回主遊戲</button></div>`; document.getElementById("again").onclick = () => { dlg.hidden = true; }; }
 }
-const idle = {lin:"病歷記得寫清楚，交班才不會漏。", kui:"阿伯的血糖我會再追，謝謝學長姐！", zhang:"有問題隨時 call 我，不要自己硬撐。"};
+const idle = {rn:"我先幫你把 12 床的血糖紀錄印出來，等一下交班用。", kui:"剛剛回測 112 了，阿伯醒過來還問我幾點了。謝謝學長姐！", zhang:"有問題隨時 call 我，不要自己硬撐。"};
 function faceTo(a, b){ a.userData.faceY = Math.atan2(b.position.x - a.position.x, b.position.z - a.position.z); }
 
 /* ---------- 音效與音樂 ---------- */
@@ -434,8 +473,8 @@ const clock3 = new THREE.Clock(); let acc = 0, started = false;
 function loop(){
   const dt = Math.min(clock3.getDelta(), .05); acc += dt;
   if(started) stepMove(dt);
-  animChar(me, dt); Object.values(CHARS).forEach(c => animChar(c.mesh, dt));
-  controls.target.lerp(new THREE.Vector3(me.position.x*.7, .8, me.position.z*.7), Math.min(1, dt*2.5)); controls.update();
+  animChar(me, dt); Object.values(CHARS).forEach(c => { const u = c.mesh.userData; if(u.path && u.path.length){ const tgt = u.path[0], d = new THREE.Vector3(tgt.x - c.mesh.position.x, 0, tgt.z - c.mesh.position.z), L = d.length(); if(L < .05){ u.path.shift(); if(!u.path.length){ u.walking = false; u.faceY = u.endFace; const p = c.mesh.position; OBST[c.ob] = [p.x-.275, p.z-.275, p.x+.275, p.z+.275]; } } else { d.setLength(Math.min(L, 2.2*dt)); c.mesh.position.add(d); u.walking = true; u.faceY = Math.atan2(d.x, d.z); } } animChar(c.mesh, dt); });
+  if(!window.__close) controls.target.lerp(new THREE.Vector3(me.position.x*.7, .8, me.position.z*.7), Math.min(1, dt*2.5)); controls.update();
   if(acc > .06){ drawMonitors(acc); acc = 0; if(Math.abs(dawnGoal - dawnT) > .004){ dawnT += Math.sign(dawnGoal - dawnT)*.006; setDawn(dawnT); } }
   const p = dust.geometry.attributes.position; for(let i=0;i<dustN;i++){ p.array[i*3+1] += Math.sin(clock3.elapsedTime*.4 + i)*.0008 + .0006; if(p.array[i*3+1] > 2.7) p.array[i*3+1] = 0; } p.needsUpdate = true;
   if(ring.material.opacity > 0){ ring.material.opacity -= dt*1.2; ring.scale.multiplyScalar(1 + dt*1.5); }
@@ -444,6 +483,6 @@ function loop(){
 }
 drawClock(); setInterval(drawClock, 1000); drawMonitors(0); loop();
 document.getElementById("go").onclick = () => { document.getElementById("start").classList.add("out"); started = true; setGoal(); bgm.play().then(() => { muteBtn.textContent = "♪ 音樂開"; }).catch(()=>{}); };
-window.__pgy3d = {talk, CHARS, me, STORY, setDawn, get step(){ return stepI; }};
+window.__pgy3d = {closeup(){ const xs = {me:-1.2, kui:-.4, zhang:.4, rn:1.2}; Object.entries(xs).forEach(([k,x]) => { const m = k === 'me' ? me : CHARS[k].mesh; m.position.set(x+1,0,2.2); m.rotation.y = 0; m.userData.faceY = 0; }); controls.target.set(1,1,2.2); camera.position.set(1,1.5,5.4); controls.minDistance = 1; controls.update(); started = false; window.__close = 1; }, talk, CHARS, me, STORY, setDawn, get step(){ return stepI; }};
 </script>
 </body></html>

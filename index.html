@@ -1459,9 +1459,9 @@ function checkLimits(){
   if(S.hours > 320){
     addLog(`四週工時 ${S.hours}h，超過上限被叫回家`);
     S.hours = 300;
-    show(`${speaker("lin","林護禮護理長擋在你面前：「你這四週已經超過 320 小時了。住院醫師納入勞基法後總工時有上限，值班日單次勤務含延長最多 28 小時，兩次勤務之間至少休 10 小時。回去睡覺。」[[cgmh]]")}
+    show(`${speaker("cuijiao","教學部的崔嬌秘書打電話來：「工時系統顯示你這四週已經超過 320 小時了，我已經通知總醫師調整排班。住院醫師納入勞基法後總工時有上限，值班日單次勤務含延長最多 28 小時，兩次勤務之間至少休 10 小時。今天交完班就回去睡覺。」[[cgmh]]")}
      <div class="feedback"><strong>真實制度</strong><span>住院醫師自 2019 年 9 月 1 日起適用勞動基準法；《住院醫師勞動權益保障及工作時間指引》以四週為單位，總工時上限 320 小時${rich("[[cgmh]][[pts]]")}。</span></div>
-     <p class="fx">${applyFx({hp:15,mood:-3},{lin:2})}</p>${nxBtn("去休息")}`);
+     <p class="fx">${applyFx({hp:15,mood:-3},{})}</p>${nxBtn("去休息")}`);
     document.getElementById("nx").onclick = run; return true;
   }
   if(S.hp <= 0){
