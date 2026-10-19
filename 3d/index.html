@@ -24,6 +24,14 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 #goal{position:fixed;left:50%;top:70px;transform:translateX(-50%);font-size:13px;background:rgba(255,217,138,.92);color:#3a2a10;padding:6px 14px;border-radius:99px;font-weight:700;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
 #dlg{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(760px,calc(100% - 24px));background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:16px 18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 18px 50px rgba(0,0,0,.4);display:grid;gap:10px;animation:up .3s cubic-bezier(.2,.8,.2,1)}
 #dlg[hidden]{display:none}
+#ecg{position:fixed;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 24px));background:#fffaf6;border-radius:14px;padding:8px 10px 10px;box-shadow:0 18px 50px rgba(0,0,0,.45);animation:up .35s cubic-bezier(.2,.8,.2,1);z-index:5}
+#ecg[hidden],#ecgfull[hidden]{display:none}
+#ecg .eh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#5a2b2b;font-size:13px;margin-bottom:4px}#ecg .eh b{font-size:14px}#ecg .eh span{color:#8a5a5a}
+#ecg .eh button{margin-left:auto;font:inherit;font-size:12px;border:1px solid #d9a0a0;background:#fff;color:#7a2e2e;border-radius:99px;padding:3px 10px;cursor:pointer}
+#ecg canvas{width:100%;height:auto;display:block;border-radius:6px;cursor:zoom-in}
+#ecgfull{position:fixed;inset:0;background:rgba(8,10,20,.88);display:grid;place-items:center;z-index:20;padding:12px;cursor:zoom-out}
+#ecgfull canvas{width:min(1400px,100%);height:auto;border-radius:8px;background:#fffaf6}#ecgfull p{color:#ddd;font-size:13px;margin:6px 0 0}
+@media (max-width:600px){#ecgfull:not([hidden]){display:block;overflow-x:auto;padding:18vh 12px 12px}#ecgfull canvas{height:52vh;width:auto;max-width:none}#ecgfull p{position:fixed;left:0;right:0;bottom:16vh;text-align:center}}
 @keyframes up{from{opacity:0;transform:translate(-50%,16px)}}
 #dlg .who{display:flex;align-items:center;gap:10px}
 #dlg .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;border:2px solid rgba(255,255,255,.6);flex:none}
@@ -56,6 +64,8 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 <div id="hud"><div class="t"><b>7F 內科病房</b><small>呆丸 PGY 物語 · 3D 試玩版</small></div><div class="btns"><button id="mute" type="button">♪ 音樂</button><a href="../">回主遊戲</a></div></div>
 <div id="goal" hidden></div>
 <div id="help">點地板走路 · 拖曳轉視角 · 滾輪縮放 · 點人物對話（鍵盤：WASD／方向鍵、空白鍵）</div>
+<div id="ecg" hidden><div class="eh"><b>15 床 12 導程心電圖（節錄）</b><span>K⁺ 7.1 mEq/L · 25 mm/s · 10 mm/mV</span><button type="button" id="ecgbig" aria-label="放大">⤢ 放大</button></div><canvas id="ecgc" width="1400" height="660"></canvas></div>
+<div id="ecgfull" hidden><canvas id="ecgc2" width="1400" height="660"></canvas><p>手機可以左右滑動看完整心電圖 · 點一下關閉</p></div>
 <div id="dlg" hidden></div>
 <div id="start"><div><h1>呆丸 <span>PGY</span> 物語 3D</h1><p>試玩章節：凌晨四點的內科病房</p><button id="go" type="button">▶ 開始值班</button><p class="hint">建議用電腦或較新的手機 · 劇情與臨床題附參考文獻</p></div></div>
 
@@ -373,7 +383,7 @@ const QB = {
 };
 const STORY = [
   {who:"kui", goal:"小葵 call 你：快去 12 床", lines:["學長姐！12 床阿伯叫不太醒，我剛測指尖血糖只有 38 mg/dL。","他晚餐吃很少，睡前的長效胰島素照打。點滴是通的，現在沒辦法吞。"], quiz:"hypogly", after:["好，我馬上去拿 50% 葡萄糖，15 分鐘後再測一次。","對了，檢驗科剛剛打電話報 15 床的危急值，鉀 7.1。值班的乃珂學姊已經在 15 床了。"]},
-  {who:"zhang", goal:"到 15 床找值班學姊張乃珂", lines:["你來啦。15 床洗腎病人，K 7.1，剛拉的心電圖 T 波很尖，QRS 也變寬了。","我考你，第一步要做什麼？"], quiz:"hyperk", after:["對，鈣劑先上，再用胰島素加葡萄糖把鉀移進細胞，我來聯絡腎臟科安排緊急透析。打完胰島素記得追血糖。","你先去護理站等我，等一下用 SBAR 跟我報告 12 床。"], walk:{k:"zhang", path:[[5.9,.35],[-2.75,.35],[-2.75,1.5]], face:-Math.PI/2}},
+  {who:"zhang", goal:"到 15 床找值班學姊張乃珂", lines:["你來啦。15 床洗腎病人，K 7.1，剛拉的心電圖 T 波很尖，QRS 也變寬了。","我考你，第一步要做什麼？"], ecg:1, quiz:"hyperk", after:["對，鈣劑先上，再用胰島素加葡萄糖把鉀移進細胞，我來聯絡腎臟科安排緊急透析。打完胰島素記得追血糖。","你先去護理站等我，等一下用 SBAR 跟我報告 12 床。"], walk:{k:"zhang", path:[[5.9,.35],[-2.75,.35],[-2.75,1.5]], face:-Math.PI/2}},
   {who:"zhang", goal:"到護理站，用 SBAR 向值班學姊報告 12 床", lines:["好，12 床現在怎麼樣？照 SBAR 講給我聽。"], quiz:"sbar", after:["很清楚。低血糖要寫進病歷，早上交班也要提，讓主治醫師查房時調整胰島素。","天快亮了，把 progress note 補完。今晚辛苦了。"], end:true}
 ];
 let stepI = 0, busy = false;
@@ -399,13 +409,48 @@ function quiz(who, id){ const q = QB[id], c = CHARS[who]; return new Promise(res
   });
 }); }
 const score = {right:0, total:0};
+/* ---------- 高血鉀心電圖：P 波變平、QRS 變寬、T 波高尖 ---------- */
+function drawEcg(cv){ const g = cv.getContext("2d"), W = cv.width, H = cv.height, mm = 9;
+  g.fillStyle = "#fffaf6"; g.fillRect(0,0,W,H);
+  for(let x=0;x<=W;x+=mm){ g.strokeStyle = Math.round(x/mm)%5 ? "rgba(232,140,140,.28)" : "rgba(214,90,90,.55)"; g.lineWidth = Math.round(x/mm)%5 ? 1 : 1.6; g.beginPath(); g.moveTo(x,0); g.lineTo(x,H); g.stroke(); }
+  for(let y=0;y<=H;y+=mm){ g.strokeStyle = Math.round(y/mm)%5 ? "rgba(232,140,140,.28)" : "rgba(214,90,90,.55)"; g.lineWidth = Math.round(y/mm)%5 ? 1 : 1.6; g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke(); }
+  const G = (t,c,w,a) => a*Math.exp(-((t-c)*(t-c))/(2*w*w));
+  const TENT = (t,c,w,a) => { const d = Math.abs(t-c)/w; return d < 1 ? a*Math.pow(1-d,1.8) : 0; };
+  const BL = .86; /* 一拍 0.86 秒（約 70 次/分）；振幅單位 mV */
+  /* P 波低平且寬、PR 延長、QRS 寬（約 0.16 秒）且 S 波拖長、T 波高尖窄底且對稱 */
+  const beat = (t, k) => G(t,.09,.035,.045*k.p) + G(t,.315,.012,-.08*k.q) + G(t,.35,.03,k.r) + G(t,.43,.04,-k.s) + G(t,.475,.035,-.3*k.s) + TENT(t,.6,.1,k.t);
+  const strip = (y0, name, k) => { const pxs = 25*mm, pmv = 10*mm; g.strokeStyle = "#1c1c22"; g.lineWidth = 2.6; g.lineJoin = "round"; g.beginPath();
+    /* 定標方波 1 mV */
+    g.moveTo(10,y0); g.lineTo(20,y0); g.lineTo(20,y0-pmv); g.lineTo(20+.2*pxs,y0-pmv); g.lineTo(20+.2*pxs,y0); g.lineTo(60,y0);
+    for(let x=60; x<W-10; x++){ const t = ((x-60)/pxs) % BL; g.lineTo(x, y0 - beat(t,k)*pmv); } g.stroke();
+    g.fillStyle = "#1c1c22"; g.font = "700 26px " + FONT; g.fillText(name, 66, 34 + (y0 > H/2 ? H*.5 : 0)); return {pxs, pmv}; };
+  const {pxs, pmv} = strip(H*.32, "II", {p:1, q:1, r:.75, s:.45, t:1.05});
+  strip(H*.77, "V3", {p:.7, q:.4, r:.6, s:1.0, t:1.75});
+  /* 標註（第二拍） */
+  const bx = 60 + BL*pxs, y0 = H*.32;
+  g.strokeStyle = "#c0392b"; g.fillStyle = "#c0392b"; g.lineWidth = 3; g.font = "800 24px " + FONT;
+  const arrow = (x0,y0_,x1,y1) => { g.beginPath(); g.moveTo(x0,y0_); g.lineTo(x1,y1); g.stroke(); const an = Math.atan2(y1-y0_, x1-x0); g.beginPath(); g.moveTo(x1,y1); g.lineTo(x1-14*Math.cos(an-.45), y1-14*Math.sin(an-.45)); g.lineTo(x1-14*Math.cos(an+.45), y1-14*Math.sin(an+.45)); g.fill(); };
+  const tx = bx + .6*pxs, ty = y0 - 1.05*pmv; arrow(tx+80, ty-30, tx+8, ty-2); g.fillText("T 波高尖、窄底、對稱", tx+86, ty-30);
+  const q0 = bx + .3*pxs, q1 = bx + .46*pxs, qy = y0 + .9*pmv; g.beginPath(); g.moveTo(q0,qy-10); g.lineTo(q0,qy); g.lineTo(q1,qy); g.lineTo(q1,qy-10); g.stroke(); g.fillText("QRS 變寬（0.16 秒）", q0-20, qy+30);
+  const px = bx + .09*pxs, py = y0 - .06*pmv; arrow(px-60, py-60, px-4, py-8); g.fillText("P 波低平", px-150, py-66);
+  const r0 = bx + .06*pxs, r1 = bx + .3*pxs, ry = y0 - .32*pmv; g.beginPath(); g.moveTo(r0,ry+8); g.lineTo(r0,ry); g.lineTo(r1,ry); g.lineTo(r1,ry+8); g.stroke(); g.font = "800 20px " + FONT; g.fillText("PR 延長", r0+30, ry-8);
+}
+const ecgBox = document.getElementById("ecg"), ecgFull = document.getElementById("ecgfull");
+drawEcg(document.getElementById("ecgc")); drawEcg(document.getElementById("ecgc2"));
+function placeEcg(){ if(!ecgBox.hidden) ecgBox.style.bottom = (dlg.hidden ? 16 : dlg.offsetHeight + 28) + "px"; }
+new ResizeObserver(placeEcg).observe(dlg); addEventListener("resize", placeEcg);
+function showEcg(on){ ecgBox.hidden = !on; if(!on) ecgFull.hidden = true; placeEcg(); }
+const openBig = () => { ecgFull.hidden = false; };
+document.getElementById("ecgbig").onclick = openBig; document.getElementById("ecgc").onclick = openBig; ecgFull.onclick = () => { ecgFull.hidden = true; };
 async function talk(k){
   if(busy) return; const s = STORY[stepI];
   busy = true; faceTo(CHARS[k].mesh, me); faceTo(me, CHARS[k].mesh);
   if(CHARS[k].mesh.userData.path?.length){ await say(k, "我處理完馬上過去，你先到護理站等我。"); dlg.hidden = true; busy = false; return; }
   if(!s || s.who !== k){ await say(k, idle[k]); dlg.hidden = true; busy = false; return; }
+  if(s.ecg) showEcg(true);
   for(const l of s.lines) await say(k, l);
   if(s.quiz){ await quiz(k, s.quiz); for(const l of s.after) await say(k, l); }
+  showEcg(false);
   if(s.walk){ const c = CHARS[s.walk.k]; c.mesh.userData.path = s.walk.path.map(([x,z]) => new THREE.Vector3(x,0,z)); c.mesh.userData.endFace = s.walk.face; OBST[c.ob] = [99,99,99,99]; }
   dlg.hidden = true; stepI++; setGoal(); busy = false;
   if(s.end){ dlg.hidden = false; dlg.innerHTML = `<div class="who"><span class="av" style="background:#2c6e5c">✓</span><span><b>試玩完成</b><small>臨床題 ${score.right}／${score.total}</small></span></div><div class="txt">謝謝你值完這個 3D 夜班。完整兩年、24 個月的訓練、40 位以上的角色和 100 多道附文獻的臨床題都在主遊戲裡。</div><div class="row"><button type="button" id="again">再走一圈</button><button type="button" onclick="location.href='../'">回主遊戲</button></div>`; document.getElementById("again").onclick = () => { dlg.hidden = true; }; }
