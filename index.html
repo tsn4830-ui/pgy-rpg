@@ -1393,7 +1393,8 @@ function titleScreen(){
    <div class="field"><label for="nm">你的名字</label><input id="nm" maxlength="8" placeholder="例如：林小安" value="${esc(saved?.name||"")}"></div>
    <div class="field"><span>你的性別<small class="meta">（只影響外觀和別人怎麼稱呼你，舊存檔也可以改）</small></span><div class="gsel" role="radiogroup" aria-label="性別">${[["m","男生"],["f","女生"],["x","無性別"]].map(([v,l]) => `<label><input type="radio" name="gd" value="${v}" ${(saved?.gender||"x")===v?"checked":""}> ${l}</label>`).join("")}</div></div>
    <div class="row"><button class="primary" id="go">開始報到</button>${saved && saved.stage>=0 ? `<button class="ghost" id="cont">繼續上次進度（${saved.month<12?"PGY1":"PGY2"}，第 ${saved.month} 個月）</button>`:""}</div>
-   <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
+      <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
+   <a class="try3d" href="https://tsn4830-ui.github.io/pgy-rpg/3d/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border-radius:14px;text-decoration:none;color:#f3efe6;background:linear-gradient(135deg,#1b2140,#2c6e5c);box-shadow:0 8px 22px rgba(20,30,60,.25)"><span style="font-size:26px">🏥</span><span><b style="display:block;font-size:15px">新！3D 試玩：凌晨四點的內科病房</b><small style="opacity:.8">在立體病房裡走動、找護理長和學姊，答兩題附文獻的臨床題</small></span></a>
    <p class="meta" id="acct">${cloudNote()}</p>`);
   document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); S.gender = gsel(); countStat("start"); chooseHospital(); };
   const c = document.getElementById("cont"); if(c) c.onclick = () => { saved.gender = gsel(); resume(saved); };
