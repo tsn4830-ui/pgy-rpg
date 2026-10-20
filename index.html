@@ -212,11 +212,26 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 @keyframes twin{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}
 .cert .seal{position:absolute;right:18px;bottom:16px;width:62px;height:62px;border:2px solid #b8322a;border-radius:50%;color:#b8322a;display:grid;place-items:center;font-weight:800;font-size:13px;line-height:1.1;transform:rotate(-14deg);opacity:.85}
 .jump{margin-top:12px}.jump summary{cursor:pointer;color:var(--accent,#2c6e5c);font-weight:600}.jumps{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.jumps button{font-size:13px}.world{padding:0;overflow:hidden;background:#1b2427}#map{display:block;width:100%;height:auto;cursor:pointer;touch-action:manipulation}.gate{display:flex;gap:12px;align-items:center;margin:4px 0 12px}.gate .meta{display:block;margin-top:4px}img.pav{width:48px;height:48px;border-radius:10px;image-rendering:pixelated;flex:none}img.av.pav{width:44px;height:44px}
+/* v6.6 手機：功能收進選單、觸控範圍 44px、標題頁先看到開始 */
+.hero .hook{font-size:17px;font-weight:700;margin-top:6px}
+.ctrl #menu{display:none}
+.fxhint{background:rgba(242,182,48,.14);border-left:3px solid #f2b630;padding:8px 10px;border-radius:8px;margin-top:8px}
+@media (max-width:700px){
+  .ctrl #menu{display:inline-flex}
+  .ctrl:not(.open) > :not(#menu):not(#skip):not(#waiting){display:none}
+  .ctrl button{min-height:44px;font-size:15px;padding:0 14px}
+  .top .links{display:none}
+  .app:has(.ctrl.open) .top .links{display:flex;width:100%;margin-left:0}
+  .top .links a{display:inline-flex;align-items:center;min-height:44px;font-size:15px}
+  body.at-title #world{display:none}
+  .gsel label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding-right:10px}
+  .gsel input{width:20px;height:20px}
+}
 </style>
 
 <div class="app">
   <header class="top">
-    <h1>呆丸 PGY 物語</h1><span class="ver">v6.5</span>
+    <h1>呆丸 PGY 物語</h1><span class="ver">v6.6</span>
     <nav class="links" aria-label="讀書網站">
       <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
@@ -760,7 +775,7 @@ const STAGES = [
   choose("me","被當眾糾正，你的反應是？",[
    {l:"謝謝護理長，馬上改",fx:{know:1},rel:{lin:3},r:"林護理長點點頭：「縮寫 U、IU、QD 都是 ISMP 列的易錯縮寫。你改得很快，不錯。」[[ismp_abbr]]"},
    {l:"小聲抱怨「護理師管這麼多」",fx:{mood:-2},rel:{lin:-3},r:"他聽到了，沒說話，只是把 ISMP 易錯縮寫表貼在你的電腦旁邊。你後來發現，那張表救過你兩次。"}]),
-  quiz("hand","lin","林護理長抽考："),
+  quiz("hand","zhang","張乃珂學姊在走廊攔住你抽考："),
   say("bai","白芷晴：「欸，我那床的出院病摘可以幫我寫嗎？我今天有事。」這是她這週第三次。"),
   choose("me","你要怎麼處理？",[
    {l:"私下問她最近是不是遇到什麼事",fx:{mood:2,hours:1},rel:{bai:4},r:"她沉默一下才說，父親剛中風住在別家醫院，她每天下班要趕去顧。你們一起去找導師調整分工，把「家庭照顧需求」正式提出來，而不是私下硬撐。"},
@@ -1211,7 +1226,7 @@ function applyFx(fx={}, rel={}){
 /* ======================= 側欄：狀態／人生地圖／工時曲線／訓練紀錄 ======================= */
 const DEPT_COL = [["內科","#2c6e5c"],["外科","#30506e"],["兒科","#c07a12"],["婦產","#8a3b5c"],["急診","#a3342e"],["社區","#1f7a6a"],["老年","#5b5ea6"],["選修","#7a5bb3"]];
 const colOf = d => (DEPT_COL.find(([k]) => d.includes(k)) || ["","#888"])[1];
-function socialScore(){ const ks = Object.keys(S.met).filter(k => CH[k] && MET_ORDER.includes(k)); if(!ks.length) return 50; const avg = ks.reduce((a,k)=>a+(S.rel[k]||0),0)/ks.length; return clamp(Math.round(50+avg*10),0,100); }
+function socialScore(){ const ks = Object.keys(S.met).filter(k => CH[k] && MET_ORDER.includes(k)); if(!ks.length) return 50; const avg = ks.reduce((a,k)=>a+(S.rel[k]||0),0)/ks.length; return clamp(Math.round(50+avg*4),0,100); }
 function renderSide(){
   const side = document.getElementById("side");
   if(!S || S.stage<0){ side.innerHTML = introSide(); return; }
@@ -1372,7 +1387,8 @@ function show(html){
   const r = v.getBoundingClientRect(); if(r.top < 0) window.scrollTo({top: window.scrollY + r.top - 8});
 }
 function afterRender(){
-  drawScenes(); typewrite();
+  drawScenes(); typewrite(); fxHint();
+  document.body.classList.toggle("at-title", !S);
   document.getElementById("waiting").hidden = !V().querySelector(".opt:not([disabled]), .ad");
 }
 document.addEventListener("click", e => {
@@ -1388,12 +1404,13 @@ function titleScreen(){
   const saved = load();
   show(`<div class="hero"><span class="eyebrow">Taiwan Post-Graduate Year · 人生模擬</span>
    <h1>呆丸 <span>PGY</span> 物語</h1>
-   <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
-   <p>路上有搶功的同梯、凶巴巴的學長姐、管東管西的護理長，也有擋下你錯誤醫囑的護理師。每一道臨床題都附參考文獻，並連到內科小手冊與指引索引的對應章節。</p></div>
+      <p class="hook">兩年、24 個月、每一題都附參考文獻。你撐得過 PGY 嗎？</p></div>
    <div class="field"><label for="nm">你的名字</label><input id="nm" maxlength="8" placeholder="例如：林小安" value="${esc(saved?.name||"")}"></div>
    <div class="field"><span>你的性別<small class="meta">（只影響外觀和別人怎麼稱呼你，舊存檔也可以改）</small></span><div class="gsel" role="radiogroup" aria-label="性別">${[["m","男生"],["f","女生"],["x","無性別"]].map(([v,l]) => `<label><input type="radio" name="gd" value="${v}" ${(saved?.gender||"x")===v?"checked":""}> ${l}</label>`).join("")}</div></div>
    <div class="row"><button class="primary" id="go">開始報到</button>${saved && saved.stage>=0 ? `<button class="ghost" id="cont">繼續上次進度（${saved.month<12?"PGY1":"PGY2"}，第 ${saved.month} 個月）</button>`:""}</div>
       <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
+   <div class="intro"><p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
+   <p>路上有搶功的同梯、凶巴巴的學長姐、管東管西的護理長，也有擋下你錯誤醫囑的護理師。每一道臨床題都附參考文獻，並連到內科小手冊與指引索引的對應章節。</p></div>
    <a class="try3d" href="https://tsn4830-ui.github.io/pgy-rpg/3d/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border-radius:14px;text-decoration:none;color:#f3efe6;background:linear-gradient(135deg,#1b2140,#2c6e5c);box-shadow:0 8px 22px rgba(20,30,60,.25)"><span style="font-size:26px">🏥</span><span><b style="display:block;font-size:15px">新！3D 試玩：凌晨四點的內科病房</b><small style="opacity:.8">在立體病房裡走動、接大夜護理師的 call、向值班學姊報告，答三題附文獻的臨床題</small></span></a>
    <p class="meta" id="acct">${cloudNote()}</p>`);
   document.getElementById("go").onclick = () => { const n = document.getElementById("nm").value.trim() || "小安"; S = fresh(n); S.gender = gsel(); countStat("start"); chooseHospital(); };
@@ -1410,7 +1427,7 @@ function chooseHospital(){
     const fx = applyFx(h.fx, h.fx.rel);
     S.stage = 0; S.step = 0; S.hours = 230;
     addLog(`錄取「${h.n}」`);
-    show(`${speaker("sys",`你錄取了「${h.n}」！`)}<p class="fx">${fx}</p>${sceneFig(STAGES[0])}${nxBtn("七月一日，報到（從頭開始）")}
+    show(`${speaker("sys",`你錄取了「${h.n}」！`)}<p class="meta">每間院區各有取捨：學得多的通常比較累。下面是報到時的起始變化。</p><p class="fx">${fx}</p>${sceneFig(STAGES[0])}${nxBtn("七月一日，報到（從頭開始）")}
       <details class="jump"><summary>自選科別開始</summary><p class="meta">想先練某一科，可以直接跳過去。之前的月份會算成已經完成，跳過的關卡不會有題目和劇情。</p>
       <div class="jumps">${STAGES.map((s,i)=>`<button class="ghost" data-j="${i}">${s.y===1?"PGY1":"PGY2"}・${esc(s.dept.replace(/^PGY\d\s*/,""))}</button>`).join("")}</div></details>`);
     document.getElementById("nx").onclick = run;
@@ -2131,7 +2148,14 @@ function gate(who, head, go){
   show(`${head}<div class="gate"><img class="pav" src="${portrait(who)}" alt=""><div><strong>${esc(c.n)}</strong>在等你（頭上有「！」）。<span class="meta">用方向鍵或 WASD 走過去按空白鍵，也可以直接點地圖上的人物。</span></div></div><button class="primary" id="nx" data-auto="1">走過去說話</button>`);
   const wr = document.getElementById("world").getBoundingClientRect(); if(wr.top < 0) window.scrollTo({top: window.scrollY + wr.top - 8});
   document.getElementById("nx").onclick = e => { if(!e.isTrusted || REDUCED) fire(); else { W.fire(); setTimeout(fire, 1800); } };
+  /* 觸控裝置：不用再按「走過去說話」，自動走過去 */
+  if(TOUCH && !REDUCED){ const b = document.getElementById("nx"); b.textContent = "走過去中…"; b.disabled = true; const m = V().querySelector(".gate .meta"); if(m) m.textContent = "你正走過去找人。"; setTimeout(() => { W.fire(); setTimeout(fire, 1300); }, 250); }
+  else if(TOUCH){ setTimeout(fire, 250); }
 }
+const TOUCH = matchMedia("(pointer:coarse)").matches;
+function fxHint(){ try{ if(localStorage.getItem("pgy-fxhint")) return; const fx = V().querySelector(".fx"); if(!fx || !S || S.stage < 0) return;
+  fx.insertAdjacentHTML("afterend", `<p class="meta fxhint">💡 數值說明：健康歸零會倒下、休息兩天；幸福歸零會有同事來關心你；四週工時超過 320 小時會被叫回家；知識和你跟誰處得好，會寫進結訓時的成績與「那些人後來」。這個提示只出現一次。</p>`);
+  localStorage.setItem("pgy-fxhint", "1"); }catch(e){} }
 function worldReact(ok){
   ok ? SFX.ok() : SFX.bad();
   const px = W.p.fx*TW + TW/2, py = W.p.fy*TW;
@@ -2819,7 +2843,10 @@ function typewrite(){
 }
 
 function countStat(k){ try{ if(CLOUD.stat) CLOUD.stat(k); }catch(e){} }
+function initMenu(){ const c = document.getElementById("ctrl"); if(!c || document.getElementById("menu")) return; const b = document.createElement("button"); b.id = "menu"; b.type = "button"; b.setAttribute("aria-expanded","false"); b.textContent = "☰ 選單"; b.onclick = () => { const o = c.classList.toggle("open"); b.setAttribute("aria-expanded", String(o)); b.textContent = o ? "✕ 收起" : "☰ 選單"; }; c.prepend(b); c.addEventListener("click", e => { const t = e.target.closest("button[data-tab]"); if(t && innerWidth <= 700){ c.classList.remove("open"); b.setAttribute("aria-expanded","false"); b.textContent = "☰ 選單"; } }); }
+initMenu();
 function start(){ S = null; titleScreen(); }
+
 worldInit();
 window.claude?.hot?.snapshot?.(() => ({S}));
 if(window.claude?.hot?.ready){ window.claude.hot.ready(d => { if(d && d.S){ resume(d.S); } else start(); }); }

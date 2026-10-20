@@ -1,0 +1,52 @@
+   <p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
+   <p>路上有搶功的同梯、凶巴巴的學長姐、管東管西的護理長，也有擋下你錯誤醫囑的護理師。每一道臨床題都附參考文獻，並連到內科小手冊與指引索引的對應章節。</p></div>|||   <p class="hook">兩年、24 個月、每一題都附參考文獻。你撐得過 PGY 嗎？</p></div>
+@@@
+      <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>|||      <p class="meta">「跳到下一個決定」略過對話，「自動播放」會自動翻頁，但臨床題和選擇一定要你自己來。</p>
+   <div class="intro"><p>剛拿到醫師證書的你，要走完兩年期畢業後一般醫學訓練。內科、外科、兒科、婦產、急診、社區、老年醫學與選修，一格一個月，共 24 格。急診月結束還有一場急救與插管的技能關卡。</p>
+   <p>路上有搶功的同梯、凶巴巴的學長姐、管東管西的護理長，也有擋下你錯誤醫囑的護理師。每一道臨床題都附參考文獻，並連到內科小手冊與指引索引的對應章節。</p></div>
+@@@
+</style>|||/* v6.6 手機：功能收進選單、觸控範圍 44px、標題頁先看到開始 */
+.hero .hook{font-size:17px;font-weight:700;margin-top:6px}
+.ctrl #menu{display:none}
+.fxhint{background:rgba(242,182,48,.14);border-left:3px solid #f2b630;padding:8px 10px;border-radius:8px;margin-top:8px}
+@media (max-width:700px){
+  .ctrl #menu{display:inline-flex}
+  .ctrl:not(.open) > :not(#menu):not(#skip):not(#waiting){display:none}
+  .ctrl button{min-height:44px;font-size:15px;padding:0 14px}
+  .top .links{display:none}
+  .app:has(.ctrl.open) .top .links{display:flex;width:100%;margin-left:0}
+  .top .links a{display:inline-flex;align-items:center;min-height:44px;font-size:15px}
+  body.at-title #world{display:none}
+  .gsel label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding-right:10px}
+  .gsel input{width:20px;height:20px}
+}
+</style>
+@@@
+function afterRender(){
+  drawScenes(); typewrite();|||function afterRender(){
+  drawScenes(); typewrite(); fxHint();
+  document.body.classList.toggle("at-title", !S);
+@@@
+quiz("hand","lin","林護理長抽考：")|||quiz("hand","zhang","張乃珂學姊在走廊攔住你抽考：")
+@@@
+const avg = ks.reduce((a,k)=>a+(S.rel[k]||0),0)/ks.length; return clamp(Math.round(50+avg*10),0,100);|||const avg = ks.reduce((a,k)=>a+(S.rel[k]||0),0)/ks.length; return clamp(Math.round(50+avg*4),0,100);
+@@@
+<p class="fx">${fx}</p>${sceneFig(STAGES[0])}|||<p class="meta">每間院區各有取捨：學得多的通常比較累。下面是報到時的起始變化。</p><p class="fx">${fx}</p>${sceneFig(STAGES[0])}
+@@@
+  document.getElementById("nx").onclick = e => { if(!e.isTrusted || REDUCED) fire(); else { W.fire(); setTimeout(fire, 1800); } };
+}|||  document.getElementById("nx").onclick = e => { if(!e.isTrusted || REDUCED) fire(); else { W.fire(); setTimeout(fire, 1800); } };
+  /* 觸控裝置：不用再按「走過去說話」，自動走過去 */
+  if(TOUCH && !REDUCED){ const b = document.getElementById("nx"); b.textContent = "走過去中…"; b.disabled = true; const m = V().querySelector(".gate .meta"); if(m) m.textContent = "你正走過去找人。"; setTimeout(() => { W.fire(); setTimeout(fire, 1300); }, 250); }
+  else if(TOUCH){ setTimeout(fire, 250); }
+}
+const TOUCH = matchMedia("(pointer:coarse)").matches;
+function fxHint(){ try{ if(localStorage.getItem("pgy-fxhint")) return; const fx = V().querySelector(".fx"); if(!fx || !S || S.stage < 0) return;
+  fx.insertAdjacentHTML("afterend", `<p class="meta fxhint">💡 數值說明：健康歸零會倒下、休息兩天；幸福歸零會有同事來關心你；四週工時超過 320 小時會被叫回家；知識和你跟誰處得好，會寫進結訓時的成績與「那些人後來」。這個提示只出現一次。</p>`);
+  localStorage.setItem("pgy-fxhint", "1"); }catch(e){} }
+@@@
+function start(){ S = null; titleScreen(); }|||function initMenu(){ const c = document.getElementById("ctrl"); if(!c || document.getElementById("menu")) return; const b = document.createElement("button"); b.id = "menu"; b.type = "button"; b.setAttribute("aria-expanded","false"); b.textContent = "☰ 選單"; b.onclick = () => { const o = c.classList.toggle("open"); b.setAttribute("aria-expanded", String(o)); b.textContent = o ? "✕ 收起" : "☰ 選單"; }; c.prepend(b); c.addEventListener("click", e => { const t = e.target.closest("button[data-tab]"); if(t && innerWidth <= 700){ c.classList.remove("open"); b.setAttribute("aria-expanded","false"); b.textContent = "☰ 選單"; } }); }
+initMenu();
+function start(){ S = null; titleScreen(); }
+
+@@@
+<span class="ver">v6.5</span>|||<span class="ver">v6.6</span>

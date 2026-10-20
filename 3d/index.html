@@ -54,6 +54,8 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 #start p{margin:8px 0 0;color:var(--muted)}
 #start button{margin-top:22px;font:inherit;font-size:18px;font-weight:800;padding:12px 34px;border-radius:99px;border:0;background:var(--gold);color:#3a2a10;cursor:pointer;animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.05)}}
+#start button:disabled{opacity:.6;cursor:progress;animation:none}
+@media (prefers-reduced-motion:reduce){#start button{animation:none}#dlg,#ecg{animation:none}}
 #start .hint{font-size:12px;opacity:.7;margin-top:14px}
 @media (max-width:600px){#hud .t small{display:none}#help{display:none}#dlg .txt{font-size:15px}}
 </style>
@@ -67,7 +69,7 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 <div id="ecg" hidden><div class="eh"><b>15 床 12 導程心電圖（節錄）</b><span>K⁺ 7.1 mEq/L · 25 mm/s · 10 mm/mV</span><button type="button" id="ecgbig" aria-label="放大">⤢ 放大</button></div><canvas id="ecgc" width="1400" height="660"></canvas></div>
 <div id="ecgfull" hidden><canvas id="ecgc2" width="1400" height="660"></canvas><p>手機可以左右滑動看完整心電圖 · 點一下關閉</p></div>
 <div id="dlg" hidden></div>
-<div id="start"><div><h1>呆丸 <span>PGY</span> 物語 3D</h1><p>試玩章節：凌晨四點的內科病房</p><button id="go" type="button">▶ 開始值班</button><p class="hint">建議用電腦或較新的手機 · 劇情與臨床題附參考文獻</p></div></div>
+<div id="start"><div><h1>呆丸 <span>PGY</span> 物語 3D</h1><p>試玩章節：凌晨四點的內科病房</p><button id="go" type="button" disabled>載入病房中…</button><p class="hint">建議用電腦或較新的手機 · 劇情與臨床題附參考文獻</p></div></div>
 
 <script type="module">
 import * as THREE from "three";
@@ -80,6 +82,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
 const MOBILE = matchMedia("(pointer:coarse)").matches || innerWidth < 700;
+const CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canvas = document.getElementById("c");
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:"high-performance"});
 renderer.setPixelRatio(Math.min(devicePixelRatio, MOBILE ? 1.6 : 2));
@@ -93,9 +96,9 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; scene.
 { const cv = document.createElement("canvas"); cv.width = 2; cv.height = 256; const g = cv.getContext("2d"); const gr = g.createLinearGradient(0,0,0,256); gr.addColorStop(0,"#1b2140"); gr.addColorStop(1,"#0a0d1a"); g.fillStyle = gr; g.fillRect(0,0,2,256); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; scene.background = t; }
 
 const camera = new THREE.PerspectiveCamera(MOBILE ? 46 : 36, innerWidth/innerHeight, 0.1, 200);
-camera.position.set(9, 10.5, 13); if(innerWidth/innerHeight < .8) camera.position.multiplyScalar(1.3);
+camera.position.set(9, 10.5, 13); const PORTRAIT = innerWidth/innerHeight < .8; if(PORTRAIT) camera.position.set(19, 18, -.5);
 const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 7; controls.maxDistance = 24;
+controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 7; controls.maxDistance = innerWidth/innerHeight < .8 ? 32 : 24;
 controls.minPolarAngle = 0.35; controls.maxPolarAngle = 1.15; controls.target.set(0,0.8,0);
 
 /* ---------- 材質與小工具 ---------- */
@@ -268,7 +271,7 @@ WINS.forEach(c => { const geo = new THREE.BufferGeometry(); const v = new Float3
 const dustN = 260, dustGeo = new THREE.BufferGeometry(), dp = new Float32Array(dustN*3);
 for(let i=0;i<dustN;i++){ dp[i*3] = (Math.random()-.5)*14; dp[i*3+1] = Math.random()*2.6; dp[i*3+2] = BZ + Math.random()*4.5; }
 dustGeo.setAttribute("position", new THREE.BufferAttribute(dp,3));
-const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({color:"#fff2d0", size:.035, transparent:true, opacity:.7, depthWrite:false, blending:THREE.AdditiveBlending})); scene.add(dust);
+const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({color:"#fff2d0", size:.035, transparent:true, opacity:.7, depthWrite:false, blending:THREE.AdditiveBlending})); dust.visible = !CALM; scene.add(dust);
 
 /* ---------- 角色 ---------- */
 const blobTex = canvasTex(128,128,(g) => { const gr = g.createRadialGradient(64,64,4,64,64,62); gr.addColorStop(0,"rgba(0,0,0,.45)"); gr.addColorStop(1,"rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0,0,128,128); });
@@ -451,7 +454,7 @@ async function talk(k){
   for(const l of s.lines) await say(k, l);
   if(s.quiz){ await quiz(k, s.quiz); for(const l of s.after) await say(k, l); }
   showEcg(false);
-  if(s.walk){ const c = CHARS[s.walk.k]; c.mesh.userData.path = s.walk.path.map(([x,z]) => new THREE.Vector3(x,0,z)); c.mesh.userData.endFace = s.walk.face; OBST[c.ob] = [99,99,99,99]; }
+  if(s.walk){ const c = CHARS[s.walk.k]; c.mesh.userData.path = s.walk.path.map(([x,z]) => new THREE.Vector3(x,0,z)); c.mesh.userData.endFace = s.walk.face; OBST[c.ob] = [99,99,99,99]; TAGS[s.walk.k].innerHTML = c.n + "<small style=\"display:block;font-weight:500;opacity:.85\">走回護理站中…</small>"; }
   dlg.hidden = true; stepI++; setGoal(); busy = false;
   if(s.end){ dlg.hidden = false; dlg.innerHTML = `<div class="who"><span class="av" style="background:#2c6e5c">✓</span><span><b>試玩完成</b><small>臨床題 ${score.right}／${score.total}</small></span></div><div class="txt">謝謝你值完這個 3D 夜班。完整兩年、24 個月的訓練、40 位以上的角色和 100 多道附文獻的臨床題都在主遊戲裡。</div><div class="row"><button type="button" id="again">再走一圈</button><button type="button" onclick="location.href='../'">回主遊戲</button></div>`; document.getElementById("again").onclick = () => { dlg.hidden = true; }; }
 }
@@ -509,7 +512,7 @@ function animChar(c, dt){ const u = c.userData; u.t += dt; const w = u.walking;
 const rt = new THREE.WebGLRenderTarget(innerWidth, innerHeight, {samples: MOBILE ? 2 : 4, type: THREE.HalfFloatType});
 const composer = new EffectComposer(renderer, rt);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .5, .5, .97); composer.addPass(bloom);
+if(!CALM){ const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .5, .5, .97); composer.addPass(bloom); }
 composer.addPass(new OutputPass());
 addEventListener("resize", () => { camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); });
 
@@ -518,8 +521,8 @@ const clock3 = new THREE.Clock(); let acc = 0, started = false;
 function loop(){
   const dt = Math.min(clock3.getDelta(), .05); acc += dt;
   if(started) stepMove(dt);
-  animChar(me, dt); Object.values(CHARS).forEach(c => { const u = c.mesh.userData; if(u.path && u.path.length){ const tgt = u.path[0], d = new THREE.Vector3(tgt.x - c.mesh.position.x, 0, tgt.z - c.mesh.position.z), L = d.length(); if(L < .05){ u.path.shift(); if(!u.path.length){ u.walking = false; u.faceY = u.endFace; const p = c.mesh.position; OBST[c.ob] = [p.x-.275, p.z-.275, p.x+.275, p.z+.275]; } } else { d.setLength(Math.min(L, 2.2*dt)); c.mesh.position.add(d); u.walking = true; u.faceY = Math.atan2(d.x, d.z); } } animChar(c.mesh, dt); });
-  if(!window.__close) controls.target.lerp(new THREE.Vector3(me.position.x*.7, .8, me.position.z*.7), Math.min(1, dt*2.5)); controls.update();
+  animChar(me, dt); Object.values(CHARS).forEach(c => { const u = c.mesh.userData; if(u.path && u.path.length){ const tgt = u.path[0], d = new THREE.Vector3(tgt.x - c.mesh.position.x, 0, tgt.z - c.mesh.position.z), L = d.length(); if(L < .05){ u.path.shift(); if(!u.path.length){ u.walking = false; u.faceY = u.endFace; const p = c.mesh.position; OBST[c.ob] = [p.x-.275, p.z-.275, p.x+.275, p.z+.275]; setGoal(); } } else { d.setLength(Math.min(L, 2.2*dt)); c.mesh.position.add(d); u.walking = true; u.faceY = Math.atan2(d.x, d.z); } } animChar(c.mesh, dt); });
+  if(!window.__close) controls.target.lerp(PORTRAIT ? new THREE.Vector3(me.position.x*.55, .6, me.position.z*.25 - .8) : new THREE.Vector3(me.position.x*.7, .8, me.position.z*.7), Math.min(1, dt*2.5)); controls.update();
   if(acc > .06){ drawMonitors(acc); acc = 0; if(Math.abs(dawnGoal - dawnT) > .004){ dawnT += Math.sign(dawnGoal - dawnT)*.006; setDawn(dawnT); } }
   const p = dust.geometry.attributes.position; for(let i=0;i<dustN;i++){ p.array[i*3+1] += Math.sin(clock3.elapsedTime*.4 + i)*.0008 + .0006; if(p.array[i*3+1] > 2.7) p.array[i*3+1] = 0; } p.needsUpdate = true;
   if(ring.material.opacity > 0){ ring.material.opacity -= dt*1.2; ring.scale.multiplyScalar(1 + dt*1.5); }
@@ -527,6 +530,7 @@ function loop(){
   requestAnimationFrame(loop);
 }
 drawClock(); setInterval(drawClock, 1000); drawMonitors(0); loop();
+{ const g = document.getElementById("go"); g.disabled = false; g.textContent = "▶ 開始值班"; }
 document.getElementById("go").onclick = () => { document.getElementById("start").classList.add("out"); started = true; setGoal(); bgm.play().then(() => { muteBtn.textContent = "♪ 音樂開"; }).catch(()=>{}); };
 window.__pgy3d = {closeup(){ const xs = {me:-1.2, kui:-.4, zhang:.4, rn:1.2}; Object.entries(xs).forEach(([k,x]) => { const m = k === 'me' ? me : CHARS[k].mesh; m.position.set(x+1,0,2.2); m.rotation.y = 0; m.userData.faceY = 0; }); controls.target.set(1,1,2.2); camera.position.set(1,1.5,5.4); controls.minDistance = 1; controls.update(); started = false; window.__close = 1; }, talk, CHARS, me, STORY, setDawn, get step(){ return stepI; }};
 </script>
