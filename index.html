@@ -231,7 +231,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 
 <div class="app">
   <header class="top">
-    <h1>呆丸 PGY 物語</h1><span class="ver">v6.7</span>
+    <h1>呆丸 PGY 物語</h1><span class="ver">v6.8</span>
     <nav class="links" aria-label="讀書網站">
       <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
@@ -2092,11 +2092,88 @@ const FURN9 = {
 };
 function txt9(c, s, x, y, col, px, al){ c.fillStyle = col; c.font = `bold ${px||9}px sans-serif`; c.textAlign = al || "left"; c.fillText(s, x, y); c.textAlign = "left"; }
 function wheel9(c, x, y, rr){ c.fillStyle = "#2d3438"; c.beginPath(); c.arc(x, y, rr, 0, 7); c.fill(); c.fillStyle = "#8d989e"; c.beginPath(); c.arc(x, y, rr*.4, 0, 7); c.fill(); }
+if(!CanvasRenderingContext2D.prototype.roundRect) CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h){ this.rect(x,y,w,h); };
+/* v6.8 場景質感：地板材質、牆面扶手、窗光、病床與隔簾（polish10） */
+function hash10(x, y){ return ((x*73856093) ^ (y*19349663)) >>> 0; }
+function tile10(c, x, y, X, Y, a, b){
+  const h = hash10(x, y), th = W.theme, R = (xx,yy,ww,hh,col) => { c.fillStyle = col; c.fillRect(X+xx, Y+yy, ww, hh); };
+  if(th==="or"){ R(0,0,TW,TW,a); if(h%5===0) R(h%20,(h>>3)%20,10,6,"rgba(255,255,255,.07)"); if(h%7===0) R((h>>2)%24,(h>>5)%24,2,2,"rgba(0,0,0,.05)"); return; }
+  if(th==="ob"){ /* 木紋地板 */ a = "#ecdcc4"; b = "#e6d3b6"; for(let j=0;j<4;j++){ const s = hash10(x*3+j, y*5+j); R(0,j*8,TW,8, s%3===0 ? b : a); R(0,j*8+7,TW,1,"rgba(110,70,50,.07)"); if((s+x)%3===0) R((s>>4)%28,j*8,1,7,"rgba(110,70,50,.08)"); R((s>>6)%20,j*8+3,10,1,"rgba(255,255,255,.12)"); } return; }
+  if(th==="office"){ a = "#cdd3d9"; b = "#c6cdd4"; R(0,0,TW,TW,(x+y)%2 ? a : b); c.fillStyle = "rgba(0,0,0,.045)"; for(let i=2;i<TW;i+=4) (x+y)%2 ? c.fillRect(X+i,Y+1,1,TW-2) : c.fillRect(X+1,Y+i,TW-2,1); R(0,0,TW,1,"rgba(0,0,0,.06)"); R(0,0,1,TW,"rgba(0,0,0,.06)"); return; }
+  if(th==="lobby"){ const big = ((x>>1)+(y>>1))%2; R(0,0,TW,TW, big ? a : b); if(x%2===0) R(0,0,1,TW,"rgba(0,0,0,.08)"); if(y%2===0) R(0,0,TW,1,"rgba(0,0,0,.08)");
+    R(2,2,TW-4,1,"rgba(255,255,255,.22)"); if(h%6===0) R(6+h%12,8+(h>>4)%12,6,1,"rgba(255,255,255,.3)"); return; }
+  /* 病房、急診、兒科：PVC 地磚，有細縫、斑點與光澤 */
+  let base = (x+y)%2 ? a : b;
+  if(th==="peds" && h%11===0) base = ["#f6d0c4","#cfe6f2","#d9eccb","#f8e7b0"][h%4];
+  R(0,0,TW,TW,base);
+  R(0,0,TW,1,"rgba(255,255,255,.35)"); R(0,0,1,TW,"rgba(255,255,255,.35)"); R(0,TW-1,TW,1,"rgba(0,0,0,.07)"); R(TW-1,0,1,TW,"rgba(0,0,0,.07)");
+  for(let i=0;i<4;i++){ const s = hash10(x*7+i, y*11+i); R(2+s%27, 2+(s>>5)%27, 1, 1, i%2 ? "rgba(0,0,0,.08)" : "rgba(255,255,255,.4)"); }
+  if(th==="er" && h%9===0) R(4+h%14, 10+(h>>4)%12, 12, 2, "rgba(60,60,60,.06)");
+  R(3,3,10,2,"rgba(255,255,255,.12)");
+}
+function wall10(c){
+  if(W.theme==="village" || W.theme==="party") return;
+  const N = COLS*TW, night = isNight(), care = /ward|er|peds|ob/.test(W.theme);
+  /* 牆板接縫與上緣燈槽 */
+  c.fillStyle = "rgba(0,0,0,.05)"; for(let x=TW*2; x<N; x+=TW*2) c.fillRect(x, 0, 1, TW-6);
+  c.fillStyle = night ? "rgba(255,220,160,.10)" : "rgba(255,255,255,.22)"; c.fillRect(0, 0, N, 2);
+  /* 走廊扶手（醫院牆面標準配備） */
+  if(care){ c.fillStyle = "rgba(0,0,0,.15)"; c.fillRect(0, 23, N, 3); c.fillStyle = W.theme==="peds" ? "#e8a34a" : W.theme==="ob" ? "#c98fa3" : "#b48a5e"; c.fillRect(0, 21, N, 3); c.fillStyle = "rgba(255,255,255,.35)"; c.fillRect(0, 21, N, 1);
+    c.fillStyle = "#8a969c"; for(let x=TW; x<N; x+=TW*3) c.fillRect(x, 24, 3, 2); }
+  /* 牆腳陰影（AO） */
+  const g = c.createLinearGradient(0, TW, 0, TW+12); g.addColorStop(0, "rgba(0,0,0,.16)"); g.addColorStop(1, "rgba(0,0,0,0)"); c.fillStyle = g; c.fillRect(0, TW, N, 12);
+  /* 窗光灑在地上 */
+  if(!night){ const used = new Set(); W.items.forEach(f => { if(f.y===0) for(let i=0;i<(f.w||1);i++) used.add(f.x+i); });
+    [1,13].forEach(wx => { if(used.has(wx)) return; const x0 = wx*TW+3, x1 = x0+TW-6, s = wx===1 ? 1 : -1;
+      const lg = c.createLinearGradient(0, TW, 0, TW*4); lg.addColorStop(0, "rgba(255,250,215,.20)"); lg.addColorStop(1, "rgba(255,250,215,0)");
+      c.fillStyle = lg; c.beginPath(); c.moveTo(x0, TW); c.lineTo(x1, TW); c.lineTo(x1+s*TW*1.2, TW*4); c.lineTo(x0+s*TW*1.2, TW*4); c.fill(); }); }
+}
+function bed10(c, f){
+  const X = f.x*TW, Y = f.y*TW, t = W.t, k = f.k, R = (x,y,w,h,col) => { c.fillStyle = col; c.fillRect(X+x, Y+y, w, h); };
+  const rr = (x,y,w,h,rad,col) => { c.fillStyle = col; c.beginPath(); c.roundRect(X+x, Y+y, w, h, rad); c.fill(); };
+  const blanket = k==="cot" ? "#f2c463" : k==="resus" ? "#7fa7c9" : "#8fb9a8", dark = k==="cot" ? "#d9a842" : k==="resus" ? "#5f89ad" : "#6f9c8a";
+  c.fillStyle = "rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(X+32, Y+60, 30, 4, 0, 0, 7); c.fill();
+  R(4,57,3,4,"#555"); R(57,57,3,4,"#555");
+  rr(1,3,62,55,5, k==="cot" ? "#f1d8a8" : "#c9d3da"); rr(1,3,62,55,5,"rgba(255,255,255,.0)");
+  rr(2,1,60,7,3, k==="cot" ? "#e0a868" : k==="resus" ? "#5c6f7c" : "#7d93a3"); R(4,2,56,1,"rgba(255,255,255,.35)");
+  rr(5,8,54,46,4,"#fbfcfc");
+  rr(9,10,28,13,5,"#ffffff"); R(10,19,26,3,"#e3e8ec"); R(12,12,8,2,"rgba(255,255,255,.9)");
+  /* 病人 */
+  c.fillStyle = "#eac29c"; c.beginPath(); c.ellipse(X+23, Y+17, 6, 5.5, 0, 0, 7); c.fill();
+  c.fillStyle = ["#5b4a3f","#2f2a28","#9a9a9a","#6b4a2a"][(f.x+f.y)%4]; c.beginPath(); c.ellipse(X+23, Y+13.5, 6.5, 3.5, 0, Math.PI, 0); c.fill(); c.fillRect(X+16.5, Y+13, 2, 4);
+  c.fillStyle = "#6b4a3a"; c.fillRect(X+20, Y+18, 2, .9); c.fillRect(X+25, Y+18, 2, .9);
+  /* 被子 */
+  rr(5,24,54,30,4,blanket); R(5,24,54,6,"rgba(255,255,255,.55)"); R(5,29,54,1,"rgba(0,0,0,.08)");
+  c.fillStyle = "rgba(255,255,255,.18)"; c.beginPath(); c.ellipse(X+30, Y+40, 16, 7, 0, 0, 7); c.fill();
+  c.strokeStyle = dark; c.lineWidth = 1; c.beginPath(); c.moveTo(X+12, Y+36); c.quadraticCurveTo(X+20, Y+39, X+26, Y+46); c.moveTo(X+42, Y+34); c.quadraticCurveTo(X+48, Y+40, X+52, Y+48); c.stroke();
+  if(k==="cot"){ c.fillStyle = "rgba(255,255,255,.6)"; for(let i=0;i<8;i++){ c.beginPath(); c.arc(X+10+(i%4)*13, Y+36+Math.floor(i/4)*9, 1.6, 0, 7); c.fill(); } }
+  /* 床欄 */
+  if(k==="cot"){ c.fillStyle = "#d9a24f"; R(0,8,4,48,"rgba(217,162,79,.25)"); R(60,8,4,48,"rgba(217,162,79,.25)"); for(let i=0;i<8;i++){ R(1,10+i*6,2,3,"#d9a24f"); R(61,10+i*6,2,3,"#d9a24f"); } R(0,8,4,2,"#d9a24f"); R(60,8,4,2,"#d9a24f"); R(0,54,4,2,"#d9a24f"); R(60,54,4,2,"#d9a24f"); }
+  else { R(0,12,3,22,"#aab7bf"); R(61,12,3,22,"#aab7bf"); R(0,12,3,1,"#fff"); R(61,12,3,1,"#fff"); R(0,22,3,1,"#8a969c"); R(61,22,3,1,"#8a969c"); }
+  rr(2,53,60,6,2, k==="cot" ? "#e0a868" : k==="resus" ? "#5c6f7c" : "#7d93a3");
+  if(k!=="resus"){ R(26,50,11,9,"#d6b58a"); R(27,52,9,6,"#fff"); R(28,53,7,1,"#bbb"); R(28,55,5,1,"#bbb"); R(30,50,3,2,"#888"); }
+  if(k==="bed"){ R(58,-14,2,40,"#9aa6ad"); R(53,-16,12,3,"#9aa6ad"); R(53,-13,7,11,"rgba(190,225,245,.85)"); R(54,-6,5,4,"rgba(140,190,225,.9)");
+    const dp = (t*1.3 + f.x) % 1; c.fillStyle = "rgba(120,170,210,.9)"; c.fillRect(X+56, Y-2+dp*8, 1.5, 2);
+    c.strokeStyle = "rgba(160,200,220,.9)"; c.beginPath(); c.moveTo(X+56, Y+6); c.quadraticCurveTo(X+48, Y+22, X+40, Y+30); c.stroke(); }
+  if(k==="resus"){ R(52,0,10,10,"#222"); c.strokeStyle = "#4ef08a"; c.beginPath(); for(let i=0;i<9;i++){ const yy = (i===4? -3 : i===5 ? 3 : 0); c.lineTo(X+52+i, Y+5+yy); } c.stroke();
+    c.strokeStyle = "rgba(240,90,90,.8)"; c.beginPath(); c.moveTo(X+52, Y+9); c.quadraticCurveTo(X+40, Y+26, X+30, Y+30); c.stroke(); }
+  else { const z = Math.sin(t*2)*2; c.fillStyle = "#6b7c86"; c.font = "bold 11px sans-serif"; c.fillText("z", X+34, Y+8+z); }
+}
+function curtain10(c, f){
+  const X = f.x*TW, Y = f.y*TW, sway = Math.sin(W.t*1.2+f.x)*1.2, H = TW*1.6;
+  c.fillStyle = "#9aa6ad"; c.fillRect(X-2, Y-3, 8, 2);
+  const col = W.theme==="peds" ? ["#f5c7a9","#f9dcc6"] : W.theme==="ob" ? ["#e7b3c3","#f2cfda"] : ["#9cc9d6","#c3e0e8"];
+  for(let i=0;i<4;i++){ c.fillStyle = col[i%2]; c.beginPath(); c.moveTo(X+i*1.5, Y); c.lineTo(X+i*1.5+1.5, Y); c.lineTo(X+i*1.5+1.5+sway, Y+H); c.lineTo(X+i*1.5+sway, Y+H); c.fill(); }
+  c.fillStyle = "rgba(0,0,0,.10)"; c.fillRect(X+sway, Y+H-2, 6, 2);
+  c.fillStyle = "#9aa6ad"; for(let i=0;i<3;i++) c.fillRect(X+i*2, Y-1, 1, 2);
+}
 function drawItem9(c, f){
   const X = f.x*TW, Y = f.y*TW, w = (f.w||1)*TW, h = (f.h||1)*TW, t = W.t, blink = Math.floor(t*2)%2;
   const r = (x,y,ww,hh,col) => { c.fillStyle = col; c.fillRect(X+x, Y+y, ww, hh); };
   const shadow = (x,y,ww) => { c.fillStyle = "rgba(0,0,0,.14)"; c.beginPath(); c.ellipse(X+x+ww/2, Y+y, ww/2, 3, 0, 0, 7); c.fill(); };
   switch(f.k){
+  case "bed": case "cot": case "resus": bed10(c, f); return true;
+  case "curtain": curtain10(c, f); return true;
   /* 地面標示 */
   case "fline": { const o = f.o || 14; r(0,o,w,3,f.col); for(let i=0;i<w;i+=14) r(i+8,o,4,3,"rgba(255,255,255,.3)"); if(f.t) txt9(c,f.t,X+6,Y+o-3,f.col,8); return true; }
   case "zone": c.strokeStyle = "rgba(205,60,60,.5)"; c.setLineDash([6,4]); c.lineWidth = 2; c.strokeRect(X+2, Y+2, w-4, h-4); c.setLineDash([]); c.lineWidth = 1;
@@ -2510,6 +2587,7 @@ function drawFloor(c){
   const [a,b] = FLOOR[W.theme], V2 = W.theme==="village";
   for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
     const X = x*TW, Y = y*TW;
+    if(!V2 && W.theme!=="party"){ tile10(c, x, y, X, Y, a, b); continue; }
     c.fillStyle = (x+y)%2 ? a : b; c.fillRect(X, Y, TW, TW);
     if(V2){ const h = (x*7+y*13)%5; c.fillStyle="rgba(40,100,30,.35)"; if(h<3){ c.fillRect(X+6+h*5, Y+10+h*3, 2, 4); c.fillRect(X+8+h*5, Y+9+h*3, 2, 5); } if(h===4){ c.fillStyle="#f6e27a"; c.fillRect(X+20,Y+20,3,3); } continue; }
     c.fillStyle = "rgba(255,255,255,.28)"; c.fillRect(X, Y, TW, 1); c.fillRect(X, Y, 1, TW);
@@ -2523,6 +2601,7 @@ function drawFloor(c){
   g.addColorStop(0, wall); g.addColorStop(1, "rgba(0,0,0,.08)");
   c.fillStyle = wall; c.fillRect(0,0,COLS*TW,TW); c.fillStyle = g; c.fillRect(0,0,COLS*TW,TW);
   c.fillStyle = "rgba(0,0,0,.18)"; c.fillRect(0,TW-5,COLS*TW,5); c.fillStyle = "rgba(255,255,255,.25)"; c.fillRect(0,TW-6,COLS*TW,1);
+  wall10(c);
   const used = new Set(); W.items.forEach(f => { if(f.y===0) for(let i=0;i<(f.w||1);i++) used.add(f.x+i); });
   const night = isNight();
   [1,13].forEach(wx => { if(used.has(wx)) return;
