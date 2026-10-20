@@ -198,6 +198,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 .cert p span{display:inline-block;white-space:nowrap;margin:0 5px}
 @media (max-width:520px){.cert{padding-bottom:84px}.cert .seal{right:50%;margin-right:-31px;bottom:12px}}
 .cert small{font-size:11px;color:#7a6a4a}
+.cert2{margin:8px auto;max-width:560px}.cert2 img{width:100%;display:block;border-radius:4px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
 #certdlg{position:fixed;inset:0;z-index:90;background:rgba(10,20,16,.72);display:grid;place-items:center;padding:16px;animation:spIn .25s ease both}
 #certdlg .box{background:var(--surface);border-radius:16px;padding:16px;display:grid;gap:12px;max-width:min(480px,100%);box-shadow:0 20px 60px rgba(0,0,0,.4)}
 #certdlg img{width:100%;max-height:68vh;object-fit:contain;border-radius:8px;display:block}
@@ -231,7 +232,7 @@ th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertic
 
 <div class="app">
   <header class="top">
-    <h1>呆丸 PGY 物語</h1><span class="ver">v6.8</span>
+    <h1>呆丸 PGY 物語</h1><span class="ver">v6.9</span>
     <nav class="links" aria-label="讀書網站">
       <a href="https://pocket.drtsengshihting.com/" target="_blank" rel="noopener">2026 內科小手冊 ↗</a>
       <a href="https://guideline.drtsengshihting.com/" target="_blank" rel="noopener">內科指引索引 ↗</a>
@@ -1281,48 +1282,118 @@ function lifeStrip(from){
   const cells = []; STAGES.forEach(s => { for(let k=0;k<s.m;k++) cells.push(colOf(s.dept)); });
   return `<div class="strip" aria-label="人生地圖 ${S.month}/24">${cells.map((c,i) => i < S.month ? `<div class="${i>=from?"new":""}" style="background:${c};${i>=from?`animation-delay:${(i-from)*.12+.2}s`:""}"></div>` : "<div></div>").join("")}</div>`;
 }
-/* 結局的結訓證書（遊戲紀念，非正式文件） */
-function certHtml(){
-  const h = (HOSP.find(x => x.id === S.hosp) || {}).n || "呆丸綜合醫院";
-  const pct = S.total ? Math.round(S.right/S.total*100) : 0;
-  return `<div class="cert" role="img" aria-label="結訓證書"><span class="ct">結訓證書</span><span class="cn">${esc(S.name)} 醫師</span>
-   <p><span>完成「二年期醫師畢業後</span><span>一般醫學訓練」24 個月</span><br><span>訓練醫院：${esc(h)}</span><br><span>臨床題答對率 ${pct}%</span><span>知識卡 ${Object.keys(S.cards).length} 張</span><span>成就 ${Object.keys(S.ach||{}).length}／${ACH.length}</span><br><span>下一站：${esc(S.spec)}</span></p>
-   <small>呆丸 PGY 物語 · 遊戲紀念，非正式文件</small><span class="seal">PGY<br>結訓</span></div>`;
-}
-/* 結訓證書圖：1080×1350（社群直式），含玩家像素小人 */
-async function certImage(){
-  try{ await document.fonts.ready; }catch(e){}
-  const W = 1080, H = 1350, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+/* 結訓證書（v6.9）：A4 直式正式文件版，含 2 吋證件照（與玩家選的人物相同）、鋼印、院長與教學部用印 */
+function zhNum(n){ const D = "〇一二三四五六七八九"; if(n >= 100) return String(n).split("").map(d => D[+d]).join(""); if(n <= 10) return n===10 ? "十" : D[n]; return (n>=20 ? D[Math.floor(n/10)] : "") + "十" + (n%10 ? D[n%10] : ""); }
+function certCanvas(){
+  const W = 1240, H = 1754, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   const c = cv.getContext("2d");
   const serif = '"Noto Serif TC","Songti TC","PMingLiU",serif', sans = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
-  const txt = (t, y, size, font, col, weight="700", maxW=860) => { let s = size; do { c.font = `${weight} ${s}px ${font}`; s -= 2; } while(c.measureText(t).width > maxW && s > 18); c.fillStyle = col; c.textAlign = "center"; c.fillText(t, W/2, y); };
-  const g = c.createLinearGradient(0,0,W,H); g.addColorStop(0,"#fffaf0"); g.addColorStop(1,"#f3e6c8"); c.fillStyle = g; c.fillRect(0,0,W,H);
-  c.strokeStyle = "#b08a3e"; c.lineWidth = 10; c.strokeRect(40,40,W-80,H-80); c.lineWidth = 3; c.strokeRect(62,62,W-124,H-124);
-  [[62,62],[W-62,62],[62,H-62],[W-62,H-62]].forEach(([x,y]) => { c.fillStyle = "#b08a3e"; c.beginPath(); c.arc(x,y,12,0,7); c.fill(); });
-  txt("呆丸 PGY 物語", 150, 32, sans, "#8a7240", "500");
-  txt("結 訓 證 書", 250, 96, serif, "#3a2e1a", "900");
-  c.fillStyle = "#2c6e5c"; c.beginPath(); c.arc(W/2, 440, 120, 0, 7); c.fill();
-  c.fillStyle = "rgba(255,255,255,.12)"; c.beginPath(); c.arc(W/2, 440, 104, 0, 7); c.fill();
-  try{ drawChar(c, W/2 - 80, 335, "me", "down", 0, 10); }catch(e){}
-  txt(`${S.name} 醫師`, 650, 76, serif, "#3a2e1a", "900");
-  c.fillStyle = "#b08a3e"; c.fillRect(W/2-220, 678, 440, 3);
-  const h = (HOSP.find(x => x.id === S.hosp) || {}).n || "呆丸綜合醫院";
-  txt("完成「二年期醫師畢業後一般醫學訓練」24 個月", 750, 36, sans, "#4a3c22", "500");
-  txt(`訓練醫院：${h}`, 805, 34, sans, "#4a3c22", "500");
-  txt(`下一站：${S.spec || ""}`, 860, 40, serif, "#2c6e5c", "800");
+  const INK = "#2a2418", GOLD = "#a8843a", GREEN = "#2c5e4f", RED = "#b8322a";
+  const fit = (t, size, font, weight, maxW) => { let s = size; do { c.font = `${weight} ${s}px ${font}`; s -= 2; } while(c.measureText(t).width > maxW && s > 16); };
+  const txt = (t, x, y, size, font, col, weight="700", al="center", maxW=1000) => { fit(t, size, font, weight, maxW); c.fillStyle = col; c.textAlign = al; c.fillText(t, x, y); c.textAlign = "left"; };
+  const spaced = (t, x, y, size, font, col, weight, gap) => { c.font = `${weight} ${size}px ${font}`; const chars = [...t], w = chars.reduce((a,ch) => a + c.measureText(ch).width, 0) + gap*(chars.length-1); let cx = x - w/2; c.fillStyle = col; c.textAlign = "left"; chars.forEach(ch => { c.fillText(ch, cx, y); cx += c.measureText(ch).width + gap; }); };
+  const hosp = (HOSP.find(x => x.id === S.hosp) || {}).n || "呆丸綜合醫院";
+  const hMain = hosp.split("・")[0], hSub = hosp.split("・")[1] || "";
+  const d = new Date(), roc = d.getFullYear() - 1911, mon = d.getMonth() + 1;
+  const st = new Date(d.getFullYear(), d.getMonth() - 23, 1), sRoc = st.getFullYear() - 1911, sMon = st.getMonth() + 1;
+  let hsh = 0; for(const ch of (S.name || "") + hosp) hsh = (hsh*31 + ch.charCodeAt(0)) % 99991;
+  const serial = String(hsh % 9000 + 1000).padStart(6, "0");
+  /* 紙張：米白底、細纖維紋 */
+  const g = c.createLinearGradient(0,0,W,H); g.addColorStop(0,"#fdfaf1"); g.addColorStop(.5,"#faf4e4"); g.addColorStop(1,"#f3e9d0"); c.fillStyle = g; c.fillRect(0,0,W,H);
+  for(let i=0;i<2600;i++){ const x = (i*7919)%W, y = (i*104729)%H; c.fillStyle = i%3 ? "rgba(150,120,60,.035)" : "rgba(255,255,255,.5)"; c.fillRect(x, y, 2+(i%5), 1); }
+  /* 防偽花紋邊框（guilloche） */
+  const band = (inset, amp, freq, col, lw, ph) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath();
+    const x0 = inset, y0 = inset, x1 = W-inset, y1 = H-inset, P = 2*((x1-x0)+(y1-y0));
+    for(let s=0; s<=P; s+=3){ let x, y, nx, ny;
+      if(s < x1-x0){ x = x0+s; y = y0; nx = 0; ny = 1; }
+      else if(s < (x1-x0)+(y1-y0)){ x = x1; y = y0+(s-(x1-x0)); nx = -1; ny = 0; }
+      else if(s < 2*(x1-x0)+(y1-y0)){ x = x1-(s-(x1-x0)-(y1-y0)); y = y1; nx = 0; ny = -1; }
+      else { x = x0; y = y1-(s-2*(x1-x0)-(y1-y0)); nx = 1; ny = 0; }
+      const o = amp*(1+Math.sin(s/freq+ph))/2; s===0 ? c.moveTo(x+nx*o, y+ny*o) : c.lineTo(x+nx*o, y+ny*o); }
+    c.closePath(); c.stroke(); };
+  c.fillStyle = GREEN; c.fillRect(34,34,W-68,H-68); c.fillStyle = "#fbf7ea"; c.fillRect(44,44,W-88,H-88);
+  for(let k=0;k<6;k++) band(58, 26, 9+k*.6, k%2 ? "rgba(44,94,79,.55)" : "rgba(168,132,58,.65)", 1.2, k*1.05);
+  c.strokeStyle = GOLD; c.lineWidth = 3; c.strokeRect(96,96,W-192,H-192); c.lineWidth = 1; c.strokeRect(104,104,W-208,H-208);
+  [[96,96],[W-96,96],[96,H-96],[W-96,H-96]].forEach(([x,y]) => { c.save(); c.translate(x,y); c.rotate(Math.PI/4); c.fillStyle = GOLD; c.fillRect(-11,-11,22,22); c.fillStyle = "#fbf7ea"; c.fillRect(-5,-5,10,10); c.restore(); });
+  /* 醫學標誌：阿斯克勒庇俄斯之杖 */
+  const emblem = (cx, cy, R, col, alpha) => { c.save(); c.globalAlpha = alpha; c.strokeStyle = col; c.fillStyle = col;
+    c.lineWidth = R*.05; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.stroke(); c.lineWidth = R*.02; c.beginPath(); c.arc(cx, cy, R*.88, 0, 7); c.stroke();
+    c.lineCap = "round"; c.lineWidth = R*.09; c.beginPath(); c.moveTo(cx, cy-R*.62); c.lineTo(cx, cy+R*.66); c.stroke();
+    c.lineWidth = R*.075; c.beginPath(); for(let i=0;i<=60;i++){ const tt = i/60, y = cy+R*.55 - tt*R*1.05, x = cx + Math.sin(tt*Math.PI*3.2)*R*.22*(1-tt*.25); i ? c.lineTo(x,y) : c.moveTo(x,y); } c.stroke();
+    c.beginPath(); c.ellipse(cx + Math.sin(Math.PI*3.2)*R*.17, cy-R*.52, R*.09, R*.06, -.4, 0, 7); c.fill();
+    const ring = "PGY · GENERAL MEDICINE TRAINING · "; c.font = `700 ${R*.13}px ${sans}`; c.textAlign = "center";
+    [...ring].forEach((ch,i) => { const a = -Math.PI/2 + (i/ring.length)*Math.PI*2; c.save(); c.translate(cx+Math.cos(a)*R*.75, cy+Math.sin(a)*R*.75); c.rotate(a+Math.PI/2); c.fillText(ch,0,R*.045); c.restore(); });
+    c.textAlign = "left"; c.lineCap = "butt"; c.restore(); };
+  emblem(W/2, H/2+90, 330, GREEN, .045);
+  emblem(W/2, 214, 64, GREEN, .9);
+  /* 抬頭 */
+  spaced(hMain, W/2, 336, 50, serif, INK, "900", 14);
+  if(hSub) spaced(hSub, W/2, 386, 28, serif, "#5a4c32", "700", 10);
+  spaced("結訓證書", W/2, 520, 112, serif, INK, "900", 46);
+  c.fillStyle = GOLD; c.fillRect(W/2-300, 560, 600, 2); c.fillRect(W/2-240, 568, 480, 1);
+  txt(`（${roc}）${hMain.replace(/綜合醫院|醫院/,"")}教字第 ${serial} 號`, W-150, 620, 26, serif, "#5a4c32", "500", "right");
+  /* 2 吋證件照（35×45 mm 比例），人物與玩家選的一樣 */
+  const PW = 252, PH = 324, PX = W-150-PW, PY = 660;
+  c.fillStyle = "rgba(0,0,0,.12)"; c.fillRect(PX+6, PY+8, PW, PH);
+  c.fillStyle = "#fff"; c.fillRect(PX-8, PY-8, PW+16, PH+16);
+  c.save(); c.beginPath(); c.rect(PX, PY, PW, PH); c.clip();
+  const bg = c.createLinearGradient(0, PY, 0, PY+PH); bg.addColorStop(0, "#cfe3f3"); bg.addColorStop(1, "#a9c8e2"); c.fillStyle = bg; c.fillRect(PX, PY, PW, PH);
+  try{ drawChar(c, PX + PW/2 - 8*22, PY + 40, "me", "down", 0, 22); }catch(e){}
+  c.restore();
+  c.strokeStyle = "#cfc4a8"; c.lineWidth = 1; c.strokeRect(PX-8, PY-8, PW+16, PH+16);
+  /* 鋼印：壓在照片右下角 */
+  { const ex = PX+PW-6, ey = PY+PH-10, R = 78; c.save();
+    c.beginPath(); c.arc(ex, ey, R, 0, 7); c.fillStyle = "rgba(255,255,255,.10)"; c.fill();
+    c.lineWidth = 3; c.strokeStyle = "rgba(255,255,255,.55)"; c.beginPath(); c.arc(ex-1.5, ey-1.5, R, 0, 7); c.stroke(); c.beginPath(); c.arc(ex-1.5, ey-1.5, R*.72, 0, 7); c.stroke();
+    c.strokeStyle = "rgba(60,50,30,.28)"; c.beginPath(); c.arc(ex+1.5, ey+1.5, R, 0, 7); c.stroke(); c.beginPath(); c.arc(ex+1.5, ey+1.5, R*.72, 0, 7); c.stroke();
+    const ring = `${hMain}・教學部・`; c.font = `800 20px ${serif}`; c.textAlign = "center";
+    [...ring].forEach((ch,i) => { const a = -Math.PI/2 + (i/ring.length)*Math.PI*2, x = ex+Math.cos(a)*R*.86, y = ey+Math.sin(a)*R*.86;
+      c.save(); c.translate(x, y); c.rotate(a+Math.PI/2); c.fillStyle = "rgba(255,255,255,.6)"; c.fillText(ch, -1, 6); c.fillStyle = "rgba(60,50,30,.28)"; c.fillText(ch, 1, 8); c.restore(); });
+    c.font = `900 30px ${serif}`; c.fillStyle = "rgba(255,255,255,.6)"; c.fillText("結訓", ex-1, ey+9); c.fillStyle = "rgba(60,50,30,.3)"; c.fillText("結訓", ex+1, ey+11); c.textAlign = "left"; c.restore(); }
+  /* 欄位 */
+  const gender = {m:"男", f:"女"}[S.gender];
+  const rows = [["姓　　名", `${S.name}`], ...(gender ? [["性　　別", gender]] : []), ["訓練醫院", hosp], ["訓練期間", `民國 ${sRoc} 年 ${sMon} 月 至 ${roc} 年 ${mon} 月`], ["訓練月數", "二十四個月"]];
+  rows.forEach(([k,v],i) => { const y = 712 + i*62;
+    txt(k, 150, y, 30, serif, "#5a4c32", "700", "left");
+    txt(v, 320, y, k==="姓　　名" ? 44 : 30, serif, INK, k==="姓　　名" ? "900" : "700", "left", PX-360);
+    c.fillStyle = "rgba(168,132,58,.45)"; c.fillRect(320, y+14, PX-370, 1); });
+  /* 本文 */
+  const body = ["茲證明上列醫師於本院完成", "「二年期醫師畢業後一般醫學訓練」", "計二十四個月，經評核合格，特發此證。"];
+  body.forEach((l,i) => txt(l, W/2, 1090 + i*62, 38, serif, INK, "700", "center", W-320));
+  /* 訓練紀錄表 */
   const pct = S.total ? Math.round(S.right/S.total*100) : 0;
-  [["答對率", pct + "%"], ["知識卡", Object.keys(S.cards).length + " 張"], ["成就", `${Object.keys(S.ach||{}).length}／${ACH.length}`]].forEach(([k,v],i) => {
-    const x = 170 + i*260, y = 920;
-    c.fillStyle = "rgba(255,255,255,.75)"; c.strokeStyle = "#d8c08a"; c.lineWidth = 2;
-    c.beginPath(); c.roundRect ? c.roundRect(x, y, 220, 130, 18) : c.rect(x, y, 220, 130); c.fill(); c.stroke();
-    c.textAlign = "center"; c.fillStyle = "#8a7240"; c.font = `500 26px ${sans}`; c.fillText(k, x+110, y+46);
-    c.fillStyle = "#3a2e1a"; c.font = `800 44px ${serif}`; c.fillText(v, x+110, y+104);
-  });
-  const d = new Date(); txt(`結訓日 ${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`, 1130, 28, sans, "#7a6a4a", "500");
-  c.save(); c.translate(W-200, H-196); c.rotate(-.24); c.strokeStyle = "#b8322a"; c.lineWidth = 6; c.globalAlpha = .85;
-  c.beginPath(); c.arc(0,0,78,0,7); c.stroke(); c.beginPath(); c.arc(0,0,66,0,7); c.lineWidth = 2; c.stroke();
-  c.fillStyle = "#b8322a"; c.textAlign = "center"; c.font = `900 34px ${sans}`; c.fillText("PGY", 0, -6); c.fillText("結訓", 0, 36); c.restore();
-  txt("tsn4830-ui.github.io/pgy-rpg · 遊戲紀念，非正式文件", 1240, 24, sans, "#8a7a5a", "500");
+  const cells = [["臨床題答對率", pct + "%"], ["知識卡", Object.keys(S.cards).length + " 張"], ["成就", `${Object.keys(S.ach||{}).length}／${ACH.length}`], ["申請專科", S.spec || "—"]];
+  const TX = 150, TY = 1250, TW2 = W-300, cw = TW2/4;
+  c.fillStyle = "rgba(44,94,79,.08)"; c.fillRect(TX, TY, TW2, 44); c.strokeStyle = "rgba(90,76,50,.55)"; c.lineWidth = 1.5; c.strokeRect(TX, TY, TW2, 112); c.beginPath(); c.moveTo(TX, TY+44); c.lineTo(TX+TW2, TY+44); c.stroke();
+  cells.forEach(([k,v],i) => { if(i){ c.beginPath(); c.moveTo(TX+cw*i, TY); c.lineTo(TX+cw*i, TY+112); c.stroke(); }
+    txt(k, TX+cw*i+cw/2, TY+31, 22, sans, "#5a4c32", "600", "center", cw-16); txt(v, TX+cw*i+cw/2, TY+94, 34, serif, INK, "800", "center", cw-20); });
+  /* 署名與用印 */
+  const seal = (cx, cy, size, chars, rot) => { c.save(); c.translate(cx, cy); c.rotate(rot); c.globalAlpha = .88;
+    c.strokeStyle = RED; c.lineWidth = size*.06; c.strokeRect(-size/2, -size/2, size, size); c.lineWidth = size*.02; c.strokeRect(-size/2+size*.08, -size/2+size*.08, size*.84, size*.84);
+    c.fillStyle = RED; c.font = `900 ${size*.34}px ${serif}`; c.textAlign = "center";
+    const n = chars.length, cols = 2, rowsN = Math.ceil(n/cols);
+    chars.forEach((ch,i) => { const col = cols-1-Math.floor(i/rowsN), row = i%rowsN; c.fillText(ch, -size/4 + col*size/2, -size/2 + size*.12 + (row+.78)*(size*.76/rowsN)); });
+    c.globalAlpha = 1; c.fillStyle = "rgba(253,250,241,.55)"; for(let i=0;i<40;i++){ const a = (i*2.39)%6.28, rr = (i*37)%(size*.5); c.fillRect(Math.cos(a)*rr, Math.sin(a)*rr, 2+(i%3), 1.5); }
+    c.restore(); };
+  [["院　　長", W*0.3, [..."院長之印"]], ["教學部主任", W*0.7, [..."教學部章"]]].forEach(([role, x, chars],i) => {
+    txt(role, x-70, 1462, 30, serif, INK, "700", "center");
+    c.fillStyle = "rgba(90,76,50,.6)"; c.fillRect(x-10, 1470, 190, 1.5);
+    seal(x+86, 1442, i ? 92 : 118, chars, i ? .05 : -.04); });
+  /* 日期（中文數字，正式公文寫法） */
+  spaced(`中華民國　${zhNum(roc)}　年　${zhNum(mon)}　月　${zhNum(d.getDate())}　日`, W/2, 1568, 36, serif, INK, "800", 6);
+  txt("呆丸 PGY 物語 · 遊戲紀念，非正式文件 · tsn4830-ui.github.io/pgy-rpg", W/2, 1622, 20, sans, "#8a7a5a", "500");
+  return cv;
+}
+function certHtml(){
+  const h = (HOSP.find(x => x.id === S.hosp) || {}).n || "呆丸綜合醫院";
+  let src = ""; try{ src = certCanvas().toDataURL("image/jpeg", .9); }catch(e){}
+  try{ document.fonts.ready.then(() => { const im = document.querySelector(".cert2 img"); if(im) im.src = certCanvas().toDataURL("image/jpeg", .9); }); }catch(e){}
+  return `<figure class="cert2"><img src="${src}" alt="${esc(S.name)} 醫師的結訓證書：${esc(h)}，完成二年期醫師畢業後一般醫學訓練二十四個月，申請專科 ${esc(S.spec||"")}（遊戲紀念，非正式文件）"></figure>`;
+}
+/* 結訓證書圖：A4 直式 1240×1754（150 dpi），含證件照 */
+async function certImage(){
+  try{ await document.fonts.ready; }catch(e){}
+  const cv = certCanvas();
   const url = cv.toDataURL("image/png");
   const dlg = document.createElement("div"); dlg.id = "certdlg"; dlg.setAttribute("role","dialog"); dlg.setAttribute("aria-label","結訓證書圖片");
   dlg.innerHTML = `<div class="box"><img src="${url}" alt="${esc(S.name)} 醫師的結訓證書"><p class="meta" style="margin:0;text-align:center">手機也可以長按圖片儲存</p>
