@@ -2,7 +2,7 @@
 
 臺灣二年期畢業後一般醫學訓練（PGY）的角色扮演遊戲。在各科地圖走動、跟同事對話，回答附參考文獻的臨床題。
 
-- 線上玩：https://tsn4830-ui.github.io/pgy-rpg/
+- 線上玩：https://pgy.drtsengshihting.com/
 - 單一 HTML 檔。可以用 Google 帳號登入，進度存在 Firebase（每人只能讀寫自己的存檔，規則見 firestore.rules）；沒登入時存在瀏覽器。
 - 醫院與人物皆為虛構。醫學內容依所附參考文獻撰寫，僅供學習，臨床處置請以最新指引與院內規範為準。
 

@@ -107,6 +107,7 @@ for a,b2 in [x.split('|||') for fn in ('gender.txt','coffee.txt','polish.txt','p
     else: h=h.replace(a,b2)
 for a,_ in KT_NAMES: assert a not in d+e, a
 out=h+'\n<script>\n"use strict";\n'+d+'\n'+e+'</script>\n'
+out=out.replace('https://tsn4830-ui.github.io/pgy-rpg/','https://pgy.drtsengshihting.com/').replace('tsn4830-ui.github.io/pgy-rpg','pgy.drtsengshihting.com')
 open('/mnt/project-files/pgy-rpg/index.html','w',encoding='utf-8').write(out)
 open('test.html','w',encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+out+'</body></html>')
 assert 'drive.google' not in out
@@ -116,7 +117,7 @@ print('built',len(out))
 import json, os
 fb = json.load(open('fbconfig.json')) if os.path.exists('fbconfig.json') else None
 pub = out.replace('const FB_CONFIG = null;', 'const FB_CONFIG = '+json.dumps(fb)+';') if fb else out
-SITE='https://tsn4830-ui.github.io/pgy-rpg/'
+SITE='https://pgy.drtsengshihting.com/'
 DESC='台灣 PGY 醫師兩年訓練的像素角色扮演遊戲：值班、報告、錄音家屬、主任查房，每一道臨床題都附參考文獻。手機、電腦都能玩，免費。'
 HEAD=('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
  '<title>呆丸 PGY 物語｜台灣 PGY 醫師生存 RPG</title>'
