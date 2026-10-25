@@ -118,6 +118,11 @@ import json, os
 fb = json.load(open('fbconfig.json')) if os.path.exists('fbconfig.json') else None
 pub = out.replace('const FB_CONFIG = null;', 'const FB_CONFIG = '+json.dumps(fb)+';') if fb else out
 SITE='https://pgy.drtsengshihting.com/'
+# 4388 小遊戲收錄徽章（只放公開網站版）
+_L='·© 2026 呆丸 PGY 物語</p>'
+assert pub.count(_L)==1
+pub=pub.replace(_L,_L+'\n  <p class="legal badge4388"><a href="https://4388.fun/g/2672" target="_blank" rel="noopener"><img src="https://4388.fun/badge-zh.png" width="176" height="44" alt="已收錄於 4388 小遊戲" loading="lazy"></a></p>')
+
 DESC='台灣 PGY 醫師兩年訓練的像素角色扮演遊戲：值班、報告、錄音家屬、主任查房，每一道臨床題都附參考文獻。手機、電腦都能玩，免費。'
 HEAD=('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
  '<title>呆丸 PGY 物語｜台灣 PGY 醫師生存 RPG</title>'
